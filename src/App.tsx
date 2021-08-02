@@ -34,7 +34,7 @@ const App = () => {
       })
       .catch((error) => {
         if (error.response) {
-          dispatch({ type: 'logout' });
+          dispatch({ type: 'reset' });
         } else {
           toast.error(error.message);
         }

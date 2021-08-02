@@ -14,7 +14,8 @@ const initialState: UserStateType = {
   avatar: '',
 };
 
-type UserActionType = { type: 'login', info: UserStateType } | { type: 'logout' };
+type UserActionType = { type: 'login', info: UserStateType } | { type: 'logout' }
+                    | { type: 'reset' };
 
 const StateContext = createContext<UserStateType | undefined>(undefined);
 const DispatchContext = createContext<Dispatch<UserActionType> | undefined>(undefined);
@@ -24,6 +25,7 @@ function reducer(state: UserStateType, action: UserActionType): UserStateType {
     case 'login':
       return { ...action.info };
     case 'logout':
+    case 'reset':
     default:
       return { ...initialState };
   }
