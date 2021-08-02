@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Switch, Route } from 'react-router-dom';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import { useDispatch, useUserState } from './utils/hooks/useContext';
 import LoginPage from './components/pages/LoginPage/LoginPage';
@@ -34,7 +36,7 @@ const App = () => {
         if (error.response) {
           dispatch({ type: 'logout' });
         } else {
-          // TODO: toast?
+          toast.error(error.message);
         }
       });
   }, []);
@@ -48,7 +50,22 @@ const App = () => {
     <Route path="/" component={LoginPage} />
   );
 
-  return isLoading ? <LinearProgress /> : children;
+  return (
+    <>
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+      {isLoading ? <LinearProgress /> : children}
+    </>
+  );
 };
 
 export default App;
