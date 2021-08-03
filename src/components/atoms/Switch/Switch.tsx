@@ -1,13 +1,6 @@
 /* eslint-disable arrow-body-style */
 import React from 'react';
 import MaterialSwitch from '@material-ui/core/Switch';
-import { withStyles } from '@material-ui/core/styles';
-
-const StyledSwitch = withStyles({
-  root: {
-
-  },
-})(MaterialSwitch);
 
 type SwitchProps = {
   checked?: boolean,
@@ -20,7 +13,7 @@ const Switch = ({
   checked, onChange, name,
 }: SwitchProps) => {
   return (
-    <StyledSwitch
+    <MaterialSwitch
       checked={checked}
       onChange={onChange}
       name={name}
