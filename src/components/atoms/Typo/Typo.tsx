@@ -13,17 +13,19 @@ type TypoProps = {
   | 'subtitle1' | 'subtitle2' | 'body1' | 'body2'
   | 'caption' | 'button',
   display?: 'initial' | 'block' | 'inline',
+  align?: 'inherit' | 'center' | 'left' | 'right',
   gutterBottom?: boolean,
   children: React.ReactNode,
 };
 
 const Typo = ({
-  variant, display, gutterBottom, children,
+  variant, display, align, gutterBottom, children,
 // eslint-disable-next-line arrow-body-style
 }: TypoProps) => {
   return (
     <StyledTypo
       variant={variant}
+      align={align}
       display={display}
       gutterBottom={gutterBottom}
     >
@@ -35,6 +37,7 @@ const Typo = ({
 Typo.defaultProps = {
   variant: 'body1',
   display: 'initial',
+  align: 'inherit',
   gutterBottom: false,
 };
 
