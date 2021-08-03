@@ -9,16 +9,12 @@ export default {
 } as Meta;
 
 export const Default = () => {
-  const [bool, setBool] = useState(false);
-  const handleChange = () => {
-    if (bool === false) return setBool(true);
-    return setBool(false);
-  };
+  const [isChecked, setIsChecked] = useState(false);
   return (
     <>
       <Switch
-        checked={bool}
-        onChange={handleChange}
+        checked={isChecked}
+        onChange={() => { setIsChecked(!isChecked); }}
         name="2FAswitch"
       />
     </>

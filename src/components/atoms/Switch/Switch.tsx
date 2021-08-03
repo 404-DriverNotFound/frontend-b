@@ -9,31 +9,29 @@ const StyledSwitch = withStyles({
   },
 })(MaterialSwitch);
 
-export type SwitchProps = {
-  checked: boolean,
+type SwitchProps = {
+  checked?: boolean,
   // eslint-disable-next-line no-unused-vars
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void,
-  name: string,
-  color: 'default' | 'primary' | 'secondary',
+  name?: string,
 };
 
 const Switch = ({
-  checked, onChange, name, color,
+  checked, onChange, name,
 }: SwitchProps) => {
   return (
     <StyledSwitch
       checked={checked}
       onChange={onChange}
       name={name}
-      color={color}
+      color="primary"
     />
   );
 };
 
 Switch.defaultProps = {
   checked: false,
-  name: 'twoFactorSW',
-  color: 'primary',
+  name: '',
 };
 
 export default Switch;
