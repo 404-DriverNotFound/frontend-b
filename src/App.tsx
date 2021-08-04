@@ -20,8 +20,9 @@ const App = () => {
   useEffect(() => {
     setLoading(true);
     /**
-     * FIXME: CORS 때문인지 서버가 안 떠있어서 그런 건지 콘솔에 오류가 뜸
-     * 문제 원인 파악해서 해결하고 FIXME 지워줄 것
+     * FIXME: 서버가 403 주면 콘솔에 오류 뜸
+     * 서버에서 콘솔에 적는 거라 프론트에서 핸들링 불가
+     * 그러면 성공 응답을 받아야 하나?
     */
     axios.get(makeAPIPath('/users/me'))
       .finally(() => { setLoading(false); })
@@ -43,11 +44,15 @@ const App = () => {
 
   const children = state.id ? (
     // FIXME: Main Page 컴포넌트가 없어 임시로 적어 둠
+    // register page에서 세션 있는지, id 검증까지 하도록 해야 하나?
     <Switch>
       <Route exact path="/" render={() => <h1>main page</h1>} />
     </Switch>
   ) : (
-    <Route path="/" component={LoginPage} />
+    <Switch>
+      <Route exact path="/register" render={() => <h1>register page</h1>} />
+      <Route path="/" component={LoginPage} />
+    </Switch>
   );
 
   return (
