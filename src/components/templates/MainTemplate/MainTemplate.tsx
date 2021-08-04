@@ -3,7 +3,6 @@ import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 import { AppBar } from '@material-ui/core';
 
-// eslint-disable-next-line no-unused-vars
 const useStyles = makeStyles({
   root: {
     margin: '0 auto',
@@ -20,7 +19,6 @@ type MainTemplateProps = {
   chat: React.ReactElement,
 };
 
-// eslint-disable-next-line arrow-body-style
 const MainTemplate = ({ main, chat }: MainTemplateProps) => {
   const classes = useStyles();
 
