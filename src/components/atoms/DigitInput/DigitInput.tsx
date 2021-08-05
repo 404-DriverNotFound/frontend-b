@@ -6,26 +6,32 @@ const StyledDigitInput = withStyles({
   root: {
     width: 75,
     height: 120,
-    '& input::-webkit-inner-spin-button, & input::-webkit-outer-spin-button': {
-      '-webkit-appearance': 'none',
-    },
-    '& input': {
-      '-moz-appearance': 'textfield',
-    },
   },
 })(TextField);
 
+type DigitInputProps = {
+  onChange?: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> | undefined,
+  value?: string,
+};
+
 // eslint-disable-next-line arrow-body-style
-const DigitInput = () => {
+const DigitInput = ({ onChange, value }: DigitInputProps) => {
   return (
     <StyledDigitInput
       variant="outlined"
-      type="number"
+      type="text"
       inputProps={{
-        style: { textAlign: 'center', fontSize: 50 }, margin: 0,
+        style: { textAlign: 'center', fontSize: 50 }, margin: 0, maxLength: 1,
       }}
+      onChange={onChange}
+      value={value}
     />
   );
+};
+
+DigitInput.defaultProps = {
+  onChange: null,
+  value: '',
 };
 
 export default DigitInput;

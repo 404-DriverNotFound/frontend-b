@@ -1,5 +1,5 @@
 /* eslint-disable arrow-body-style */
-import React from 'react';
+import React, { useState } from 'react';
 import { Meta } from '@storybook/react';
 import DigitInput from './DigitInput';
 
@@ -8,4 +8,18 @@ export default {
   title: 'atoms/DigitInput',
 } as Meta;
 
-export const DigitInputStory = () => <DigitInput />;
+export const Default = () => {
+  const [value, setValue] = useState('');
+  const handleChange = (event: { target: { value: string; }; }) => {
+    const letter = /^[0-9\b]+$/;
+    if (event.target.value === '' || letter.test(event.target.value)) {
+      setValue(event.target.value);
+    }
+  };
+  return (
+    <DigitInput
+      onChange={handleChange}
+      value={value}
+    />
+  );
+};
