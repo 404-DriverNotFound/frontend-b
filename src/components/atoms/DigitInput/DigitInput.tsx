@@ -1,13 +1,15 @@
 import React from 'react';
-import TextField from '@material-ui/core/TextField';
+import Input from '@material-ui/core/Input';
 import { withStyles } from '@material-ui/core/styles';
 
 const StyledDigitInput = withStyles({
   root: {
-    width: 75,
-    height: 120,
+    width: 70,
+    height: 100,
+    border: '1px solid',
+    borderRadius: '5px',
   },
-})(TextField);
+})(Input);
 
 type DigitInputProps = {
   onChange?: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> | undefined,
@@ -18,19 +20,17 @@ type DigitInputProps = {
 const DigitInput = ({ onChange, value }: DigitInputProps) => {
   return (
     <StyledDigitInput
-      variant="outlined"
       type="text"
-      inputProps={{
-        style: { textAlign: 'center', fontSize: 50 }, margin: 0, maxLength: 1,
-      }}
+      inputProps={{ style: { textAlign: 'center', fontSize: 40 }, maxLength: 1 }}
       onChange={onChange}
       value={value}
+      disableUnderline
     />
   );
 };
 
 DigitInput.defaultProps = {
-  onChange: null,
+  onChange: undefined,
   value: '',
 };
 

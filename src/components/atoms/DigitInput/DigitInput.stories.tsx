@@ -11,15 +11,8 @@ export default {
 export const Default = () => {
   const [value, setValue] = useState('');
   const handleChange = (event: { target: { value: string; }; }) => {
-    const letter = /^[0-9\b]+$/;
-    if (event.target.value === '' || letter.test(event.target.value)) {
-      setValue(event.target.value);
-    }
+    const letter = /^[0-9]$/;
+    if (event.target.value === '' || letter.test(event.target.value)) setValue(event.target.value);
   };
-  return (
-    <DigitInput
-      onChange={handleChange}
-      value={value}
-    />
-  );
+  return (<DigitInput onChange={handleChange} value={value} />);
 };
