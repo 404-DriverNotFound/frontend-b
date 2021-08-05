@@ -40,6 +40,7 @@ const App = () => {
   const classes = useStyles();
 
   useEffect(() => {
+    axios.defaults.withCredentials = true;
     appDispatch({ type: 'loading' });
     /**
      * FIXME: 서버가 403 주면 콘솔에 오류 뜸
