@@ -1,6 +1,9 @@
 import React from 'react';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { Meta } from '@storybook/react';
 import RegisterPage from './RegisterPage';
+import { ContextProvider } from '../../../utils/hooks/useContext';
 
 export default {
   component: RegisterPage,
@@ -8,5 +11,18 @@ export default {
 } as Meta;
 
 export const Register = () => (
-  <RegisterPage />
+  <ContextProvider>
+    <ToastContainer
+      position="top-center"
+      autoClose={5000}
+      hideProgressBar={false}
+      newestOnTop={false}
+      closeOnClick
+      rtl={false}
+      pauseOnFocusLoss
+      draggable
+      pauseOnHover
+    />
+    <RegisterPage />
+  </ContextProvider>
 );
