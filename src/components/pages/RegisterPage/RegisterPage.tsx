@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { useState } from 'react';
+import axios from 'axios';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 import MaterialButton from '@material-ui/core/Button';
@@ -7,6 +8,7 @@ import Input from '../../atoms/Input/Input';
 import Typo from '../../atoms/Typo/Typo';
 import Switch from '../../atoms/Switch/Switch';
 import Button from '../../atoms/Button/Button';
+import makeAPIPath from '../../../utils/utils';
 
 const useStyles = makeStyles({
   root: {
@@ -45,8 +47,14 @@ const RegisterPage = () => {
   };
 
   const handleNameCheck = () => {
-    // TODO: 이름 중복 체크 (HEAD /users/name/{name})
-    setNameChecked(true);
+    axios.head(makeAPIPath(`/users/name/${name}`))
+      .then(() => {
+        // TODO: error 띄워주기
+        setNameValid(false);
+      })
+      .catch((error) => {
+        if (error.response) setNameChecked(true);
+      });
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {

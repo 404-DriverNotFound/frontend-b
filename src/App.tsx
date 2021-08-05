@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, useHistory } from 'react-router-dom';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -14,6 +14,7 @@ const App = () => {
    * 해결되면 지우거나 좀 더 괜찮은 모양새로 고칠 것
    */
   const [isLoading, setLoading] = useState<boolean>(false);
+  const history = useHistory();
   const state = useUserState();
   const dispatch = useDispatch();
 
@@ -24,14 +25,24 @@ const App = () => {
      * 서버에서 콘솔에 적는 거라 프론트에서 핸들링 불가
      * 그러면 성공 응답을 받아야 하나?
     */
-    axios.get(makeAPIPath('/users/me'))
+    axios.get(makeAPIPath('/session'))
       .finally(() => { setLoading(false); })
-      .then((response) => {
-        const { id, name, avatar } = response.data;
-        dispatch({
-          type: 'login',
-          info: { id, name, avatar },
-        });
+      .then(() => {
+        axios.get(makeAPIPath('/users/me'))
+          .then((response) => {
+            const { id, name, avatar } = response.data;
+            dispatch({
+              type: 'login',
+              info: { id, name, avatar },
+            });
+          })
+          .catch((error) => {
+            if (error.response) {
+              history.push('/register');
+            } else {
+              toast.error(error.message);
+            }
+          });
       })
       .catch((error) => {
         if (error.response) {
