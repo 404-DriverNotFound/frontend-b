@@ -1,12 +1,12 @@
 import React from 'react';
-import axios from 'axios';
-import { toast } from 'react-toastify';
-import { NavLink, Link, useHistory } from 'react-router-dom';
+// import axios from 'axios';
+// import { toast } from 'react-toastify';
+import { NavLink, Link } from 'react-router-dom';
 import AppBar from '@material-ui/core/AppBar';
 import { makeStyles, Toolbar } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
 import Typo from '../../atoms/Typo/Typo';
-import { useAppDispatch, useUserDispatch } from '../../../utils/hooks/useContext';
+// import { useAppDispatch, useUserDispatch } from '../../../utils/hooks/useContext';
 import makeAPIPath from '../../../utils/utils';
 
 const useStyles = makeStyles({
@@ -16,9 +16,9 @@ const useStyles = makeStyles({
 });
 
 const Menu = () => {
-  const history = useHistory();
-  const appDispatch = useAppDispatch();
-  const userDispatch = useUserDispatch();
+  // const history = useHistory();
+  // const appDispatch = useAppDispatch();
+  // const userDispatch = useUserDispatch();
   const classes = useStyles();
 
   const Choices = ['Game', 'DM', 'Channel', 'Community', 'Profile'];
@@ -36,24 +36,27 @@ const Menu = () => {
     </Grid>
   ));
 
-  const handleLogout = () => {
-    appDispatch({ type: 'loading' });
-    axios.get(makeAPIPath('/auth/logout'))
-      .finally(() => {
-        appDispatch({ type: 'endLoading' });
-      })
-      .then(() => {
-        userDispatch({ type: 'logout' });
-        history.push('/');
-      })
-      .catch((error) => {
-        toast.error(error.message);
-      });
-  };
+  // const handleLogout = () => {
+  //   appDispatch({ type: 'loading' });
+  //   axios.get(makeAPIPath('/auth/logout'))
+  //     .finally(() => {
+  //       appDispatch({ type: 'endLoading' });
+  //     })
+  //     .then(() => {
+  //       userDispatch({ type: 'logout' });
+  //       history.push('/');
+  //     })
+  //     .catch((error) => {
+  //       toast.error(error.message);
+  //     });
+  // };
 
   const menu = RenderChoices.concat(
-    <Grid item key="Logout" onClick={handleLogout}>
-      <Typo className={classes.cursor} variant="h6">Logout</Typo>
+    // <Grid item key="Logout" onClick={handleLogout}>
+    //   <Typo className={classes.cursor} variant="h6">Logout</Typo>
+    // </Grid>,
+    <Grid item key="Logout">
+      <a href={makeAPIPath('/auth/logout')}><Typo className={classes.cursor} variant="h6">Logout</Typo></a>
     </Grid>,
   );
 
@@ -75,4 +78,4 @@ const Menu = () => {
   );
 };
 
-export default Menu;
+Menu();
