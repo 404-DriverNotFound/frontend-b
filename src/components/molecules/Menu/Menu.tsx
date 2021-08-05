@@ -1,10 +1,8 @@
-/* eslint-disable implicit-arrow-linebreak */
-/* eslint-disable no-unused-vars */
 import React from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import { Toolbar } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import Typo from '../../atoms/Typo/Typo';
 
 const Menu = () => {
@@ -27,9 +25,11 @@ const Menu = () => {
     <AppBar>
       <Toolbar>
         <Grid container>
-          <Typo variant="h5">
-            🏓 Pong Mighty
-          </Typo>
+          <Link to="/game" style={{ textDecoration: 'none', color: 'inherit' }}>
+            <Typo variant="h5">
+              🏓 Pong Mighty
+            </Typo>
+          </Link>
         </Grid>
         <Grid container spacing={3} justifyContent="flex-end">
           {RenderChoices}
