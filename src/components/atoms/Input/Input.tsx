@@ -25,18 +25,27 @@ const Input = ({
   onChange, value, error, type, label, helperText, defaultValue, disabled,
 // eslint-disable-next-line arrow-body-style
 }: InputProps) => {
-  return (
+  return (defaultValue ? (
+    <StyledInput
+      onChange={onChange}
+      defaultValue={defaultValue}
+      type={type}
+      label={label}
+      helperText={helperText}
+      error={error}
+      disabled={disabled}
+    />
+  ) : (
     <StyledInput
       onChange={onChange}
       value={value}
       type={type}
       label={label}
       helperText={helperText}
-      defaultValue={defaultValue}
       error={error}
       disabled={disabled}
     />
-  );
+  ));
 };
 
 Input.defaultProps = {
