@@ -1,37 +1,60 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Switch, Route, useHistory } from 'react-router-dom';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import LinearProgress from '@material-ui/core/LinearProgress';
-import { useDispatch, useUserState } from './utils/hooks/useContext';
+import { makeStyles } from '@material-ui/core/styles';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import {
+  useAppDispatch, useAppState, useUserDispatch, useUserState,
+} from './utils/hooks/useContext';
 import LoginPage from './components/pages/LoginPage/LoginPage';
 import makeAPIPath from './utils/utils';
+import RegisterPage from './components/pages/RegisterPage/RegisterPage';
+import MainTemplate from './components/templates/MainTemplate/MainTemplate';
+
+const useStyles = makeStyles({
+  progress: {
+    position: 'fixed',
+    top: 'calc(40vh)',
+    left: 'calc(50vw - 50px)',
+    width: '100%',
+  },
+  block: {
+    position: 'fixed',
+    top: '0',
+    left: '0',
+    zIndex: 1200,
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+  },
+});
 
 const App = () => {
-  /**
-   * FIXME: 아직 API 연동이 안 되어있어서 임시로 progress bar 넣어 둠
-   * 해결되면 지우거나 좀 더 괜찮은 모양새로 고칠 것
-   */
-  const [isLoading, setLoading] = useState<boolean>(false);
   const history = useHistory();
-  const state = useUserState();
-  const dispatch = useDispatch();
+  const appState = useAppState();
+  const appDispatch = useAppDispatch();
+  const userState = useUserState();
+  const userDispatch = useUserDispatch();
+  const classes = useStyles();
 
   useEffect(() => {
-    setLoading(true);
+    appDispatch({ type: 'loading' });
     /**
      * FIXME: 서버가 403 주면 콘솔에 오류 뜸
      * 서버에서 콘솔에 적는 거라 프론트에서 핸들링 불가
      * 그러면 성공 응답을 받아야 하나?
     */
     axios.get(makeAPIPath('/session'))
-      .finally(() => { setLoading(false); })
+      .finally(() => {
+        appDispatch({ type: 'endLoading' });
+      })
       .then(() => {
         axios.get(makeAPIPath('/users/me'))
           .then((response) => {
             const { id, name, avatar } = response.data;
-            dispatch({
+            userDispatch({
               type: 'login',
               info: { id, name, avatar },
             });
@@ -46,28 +69,38 @@ const App = () => {
       })
       .catch((error) => {
         if (error.response) {
-          dispatch({ type: 'reset' });
+          userDispatch({ type: 'reset' });
         } else {
           toast.error(error.message);
         }
       });
   }, []);
 
-  const children = state.id ? (
+  const children = userState.id ? (
     // FIXME: Main Page 컴포넌트가 없어 임시로 적어 둠
     // register page에서 세션 있는지, id 검증까지 하도록 해야 하나?
     <Switch>
-      <Route exact path="/" render={() => <h1>main page</h1>} />
+      <Route exact path="/" render={() => <MainTemplate main={<h1>asd</h1>} chat={<h1>asd</h1>} />} />
     </Switch>
   ) : (
     <Switch>
-      <Route exact path="/register" render={() => <h1>register page</h1>} />
+      <Route exact path="/register" component={RegisterPage} />
       <Route path="/" component={LoginPage} />
     </Switch>
   );
 
   return (
     <>
+      {appState.isLoading
+        && (
+        <div className={classes.block}>
+          <CircularProgress
+            size={100}
+            className={classes.progress}
+            aria-busy={appState.isLoading}
+          />
+        </div>
+        )}
       <ToastContainer
         position="top-center"
         autoClose={5000}
@@ -79,7 +112,7 @@ const App = () => {
         draggable
         pauseOnHover
       />
-      {isLoading ? <LinearProgress /> : children}
+      {children}
     </>
   );
 };
