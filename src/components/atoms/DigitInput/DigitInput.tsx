@@ -12,7 +12,7 @@ const StyledDigitInput = withStyles({
 })(Input);
 
 type DigitInputProps = {
-  onChange: React.ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement> | undefined,
+  onChange: React.ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement>,
   value?: string,
 };
 
