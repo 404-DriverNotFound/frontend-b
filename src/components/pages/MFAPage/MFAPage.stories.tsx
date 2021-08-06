@@ -1,6 +1,8 @@
 import React from 'react';
 import { Meta } from '@storybook/react';
+import { ToastContainer } from 'react-toastify';
 import MFAPage from './MFAPage';
+import { ContextProvider } from '../../../utils/hooks/useContext';
 
 export default {
   component: MFAPage,
@@ -8,5 +10,18 @@ export default {
 } as Meta;
 
 export const Login = () => (
-  <MFAPage />
+  <ContextProvider>
+    <ToastContainer
+      position="top-center"
+      autoClose={5000}
+      hideProgressBar={false}
+      newestOnTop={false}
+      closeOnClick
+      rtl={false}
+      pauseOnFocusLoss
+      draggable
+      pauseOnHover
+    />
+    <MFAPage />
+  </ContextProvider>
 );
