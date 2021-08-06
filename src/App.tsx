@@ -43,9 +43,9 @@ const App = () => {
     axios.defaults.withCredentials = true;
     appDispatch({ type: 'loading' });
     /**
-     * FIXME: 서버가 403 주면 콘솔에 오류 뜸
-     * 서버에서 콘솔에 적는 거라 프론트에서 핸들링 불가
-     * 그러면 성공 응답을 받아야 하나?
+     * NOTE 서버가 실패 응답(예: 403)을 주면 콘솔에 오류가 뜹니다.
+     * 서버에서 콘솔에 적도록 하는 것이라 프론트에서 핸들링이 불가한데,
+     * 이 부분은 서브젝트 요구사항과 안 맞는 듯해서 추후 고민해봐야 할 것 같습니다.
     */
     axios.get(makeAPIPath('/session'))
       .finally(() => {
@@ -62,6 +62,10 @@ const App = () => {
           })
           .catch((error) => {
             if (error.response) {
+              /** FIXME: 로그아웃+2FA 활성 상태에서는 /users/me 응답이 403입니다.
+               * 이때문에 로그인 하려는 상황에서도 register로 이동하는 문제가 발생하는데,
+               * 2FA 페이지 구현할 때 새로운 API를 이용하여 고치면 될 것 같습니다.
+               */
               history.push('/register');
             } else {
               toast.error(error.message);
@@ -78,8 +82,10 @@ const App = () => {
   }, []);
 
   const children = userState.id ? (
-    // FIXME: Main Page 컴포넌트가 없어 임시로 적어 둠
-    // register page에서 세션 있는지, id 검증까지 하도록 해야 하나?
+    /**
+     * FIXME: Main Page 컴포넌트가 없어 임시로 적어 두었습니다.
+     * 컴포넌트 구현 후 교체해야 합니다.
+     */
     <Switch>
       <Route exact path="/" render={() => <MainTemplate main={<h1>asd</h1>} chat={<h1>asd</h1>} />} />
     </Switch>
