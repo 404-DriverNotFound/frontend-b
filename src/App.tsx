@@ -12,6 +12,7 @@ import LoginPage from './components/pages/LoginPage/LoginPage';
 import makeAPIPath from './utils/utils';
 import RegisterPage from './components/pages/RegisterPage/RegisterPage';
 import MainTemplate from './components/templates/MainTemplate/MainTemplate';
+import MFAPage from './components/pages/MFAPage/MFAPage';
 
 const useStyles = makeStyles({
   progress: {
@@ -92,6 +93,7 @@ const App = () => {
   ) : (
     <Switch>
       <Route exact path="/register" component={RegisterPage} />
+      <Route exact path="/register/2FA" component={MFAPage} />
       <Route path="/" component={LoginPage} />
     </Switch>
   );
