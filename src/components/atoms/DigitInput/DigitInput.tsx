@@ -6,31 +6,27 @@ const StyledDigitInput = withStyles({
   root: {
     width: 70,
     height: 100,
-    border: '1px solid',
+    border: '1px solid gray',
     borderRadius: '5px',
   },
 })(Input);
 
 type DigitInputProps = {
-  onChange?: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> | undefined,
+  onChange: React.ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement> | undefined,
   value?: string,
 };
 
-// eslint-disable-next-line arrow-body-style
-const DigitInput = ({ onChange, value }: DigitInputProps) => {
-  return (
-    <StyledDigitInput
-      type="text"
-      inputProps={{ style: { textAlign: 'center', fontSize: 40 }, maxLength: 1 }}
-      onChange={onChange}
-      value={value}
-      disableUnderline
-    />
-  );
-};
+const DigitInput = ({ onChange, value }: DigitInputProps) => (
+  <StyledDigitInput
+    type="text"
+    inputProps={{ style: { textAlign: 'center', fontSize: 40 }, maxLength: 1 }}
+    onChange={onChange}
+    value={value}
+    disableUnderline
+  />
+);
 
 DigitInput.defaultProps = {
-  onChange: undefined,
   value: '',
 };
 

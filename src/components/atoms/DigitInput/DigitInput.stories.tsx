@@ -1,4 +1,3 @@
-/* eslint-disable arrow-body-style */
 import React, { useState } from 'react';
 import { Meta } from '@storybook/react';
 import DigitInput from './DigitInput';
@@ -10,7 +9,7 @@ export default {
 
 export const Default = () => {
   const [value, setValue] = useState('');
-  const handleChange = (event: { target: { value: string; }; }) => {
+  const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     const letter = /^[0-9]$/;
     if (event.target.value === '' || letter.test(event.target.value)) setValue(event.target.value);
   };
