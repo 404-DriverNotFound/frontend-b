@@ -7,7 +7,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 type DialogProps = {
   title?: React.ReactNode,
   content: React.ReactNode,
-  buttons?: React.ReactNode,
+  buttons: React.ReactNode,
   isOpen: boolean,
   // eslint-disable-next-line no-unused-vars
   handleClose: (event: {}, reason: 'backdropClick' | 'escapeKeyDown') => void,
@@ -26,14 +26,13 @@ const Dialog = ({
     >
       {title && <DialogTitle>{title}</DialogTitle>}
       <DialogContent>{content}</DialogContent>
-      {buttons && <DialogActions>{buttons}</DialogActions>}
+      <DialogActions>{buttons}</DialogActions>
     </MaterialDialog>
   );
 };
 
 Dialog.defaultProps = {
   title: null,
-  buttons: null,
 };
 
 export default Dialog;
