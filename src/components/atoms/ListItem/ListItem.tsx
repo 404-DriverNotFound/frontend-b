@@ -1,20 +1,26 @@
 import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
-// import Grid from '@material-ui/core/Grid';
+import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 
-const StyledCard = withStyles({
-  root: {
-    width: '90vw',
-    height: '50px',
-  },
-})(Card);
+const useStyles = makeStyles((theme: Theme) =>
+  // eslint-disable-next-line implicit-arrow-linebreak
+  createStyles({
+    root: {
+      padding: theme.spacing(1, 1, 1, 1),
+    },
+  }));
 
 type ListItemProps = {
   children?: React.ReactNode,
 };
 
-const ListItem = ({ children }: ListItemProps) => (<StyledCard>{children}</StyledCard>);
+const ListItem = ({ children }: ListItemProps) => {
+  const classes = useStyles();
+
+  return (
+    <Card className={classes.root}>{children}</Card>
+  );
+};
 
 ListItem.defaultProps = {
   children: null,
