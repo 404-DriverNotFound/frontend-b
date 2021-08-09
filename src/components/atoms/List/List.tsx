@@ -29,6 +29,7 @@ const useStyles = makeStyles({
       backgroundColor: 'transparent',
       overflow: 'hidden',
     },
+    scrollbarColor: 'lightgray transparent',
   },
   empty: {
     color: 'gray',
