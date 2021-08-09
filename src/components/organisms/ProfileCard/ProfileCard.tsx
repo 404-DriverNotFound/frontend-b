@@ -81,7 +81,7 @@ const ProfileCard = ({
   return (
     <Grid className={classes.root} item container justifyContent="space-around" alignItems="center">
       <UserProfile userInfo={userInfo} />
-      <Grid item container justifyContent="center" alignItems="center" xs={7}>
+      <Grid item container justifyContent="flex-end" alignItems="center" xs={7}>
         {Buttons}
       </Grid>
     </Grid>
