@@ -1,4 +1,5 @@
 import React from 'react';
+import { BrowserRouter } from 'react-router-dom';
 import { Meta } from '@storybook/react';
 import { ToastContainer } from 'react-toastify';
 import MFARegisterPage from './MFARegisterPage';
@@ -10,18 +11,20 @@ export default {
 } as Meta;
 
 export const Login = () => (
-  <ContextProvider>
-    <ToastContainer
-      position="top-center"
-      autoClose={5000}
-      hideProgressBar={false}
-      newestOnTop={false}
-      closeOnClick
-      rtl={false}
-      pauseOnFocusLoss
-      draggable
-      pauseOnHover
-    />
-    <MFARegisterPage />
-  </ContextProvider>
+  <BrowserRouter>
+    <ContextProvider>
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+      <MFARegisterPage />
+    </ContextProvider>
+  </BrowserRouter>
 );

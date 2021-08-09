@@ -1,3 +1,4 @@
+import { makeStyles } from '@material-ui/core/styles';
 import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
@@ -6,7 +7,17 @@ import { useAppDispatch, useUserDispatch } from '../../../utils/hooks/useContext
 import makeAPIPath from '../../../utils/utils';
 import Button from '../../atoms/Button/Button';
 import DigitInput from '../../atoms/DigitInput/DigitInput';
+import Typo from '../../atoms/Typo/Typo';
 import LoginTemplate from '../../templates/LoginTemplate/LoginTemplate';
+
+const useStyles = makeStyles({
+  inputs: {
+    margin: '1em',
+  },
+  typo: {
+    color: 'gray',
+  },
+});
 
 type digitString = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '';
 
@@ -25,6 +36,7 @@ const MFAPage = () => {
   const userDispatch = useUserDispatch();
   const history = useHistory();
   const prevInputs = usePrevious(inputs);
+  const classes = useStyles();
 
   useEffect(() => {
     let idx = 0;
@@ -78,7 +90,12 @@ const MFAPage = () => {
 
   return (
     <LoginTemplate
-      input={Inputs}
+      input={(
+        <>
+          <Typo className={classes.typo}>인증 번호를 정상 입력하였는데도 로그인할 수 없는 경우 담당자에게 문의해주세요.</Typo>
+          <main className={classes.inputs}>{Inputs}</main>
+        </>
+      )}
       button={<Button onClick={handleClick}>2FA 인증</Button>}
     />
   );
