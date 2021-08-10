@@ -22,17 +22,11 @@ export const FriendList = () => (
         <Avatar alt="Jikang" />
       </Grid>
       <Grid item container direction="column" xs={8} justifyContent="center" alignItems="flex-start">
-        <Typo variant="subtitle1">
-          Jikang
-        </Typo>
-        <Typo variant="caption">
-          메시지 차단
-        </Typo>
+        <Typo variant="subtitle1">Jikang</Typo>
+        <Typo variant="caption">메시지 차단</Typo>
       </Grid>
       <Grid item container xs={2} justifyContent="flex-start" alignItems="center">
-        <Button>
-          차단
-        </Button>
+        <Button>차단</Button>
       </Grid>
     </Grid>
   </ListItem>

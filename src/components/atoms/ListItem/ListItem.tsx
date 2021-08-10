@@ -10,13 +10,10 @@ const useStyles = makeStyles({
   },
 });
 
-type ListItemProps = {
-  children: React.ReactNode,
-};
+type ListItemProps = { children: React.ReactNode };
 
 const ListItem = ({ children }: ListItemProps) => {
   const classes = useStyles();
-
   return (
     <Grid item>
       <Card className={classes.root}>{children}</Card>
