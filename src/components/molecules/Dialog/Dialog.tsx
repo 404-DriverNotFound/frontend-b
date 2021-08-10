@@ -10,15 +10,15 @@ type DialogProps = {
   buttons: React.ReactNode,
   isOpen: boolean,
   // eslint-disable-next-line no-unused-vars
-  handleClose: (event: {}, reason: 'backdropClick' | 'escapeKeyDown') => void,
+  onClose: (event: {}, reason: 'backdropClick' | 'escapeKeyDown') => void,
 };
 
 const Dialog = ({
-  title, content, buttons, isOpen, handleClose,
+  title, content, buttons, isOpen, onClose,
 }: DialogProps) => (
   <MaterialDialog
     open={isOpen}
-    onClose={handleClose}
+    onClose={onClose}
     aria-labelledby="alert-dialog-title"
     aria-describedby="alert-dialog-description"
   >
