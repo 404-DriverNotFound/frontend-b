@@ -10,7 +10,11 @@ export default {
   title: 'atoms/List',
 } as Meta;
 
-const StyledCard = withStyles({ root: { height: '50px' } })(Card);
+const StyledCard = withStyles({
+  root: {
+    height: '50px',
+  },
+})(Card);
 
 export const EmptyList = () => <List />;
 
