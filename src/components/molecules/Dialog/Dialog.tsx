@@ -15,21 +15,18 @@ type DialogProps = {
 
 const Dialog = ({
   title, content, buttons, isOpen, handleClose,
-  // eslint-disable-next-line arrow-body-style
-}: DialogProps) => {
-  return (
-    <MaterialDialog
-      open={isOpen}
-      onClose={handleClose}
-      aria-labelledby="alert-dialog-title"
-      aria-describedby="alert-dialog-description"
-    >
-      {title && <DialogTitle>{title}</DialogTitle>}
-      <DialogContent>{content}</DialogContent>
-      <DialogActions>{buttons}</DialogActions>
-    </MaterialDialog>
-  );
-};
+}: DialogProps) => (
+  <MaterialDialog
+    open={isOpen}
+    onClose={handleClose}
+    aria-labelledby="alert-dialog-title"
+    aria-describedby="alert-dialog-description"
+  >
+    {title && <DialogTitle>{title}</DialogTitle>}
+    <DialogContent>{content}</DialogContent>
+    <DialogActions>{buttons}</DialogActions>
+  </MaterialDialog>
+);
 
 Dialog.defaultProps = {
   title: null,
