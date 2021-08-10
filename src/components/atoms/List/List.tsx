@@ -31,7 +31,9 @@ const useStyles = makeStyles({
     },
     scrollbarColor: 'lightgray transparent',
   },
-  empty: { color: 'gray' },
+  empty: {
+    color: 'gray',
+  },
 });
 
 type ListProps = {
