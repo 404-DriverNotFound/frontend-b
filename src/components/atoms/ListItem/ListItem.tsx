@@ -1,15 +1,14 @@
 import React from 'react';
-import { Theme, createStyles, makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import Grid from '@material-ui/core/Grid';
 
-const useStyles = makeStyles((theme: Theme) =>
-  // eslint-disable-next-line implicit-arrow-linebreak
-  createStyles({
-    root: {
-      padding: theme.spacing(1, 1, 1, 1),
-    },
-  }));
+const useStyles = makeStyles({
+  root: {
+    padding: '0.5em',
+    width: 'calc(100%-1em)',
+  },
+});
 
 type ListItemProps = {
   children: React.ReactNode,
