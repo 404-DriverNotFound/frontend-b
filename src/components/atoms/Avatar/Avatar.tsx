@@ -15,8 +15,8 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
     height: theme.spacing(5),
   },
   large: {
-    width: theme.spacing(7),
-    height: theme.spacing(7),
+    width: theme.spacing(9),
+    height: theme.spacing(9),
   },
 }));
 
@@ -26,7 +26,6 @@ type AvatarProps = {
   size?: 'small' | 'medium' | 'large',
 };
 
-// eslint-disable-next-line arrow-body-style
 const Avatar = ({
   src, alt, size,
 } : AvatarProps) => {

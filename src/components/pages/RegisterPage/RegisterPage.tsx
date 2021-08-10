@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -13,6 +12,7 @@ import Typo from '../../atoms/Typo/Typo';
 import Switch from '../../atoms/Switch/Switch';
 import Button from '../../atoms/Button/Button';
 import Avatar from '../../atoms/Avatar/Avatar';
+import Dialog from '../../molecules/Dialog/Dialog';
 
 const useStyles = makeStyles({
   root: {
@@ -33,6 +33,7 @@ const RegisterPage = () => {
   const [isValidName, setNameValid] = useState<boolean>(false);
   const [isNameChecked, setNameChecked] = useState<boolean>(false);
   const [is2FAEnabled, set2FA] = useState<boolean>(false);
+  const [isRegisterOpen, setRegisterOpen] = useState<boolean>(false);
   const [filename, setFilename] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<string | Blob>('');
   const [previewSrc, setPreviewSrc] = useState<string>(makeAPIPath('/files/avatar/default.png'));
@@ -107,13 +108,9 @@ const RegisterPage = () => {
       })
       .then(() => {
         if (is2FAEnabled) {
-          /**
-           * FIXME: 2FA 페이지가 구현되고 나면 2FA 페이지로 이동시켜야 합니다.
-           * history.push('/register/2FA') 같은 식으로 하면 될 것 같습니다.
-           */
-          history.push('/');
+          history.push('/register/2fa');
         } else {
-          history.push('/');
+          setRegisterOpen(true);
         }
       })
       .catch((error) => {
@@ -126,51 +123,60 @@ const RegisterPage = () => {
   };
 
   return (
-    <Grid container justifyContent="center">
-      <Grid
-        item
-        container
-        className={classes.root}
-        direction="column"
-        justifyContent="space-evenly"
-        spacing={3}
-      >
-        <Typo variant="h3" align="center" gutterBottom>Register Form</Typo>
-        <Typo>* 표시: 필수 입력 항목</Typo>
-        <Grid item container justifyContent="space-evenly" alignItems="center">
-          <Avatar size="large" alt={name} src={previewSrc} />
-        </Grid>
-        <form onSubmit={handleSubmit}>
-          <Grid item container className={classes.margin} justifyContent="space-between">
-            <Input onChange={handleNameChange} label="닉네임 *" value={name} helperText={helperText} error={!isValidName} />
-            <Button onClick={handleNameCheck} disabled={!isValidName}>중복 체크</Button>
+    <>
+      <Dialog
+        isOpen={isRegisterOpen}
+        title="회원가입 완료"
+        content="회원가입이 완료되어 로그인 화면으로 돌아갑니다. 서비스를 이용하시려면 로그인 해주세요."
+        buttons={<Button variant="text" onClick={() => { history.push('/'); }}>확인</Button>}
+        onClose={() => { history.push('/'); }}
+      />
+      <Grid container justifyContent="center">
+        <Grid
+          item
+          container
+          className={classes.root}
+          direction="column"
+          justifyContent="space-evenly"
+          spacing={3}
+        >
+          <Typo variant="h3" align="center" gutterBottom>Register Form</Typo>
+          <Typo>* 표시: 필수 입력 항목</Typo>
+          <Grid item container justifyContent="space-evenly" alignItems="center">
+            <Avatar size="large" alt={name} src={previewSrc} />
           </Grid>
-          <Grid item container className={classes.margin} direction="column">
-            <Grid item container justifyContent="space-between" alignItems="center">
-              <Typo variant="subtitle1">프로필 사진 등록</Typo>
-              <MaterialButton className={classes.button} variant="contained" color="primary" component="label">
-                <Typo variant="button">파일 선택</Typo>
-                <input
-                  accept="image/*"
-                  id="contained-button-file"
-                  type="file"
-                  onChange={handleFileSelect}
-                  hidden
-                />
-              </MaterialButton>
+          <form onSubmit={handleSubmit}>
+            <Grid item container className={classes.margin} justifyContent="space-between">
+              <Input onChange={handleNameChange} label="닉네임 *" value={name} helperText={helperText} error={!isValidName} />
+              <Button onClick={handleNameCheck} disabled={!isValidName}>중복 체크</Button>
             </Grid>
-            <Typo variant="caption">{filename || '선택된 파일이 없습니다.'}</Typo>
-          </Grid>
-          <Grid item container className={classes.margin} justifyContent="space-between">
-            <Typo variant="subtitle1">2 Factor 인증 사용 여부</Typo>
-            <Switch checked={is2FAEnabled} onChange={() => { set2FA(!is2FAEnabled); }} />
-          </Grid>
-          <Grid item container justifyContent="center">
-            <Button type="submit" disabled={!isNameChecked}>회원 가입</Button>
-          </Grid>
-        </form>
+            <Grid item container className={classes.margin} direction="column">
+              <Grid item container justifyContent="space-between" alignItems="center">
+                <Typo variant="subtitle1">프로필 사진 등록</Typo>
+                <MaterialButton className={classes.button} variant="contained" color="primary" component="label">
+                  <Typo variant="button">파일 선택</Typo>
+                  <input
+                    accept="image/*"
+                    id="contained-button-file"
+                    type="file"
+                    onChange={handleFileSelect}
+                    hidden
+                  />
+                </MaterialButton>
+              </Grid>
+              <Typo variant="caption">{filename || '선택된 파일이 없습니다.'}</Typo>
+            </Grid>
+            <Grid item container className={classes.margin} justifyContent="space-between">
+              <Typo variant="subtitle1">2 Factor 인증 사용 여부</Typo>
+              <Switch checked={is2FAEnabled} onChange={() => { set2FA(!is2FAEnabled); }} />
+            </Grid>
+            <Grid item container justifyContent="center">
+              <Button type="submit" disabled={!isNameChecked}>회원 가입</Button>
+            </Grid>
+          </form>
+        </Grid>
       </Grid>
-    </Grid>
+    </>
   );
 };
 
