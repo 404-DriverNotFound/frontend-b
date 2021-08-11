@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
-import { Meta } from '@storybook/react';
+import { Meta, Story } from '@storybook/react';
 import { BrowserRouter } from 'react-router-dom';
 import { ContextProvider, useUserDispatch } from '../../../utils/hooks/useContext';
-import ProfileCard from './ProfileCard';
+import ProfileCard, { ProfileCardProps } from './ProfileCard';
 import { UserInfoType } from '../../../types/User';
 import MainTemplate from '../../templates/MainTemplate/MainTemplate';
 
@@ -11,7 +11,7 @@ export default {
   component: ProfileCard,
 } as Meta;
 
-export const OthersProfile = () => {
+const OthersProfile: Story<ProfileCardProps> = ({ relationship }: ProfileCardProps) => {
   const handleClick = () => {};
   const userInfo: UserInfoType = {
     id: '550e8400-e29b-41d4-a716-446655440000', // 의미없는 uuid입니다
@@ -24,14 +24,32 @@ export const OthersProfile = () => {
     <ContextProvider>
       <ProfileCard
         userInfo={userInfo}
+        relationship={relationship}
         onProfileEdit={handleClick}
         onFriendAdd={handleClick}
+        onFriendRemove={handleClick}
         onUserBlock={handleClick}
+        onUserUnblock={handleClick}
         onDMClick={handleClick}
         onMatchInvite={handleClick}
       />
     </ContextProvider>
   );
+};
+
+export const NoRelationProfile = OthersProfile.bind({});
+NoRelationProfile.args = {
+  relationship: 'none',
+};
+
+export const FriendProfile = OthersProfile.bind({});
+FriendProfile.args = {
+  relationship: 'friend',
+};
+
+export const BlockedProfile = OthersProfile.bind({});
+BlockedProfile.args = {
+  relationship: 'block',
 };
 
 const ProfileCardWithContext = () => {
@@ -58,9 +76,12 @@ const ProfileCardWithContext = () => {
   return (
     <ProfileCard
       userInfo={userInfo}
+      relationship="none"
       onProfileEdit={handleClick}
       onFriendAdd={handleClick}
+      onFriendRemove={handleClick}
       onUserBlock={handleClick}
+      onUserUnblock={handleClick}
       onDMClick={handleClick}
       onMatchInvite={handleClick}
     />
@@ -88,12 +109,15 @@ export const OthersProfileWithTemplate = () => {
         <MainTemplate
           main={(
             <ProfileCard
+              userInfo={userInfo}
+              relationship="none"
               onProfileEdit={handleClick}
               onFriendAdd={handleClick}
+              onFriendRemove={handleClick}
               onUserBlock={handleClick}
+              onUserUnblock={handleClick}
               onDMClick={handleClick}
               onMatchInvite={handleClick}
-              userInfo={userInfo}
             />
         )}
           chat={<h1>chat</h1>}

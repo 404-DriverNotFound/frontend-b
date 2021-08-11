@@ -6,3 +6,5 @@ export type UserInfoType = {
   avatar: string,
   status: UserStatusType,
 };
+
+export type RelationshipType = 'none' | 'friend' | 'block';
