@@ -5,6 +5,7 @@ export type UserInfoType = {
   name: string,
   avatar: string,
   status: UserStatusType,
+  enable2FA?: boolean,
 };
 
 export type RelationshipType = 'none' | 'friend' | 'block';

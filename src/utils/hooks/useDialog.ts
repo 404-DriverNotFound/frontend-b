@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 type DialogProps = {
   title?: React.ReactNode,
   content: React.ReactNode,
-  buttons: React.ReactNode,
+  buttons?: React.ReactNode,
   // eslint-disable-next-line no-unused-vars
   onClose: (event: {}, reason: 'backdropClick' | 'escapeKeyDown') => void,
 };

@@ -8,6 +8,7 @@ import Grid from '@material-ui/core/Grid';
 import Typo from '../../atoms/Typo/Typo';
 import { useAppDispatch, useUserDispatch } from '../../../utils/hooks/useContext';
 import makeAPIPath from '../../../utils/utils';
+import { changeStatus } from '../../../utils/api/asyncRequest';
 
 const useStyles = makeStyles({
   cursor: {
@@ -38,7 +39,8 @@ const Menu = () => {
 
   const handleLogout = () => {
     appDispatch({ type: 'loading' });
-    axios.get(makeAPIPath('/auth/logout'))
+    changeStatus('OFFLINE')
+      .then(() => axios.get(makeAPIPath('/auth/logout')))
       .finally(() => {
         appDispatch({ type: 'endLoading' });
       })
@@ -47,6 +49,7 @@ const Menu = () => {
         history.push('/');
       })
       .catch((error) => {
+        changeStatus('ONLINE');
         toast.error(error.message);
       });
   };

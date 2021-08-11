@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, Redirect } from 'react-router-dom';
 import axios from 'axios';
 // eslint-disable-next-line camelcase
 import { unstable_createMuiStrictModeTheme } from '@material-ui/core';
@@ -16,6 +16,8 @@ import RegisterPage from './components/pages/RegisterPage/RegisterPage';
 import MainTemplate from './components/templates/MainTemplate/MainTemplate';
 import MFARegisterPage from './components/pages/MFARegisterPage/MFARegisterPage';
 import MFAPage from './components/pages/MFAPage/MFAPage';
+import { changeStatus } from './utils/api/asyncRequest';
+import ProfilePage from './components/pages/ProfilePage/ProfilePage';
 
 const useStyles = makeStyles({
   progress: {
@@ -58,8 +60,13 @@ const App = () => {
             const { id, name, avatar } = response.data;
             userDispatch({
               type: 'login',
-              info: { id, name, avatar },
+              info: {
+                id,
+                name,
+                avatar: makeAPIPath(`/${avatar}`),
+              },
             });
+            changeStatus('ONLINE');
           })
           .catch((error) => {
             if (!(error.response)) {
@@ -77,6 +84,12 @@ const App = () => {
           toast.error(error.message);
         }
       });
+
+    return () => {
+      if (userState.id) {
+        changeStatus('OFFLINE');
+      }
+    };
   }, []);
 
   const children = userState.id ? (
@@ -86,6 +99,10 @@ const App = () => {
      */
     <Switch>
       <Route exact path="/" render={() => <MainTemplate main={<h1>asd</h1>} chat={<h1>asd</h1>} />} />
+      <Route path="/profile/:username" component={ProfilePage} />
+      <Route exact path="/profile">
+        <Redirect to={`/profile/${userState.name}`} />
+      </Route>
     </Switch>
   ) : (
     <Switch>

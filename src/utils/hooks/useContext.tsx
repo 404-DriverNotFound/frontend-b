@@ -15,7 +15,7 @@ const initialUserState: UserStateType = {
 };
 
 type UserActionType = { type: 'login', info: UserStateType } | { type: 'logout' }
-                    | { type: 'reset' };
+                    | { type: 'reset' } | { type: 'edit', info: UserStateType };
 
 type AppStateType = {
   isLoading: boolean,
@@ -37,6 +37,8 @@ function UserReducer(state: UserStateType, action: UserActionType): UserStateTyp
   switch (action.type) {
     case 'login':
       return { ...action.info };
+    case 'edit':
+      return { ...state, ...action.info };
     case 'logout':
     case 'reset':
     default:
