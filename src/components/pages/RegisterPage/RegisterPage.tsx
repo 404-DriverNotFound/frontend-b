@@ -73,7 +73,7 @@ const RegisterPage = () => {
 
   const handleNameCheck = () => {
     appDispatch({ type: 'loading' });
-    axios.head(makeAPIPath(`/users/name/${name}`))
+    axios.get(makeAPIPath(`/users/${name}`))
       .finally(() => {
         appDispatch({ type: 'endLoading' });
       })
