@@ -96,21 +96,25 @@ const App = () => {
   }, []);
 
   const children = userState.id ? (
-    /**
-     * FIXME: Main Page 컴포넌트가 없어 임시로 적어 두었습니다.
-     * 컴포넌트 구현 후 교체해야 합니다.
-     */
-    <Switch>
-      <Route exact path="/" render={() => <MainTemplate main={<h1>asd</h1>} chat={<h1>asd</h1>} />} />
-      <Route path="/profile/:username" component={ProfilePage} />
-      <Route exact path="/profile">
-        <Redirect to={`/profile/${userState.name}`} />
-      </Route>
-      <Route exact path="/404" render={() => <h1>404 Not found</h1>} />
-      <Route path="/">
-        <Redirect to="/404" />
-      </Route>
-    </Switch>
+    <MainTemplate
+      main={(
+        <Switch>
+          <Route exact path="/">
+            <Redirect to="/game" />
+          </Route>
+          <Route path="/profile/:username" component={ProfilePage} />
+          <Route exact path="/profile">
+            <Redirect to={`/profile/${userState.name}`} />
+          </Route>
+          <Route exact path="/404" render={() => <h1>404 Not found</h1>} />
+          <Route path="/">
+            <Redirect to="/404" />
+          </Route>
+        </Switch>
+      )}
+      chat={<h3>chat</h3>}
+    />
+
   ) : (
     <Switch>
       <Route exact path="/register" component={RegisterPage} />

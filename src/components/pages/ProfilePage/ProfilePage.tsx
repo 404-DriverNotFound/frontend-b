@@ -8,7 +8,6 @@ import makeAPIPath from '../../../utils/utils';
 import List from '../../atoms/List/List';
 import Typo from '../../atoms/Typo/Typo';
 import ProfileCard from '../../organisms/ProfileCard/ProfileCard';
-import MainTemplate from '../../templates/MainTemplate/MainTemplate';
 import { asyncGetRequest } from '../../../utils/api/asyncRequest';
 import Dialog from '../../molecules/Dialog/Dialog';
 import useDialog from '../../../utils/hooks/useDialog';
@@ -109,36 +108,6 @@ const ProfilePage = ({ match }: RouteComponentProps<MatchParams>) => {
     // TODO: 추후 구현
   };
 
-  const main = (
-    <Grid container direction="column" spacing={6} justifyContent="space-evenly" alignItems="stretch">
-      <Grid item>
-        <ProfileCard
-          userInfo={user}
-          relationship={relationship}
-          onProfileEdit={handleProfileEdit}
-          onFriendAdd={handleFriendAdd}
-          onFriendRemove={handleFriendRemove}
-          onUserBlock={handleUserBlock}
-          onUserUnblock={handleUserUnblock}
-          onDMClick={handleDMClick}
-          onMatchInvite={handleMatchInvite}
-        />
-      </Grid>
-      <Grid item>
-        <Typo variant="h5">Match History</Typo>
-        <List height="15em" />
-      </Grid>
-      <Grid item>
-        <Typo variant="h5">Achievements</Typo>
-        <List height="15em" />
-      </Grid>
-    </Grid>
-  );
-
-  const chat = (
-    <Typo variant="h1">Chat</Typo>
-  );
-
   return (
     <>
       <Dialog
@@ -148,10 +117,29 @@ const ProfilePage = ({ match }: RouteComponentProps<MatchParams>) => {
         buttons={dialog.buttons}
         onClose={dialog.onClose}
       />
-      <MainTemplate
-        main={main}
-        chat={chat}
-      />
+      <Grid container direction="column" spacing={6} justifyContent="space-evenly" alignItems="stretch">
+        <Grid item>
+          <ProfileCard
+            userInfo={user}
+            relationship={relationship}
+            onProfileEdit={handleProfileEdit}
+            onFriendAdd={handleFriendAdd}
+            onFriendRemove={handleFriendRemove}
+            onUserBlock={handleUserBlock}
+            onUserUnblock={handleUserUnblock}
+            onDMClick={handleDMClick}
+            onMatchInvite={handleMatchInvite}
+          />
+        </Grid>
+        <Grid item>
+          <Typo variant="h5">Match History</Typo>
+          <List height="15em" />
+        </Grid>
+        <Grid item>
+          <Typo variant="h5">Achievements</Typo>
+          <List height="15em" />
+        </Grid>
+      </Grid>
     </>
   );
 };
