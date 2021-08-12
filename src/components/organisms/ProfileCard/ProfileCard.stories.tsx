@@ -69,6 +69,7 @@ const ProfileCardWithContext = () => {
         id: userInfo.id,
         name: userInfo.name,
         avatar: userInfo.avatar,
+        enable2FA: false,
       },
     });
   }, []);

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { RouteComponentProps } from 'react-router-dom';
+import { RouteComponentProps, useHistory } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import Grid from '@material-ui/core/Grid';
 import { RelationshipType, UserInfoType } from '../../../types/User';
@@ -27,7 +27,6 @@ const initalUserInfo: UserInfoType = {
 };
 
 const ProfilePage = ({ match }: RouteComponentProps<MatchParams>) => {
-  const [isValidUser, setValidUser] = useState<boolean>(true);
   const [user, setUser] = useState<UserInfoType>(initalUserInfo);
   const [relationship, setRelationship] = useState<RelationshipType>('none');
   const {
@@ -35,6 +34,7 @@ const ProfilePage = ({ match }: RouteComponentProps<MatchParams>) => {
   } = useDialog();
   const { username } = match.params;
   const appDispatch = useAppDispatch();
+  const history = useHistory();
   const me = useUserState();
 
   useEffect(() => {
@@ -54,7 +54,7 @@ const ProfilePage = ({ match }: RouteComponentProps<MatchParams>) => {
       })
       .catch((error) => {
         if (error.response && error.response.status >= 400 && error.response.status < 500) {
-          setValidUser(false);
+          history.push('/404');
         } else {
           toast.error(error.message);
         }
@@ -66,7 +66,7 @@ const ProfilePage = ({ match }: RouteComponentProps<MatchParams>) => {
     } else {
       appDispatch({ type: 'endLoading' });
     }
-  }, [username, me.avatar]);
+  }, []);
 
   const handleProfileEdit = () => {
     const content = (
@@ -109,7 +109,7 @@ const ProfilePage = ({ match }: RouteComponentProps<MatchParams>) => {
     // TODO: 추후 구현
   };
 
-  const main = isValidUser ? (
+  const main = (
     <Grid container direction="column" spacing={6} justifyContent="space-evenly" alignItems="stretch">
       <Grid item>
         <ProfileCard
@@ -133,9 +133,7 @@ const ProfilePage = ({ match }: RouteComponentProps<MatchParams>) => {
         <List height="15em" />
       </Grid>
     </Grid>
-  ) : (
-    <Typo variant="h1">No such user</Typo>
-  ); // FIXME: 유저 없을 때, UI 예쁘게 개선하기
+  );
 
   const chat = (
     <Typo variant="h1">Chat</Typo>

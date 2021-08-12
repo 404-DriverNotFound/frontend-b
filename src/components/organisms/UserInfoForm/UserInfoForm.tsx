@@ -166,10 +166,12 @@ const UserInfoForm = ({
             id: data.id,
             name: data.name,
             avatar: data.avatar,
+            enable2FA: data.enable2FA,
           },
         });
         setDialogOpen(false);
-        history.push(`/profile/${name}`);
+        if (is2FAChanged && is2FAEnabled) toast('다음 로그인 시 2FA 인증을 위한 QR코드 등록 절차가 진행됩니다.');
+        history.push('/profile');
       })
       .catch((error) => {
         if (error.response) {
@@ -178,6 +180,18 @@ const UserInfoForm = ({
           } else toast.error('입력값이 잘못되었습니다. 다시 확인해주세요.');
         } else toast.error(error.message);
       });
+  };
+
+  const isValidForm = () => {
+    if (is2FAChanged) {
+      if (name === currentName) return is2FAChanged;
+      return isNameChecked && is2FAChanged;
+    } if (isAvatarChanged) {
+      if (name === currentName) return isAvatarChanged;
+      return isNameChecked && isAvatarChanged;
+    }
+    if (name !== currentName) return isNameChecked;
+    return false;
   };
 
   return (
@@ -222,7 +236,7 @@ const UserInfoForm = ({
               ? (
                 <>
                   <Button variant="text" onClick={() => { setDialogOpen(false); }}>cancel</Button>
-                  <Button type="submit" disabled={!(isNameChecked || isAvatarChanged || is2FAChanged)}>submit</Button>
+                  <Button type="submit" disabled={!(isValidForm())}>submit</Button>
                 </>
               ) : (<Button type="submit" disabled={!isNameChecked}>회원 가입</Button>)
           }

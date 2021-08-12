@@ -57,13 +57,16 @@ const App = () => {
       .then(() => {
         axios.get(makeAPIPath('/users/me'))
           .then((response) => {
-            const { id, name, avatar } = response.data;
+            const {
+              id, name, avatar, enable2FA,
+            } = response.data;
             userDispatch({
               type: 'login',
               info: {
                 id,
                 name,
                 avatar: makeAPIPath(`/${avatar}`),
+                enable2FA,
               },
             });
             changeStatus('ONLINE');
@@ -102,6 +105,10 @@ const App = () => {
       <Route path="/profile/:username" component={ProfilePage} />
       <Route exact path="/profile">
         <Redirect to={`/profile/${userState.name}`} />
+      </Route>
+      <Route exact path="/404" render={() => <h1>404 Not found</h1>} />
+      <Route path="/">
+        <Redirect to="/404" />
       </Route>
     </Switch>
   ) : (
