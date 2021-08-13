@@ -35,7 +35,7 @@ const SubMenu = () => {
     <Grid
       item
       container
-      justifyContent="space-evenly"
+      justifyContent="center"
       spacing={1}
     >
       { Menus }
