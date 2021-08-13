@@ -27,7 +27,7 @@ export const InMainTemplate = () => (
       <MainTemplate
         main={(
           <Grid container flex-direction="column">
-            <Grid item container justifyContent="center">
+            <Grid container justifyContent="center">
               <SubMenu />
             </Grid>
             <Grid item container>
@@ -41,7 +41,6 @@ export const InMainTemplate = () => (
       )}
         chat={(
           <List height="80vh" scroll>
-            <OneChat />
             <OneChat />
             <OneChat />
             <OneChat />
