@@ -26,8 +26,8 @@ export const InMainTemplate = () => (
     <ContextProvider>
       <MainTemplate
         main={(
-          <Grid container flex-direction="column" justifyContent="center">
-            <Grid item>
+          <Grid container flex-direction="column">
+            <Grid item container justifyContent="center">
               <SubMenu />
             </Grid>
             <Grid item container>

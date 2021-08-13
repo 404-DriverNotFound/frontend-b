@@ -6,7 +6,7 @@ import Button from '../../atoms/Button/Button';
 
 const useStyles = makeStyles({
   width: {
-    width: '18vw',
+    width: '17em',
   },
 });
 
@@ -32,7 +32,12 @@ const SubMenu = () => {
   ));
 
   return (
-    <Grid item container>
+    <Grid
+      item
+      container
+      justifyContent="space-evenly"
+      spacing={1}
+    >
       { Menus }
     </Grid>
   );
