@@ -1,7 +1,7 @@
 import React from 'react';
-import ButtonGroup from '@material-ui/core/ButtonGroup';
 import { makeStyles } from '@material-ui/core/styles';
 import { NavLink } from 'react-router-dom';
+import Grid from '@material-ui/core/Grid';
 import Button from '../../atoms/Button/Button';
 
 const useStyles = makeStyles({
@@ -32,13 +32,9 @@ const SubMenu = () => {
   ));
 
   return (
-    <ButtonGroup
-      variant="text"
-      color="primary"
-      aria-label="subMenu"
-    >
+    <Grid item container>
       { Menus }
-    </ButtonGroup>
+    </Grid>
   );
 };
 
