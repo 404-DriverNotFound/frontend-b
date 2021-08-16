@@ -10,7 +10,6 @@ import Button from '../../atoms/Button/Button';
 import DigitInput from '../../atoms/DigitInput/DigitInput';
 import Typo from '../../atoms/Typo/Typo';
 import LoginTemplate from '../../templates/LoginTemplate/LoginTemplate';
-import { changeStatus } from '../../../utils/api/asyncRequest';
 
 const useStyles = makeStyles({
   inputs: {
@@ -89,7 +88,6 @@ const MFAPage = () => {
             id, name, avatar, enable2FA,
           },
         });
-        changeStatus('ONLINE');
         history.push('/');
       })
       .catch((error) => {

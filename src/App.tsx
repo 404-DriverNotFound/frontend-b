@@ -16,7 +16,6 @@ import RegisterPage from './components/pages/RegisterPage/RegisterPage';
 import MainTemplate from './components/templates/MainTemplate/MainTemplate';
 import MFARegisterPage from './components/pages/MFARegisterPage/MFARegisterPage';
 import MFAPage from './components/pages/MFAPage/MFAPage';
-import { changeStatus } from './utils/api/asyncRequest';
 import ProfilePage from './components/pages/ProfilePage/ProfilePage';
 
 const useStyles = makeStyles({
@@ -69,7 +68,6 @@ const App = () => {
                 enable2FA,
               },
             });
-            changeStatus('ONLINE');
           })
           .catch((error) => {
             if (!(error.response)) {
@@ -87,12 +85,6 @@ const App = () => {
           toast.error(error.message);
         }
       });
-
-    return () => {
-      if (userState.id) {
-        changeStatus('OFFLINE');
-      }
-    };
   }, []);
 
   const children = userState.id ? (
