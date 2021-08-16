@@ -97,62 +97,26 @@ export const WithListAndProfileCard = () => {
     avatar: '',
     status: 'OFFLINE',
   };
+  const ProfileList = () => (
+    <ListItem>
+      <ProfileCard
+        userInfo={userInfo}
+        onProfileEdit={handleClick}
+        onFriendAdd={handleClick}
+        onUserBlock={handleClick}
+        onDMClick={handleClick}
+        onMatchInvite={handleClick}
+      />
+    </ListItem>
+  );
 
   return (
     <ContextProvider>
       <List height="80vh" scroll>
-        <ListItem>
-          <ProfileCard
-            userInfo={userInfo}
-            relationship="friend"
-            onProfileEdit={handleClick}
-            onFriendAdd={handleClick}
-            onFriendRemove={handleClick}
-            onUserBlock={handleClick}
-            onUserUnblock={handleClick}
-            onDMClick={handleClick}
-            onMatchInvite={handleClick}
-          />
-        </ListItem>
-        <ListItem>
-          <ProfileCard
-            userInfo={userInfo}
-            relationship="friend"
-            onProfileEdit={handleClick}
-            onFriendAdd={handleClick}
-            onFriendRemove={handleClick}
-            onUserBlock={handleClick}
-            onUserUnblock={handleClick}
-            onDMClick={handleClick}
-            onMatchInvite={handleClick}
-          />
-        </ListItem>
-        <ListItem>
-          <ProfileCard
-            userInfo={userInfo}
-            relationship="friend"
-            onProfileEdit={handleClick}
-            onFriendAdd={handleClick}
-            onFriendRemove={handleClick}
-            onUserBlock={handleClick}
-            onUserUnblock={handleClick}
-            onDMClick={handleClick}
-            onMatchInvite={handleClick}
-          />
-        </ListItem>
-        <ListItem>
-          <ProfileCard
-            userInfo={userInfo}
-            relationship="friend"
-            onProfileEdit={handleClick}
-            onFriendAdd={handleClick}
-            onFriendRemove={handleClick}
-            onUserBlock={handleClick}
-            onUserUnblock={handleClick}
-            onDMClick={handleClick}
-            onMatchInvite={handleClick}
-          />
-        </ListItem>
+        <ProfileList />
+        <ProfileList />
+        <ProfileList />
+        <ProfileList />
       </List>
     </ContextProvider>
   );
