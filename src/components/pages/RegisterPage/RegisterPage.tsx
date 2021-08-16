@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Cookies from 'js-cookie';
 import { useHistory } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import axios from 'axios';
@@ -29,6 +30,7 @@ const useStyles = makeStyles({
 
 const RegisterPage = () => {
   const [name, setName] = useState<string>('');
+  const [ftId, setFtId] = useState<string>('');
   const [helperText, setHelperText] = useState<string>('영문+숫자 3-12자');
   const [isValidName, setNameValid] = useState<boolean>(false);
   const [isNameChecked, setNameChecked] = useState<boolean>(false);
@@ -40,6 +42,15 @@ const RegisterPage = () => {
   const appDispatch = useAppDispatch();
   const classes = useStyles();
   const history = useHistory();
+
+  useEffect(() => {
+    const id: string | undefined = Cookies.get('ftId');
+    if (id) setFtId(id);
+    else {
+      toast.error('서버에 문제가 생겼습니다. 회원가입을 다시 시도해주세요.');
+      history.push('/');
+    }
+  }, []);
 
   useEffect(() => {
     if (!imageFile) {
@@ -97,6 +108,7 @@ const RegisterPage = () => {
     formData.append('avatar', imageFile);
     formData.append('name', name);
     formData.append('enable2FA', String(is2FAEnabled));
+    formData.append('ftId', ftId);
     appDispatch({ type: 'loading' });
     axios({
       url: makeAPIPath('/users'),
