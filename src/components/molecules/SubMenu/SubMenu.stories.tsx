@@ -1,6 +1,6 @@
 import React from 'react';
 import { Meta } from '@storybook/react';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, Route, RouteComponentProps } from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
 import SubMenu from './SubMenu';
 import { ContextProvider } from '../../../utils/hooks/useContext';
@@ -16,7 +16,53 @@ export default {
 export const Default = () => (
   <BrowserRouter>
     <ContextProvider>
-      <SubMenu />
+      <Route
+        path={['/community/:name', '/:name']}
+        render={({ match }: RouteComponentProps<{ name: string }>) => (
+          <SubMenu
+            current={`/community/${match.params.name}`}
+            list={[
+              {
+                name: 'ALL USERS',
+                link: '/community/all',
+              },
+              {
+                name: 'FRIENDS LIST',
+                link: '/community/friends',
+              },
+              {
+                name: 'BLOCKED USER',
+                link: '/community/blocked',
+              },
+            ]}
+          />
+        )}
+      />
+    </ContextProvider>
+  </BrowserRouter>
+);
+
+export const ChannelMenu = () => (
+  <BrowserRouter>
+    <ContextProvider>
+      <Route
+        path="/:name"
+        render={({ match }: RouteComponentProps<{ name: string }>) => (
+          <SubMenu
+            current={`/${match.params.name}`}
+            list={[
+              {
+                name: 'MY CHANNEL',
+                link: '/mychannel',
+              },
+              {
+                name: 'ALL CHANNEL',
+                link: '/all',
+              },
+            ]}
+          />
+        )}
+      />
     </ContextProvider>
   </BrowserRouter>
 );
@@ -28,7 +74,28 @@ export const InMainTemplate = () => (
         main={(
           <Grid container flex-direction="column">
             <Grid container justifyContent="center">
-              <SubMenu />
+              <Route
+                path={['/community/:name', '/:name']}
+                render={({ match }: RouteComponentProps<{ name: string }>) => (
+                  <SubMenu
+                    current={`/community/${match.params.name}`}
+                    list={[
+                      {
+                        name: 'ALL USERS',
+                        link: '/community/all',
+                      },
+                      {
+                        name: 'FRIENDS LIST',
+                        link: '/community/friends',
+                      },
+                      {
+                        name: 'BLOCKED USER',
+                        link: '/community/blocked',
+                      },
+                    ]}
+                  />
+                )}
+              />
             </Grid>
             <Grid item container>
               <List height="80vh">
