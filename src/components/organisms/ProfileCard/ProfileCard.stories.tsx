@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Meta } from '@storybook/react';
 import { BrowserRouter } from 'react-router-dom';
 import { ContextProvider, useUserDispatch } from '../../../utils/hooks/useContext';
-import ProfileCard from './ProfileCard';
+import ProfileCard, { ProfileCardSkeleton } from './ProfileCard';
 import { UserInfoType } from '../../../types/User';
 import MainTemplate from '../../templates/MainTemplate/MainTemplate';
 
@@ -74,6 +74,10 @@ export const MyProfile = () => (
   <ContextProvider>
     <ProfileCardWithContext />
   </ContextProvider>
+);
+
+export const SkeletonCard = () => (
+  <ProfileCardSkeleton />
 );
 
 export const OthersProfileWithTemplate = () => {
