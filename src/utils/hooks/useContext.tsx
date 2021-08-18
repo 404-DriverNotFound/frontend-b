@@ -2,7 +2,7 @@ import React, {
   createContext, useReducer, useContext, Dispatch,
 } from 'react';
 
-type UserStateType = {
+export type UserStateType = {
   id: string,
   name: string,
   avatar: string,
