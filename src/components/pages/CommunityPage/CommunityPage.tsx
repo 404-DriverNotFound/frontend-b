@@ -83,7 +83,7 @@ const CommunityPage = () => (
         <Route exact path={ALL_PATH} render={() => <UserList API="/users" />} />
         <Route exact path={BLOCKED_PATH} render={() => <UserList API="/block" />} />
         <Route path="/">
-          <Redirect to={ALL_PATH} />
+          <Redirect to={FRIEND_PATH} />
         </Route>
       </Switch>
     </List>
