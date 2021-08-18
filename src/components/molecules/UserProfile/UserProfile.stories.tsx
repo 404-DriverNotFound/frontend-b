@@ -14,6 +14,7 @@ export const Default: Story<UserInfoType> = ({ status }: UserInfoType) => {
     name: 'USERNAME',
     avatar: '',
     status,
+    relationship: 'NONE',
   };
 
   return <UserProfile userInfo={userInfo} />;

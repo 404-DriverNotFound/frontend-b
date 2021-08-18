@@ -5,6 +5,9 @@ import { ContextProvider, useUserDispatch } from '../../../utils/hooks/useContex
 import ProfileCard from './ProfileCard';
 import { UserInfoType } from '../../../types/User';
 import MainTemplate from '../../templates/MainTemplate/MainTemplate';
+import Typo from '../../atoms/Typo/Typo';
+import List from '../../atoms/List/List';
+import ListItem from '../../atoms/ListItem/ListItem';
 
 export default {
   title: 'organisms/ProfileCard',
@@ -12,36 +15,145 @@ export default {
 } as Meta;
 
 export const OthersProfile = () => {
-  const handleClick = () => {};
   const userInfo: UserInfoType = {
     id: '550e8400-e29b-41d4-a716-446655440000', // 의미없는 uuid입니다
     name: 'USERNAME',
     avatar: '',
     status: 'OFFLINE',
+    relationship: 'NONE',
   };
 
   return (
     <ContextProvider>
+      <Typo align="center">프로필에서는 이렇게 보입니다.</Typo>
       <ProfileCard
-        userInfo={userInfo}
-        onProfileEdit={handleClick}
-        onFriendAdd={handleClick}
-        onUserBlock={handleClick}
-        onDMClick={handleClick}
-        onMatchInvite={handleClick}
+        userInfo={{ ...userInfo, name: 'NONE' }}
+        setOpen={() => {}}
+        setDialog={() => {}}
+        profile
+      />
+      <ProfileCard
+        userInfo={{
+          ...userInfo,
+          name: 'FRIEND',
+          relationship: 'FRIEND',
+          status: 'ONLINE',
+        }}
+        setOpen={() => {}}
+        setDialog={() => {}}
+        profile
+      />
+      <ProfileCard
+        userInfo={{
+          ...userInfo,
+          name: 'REQUESTING',
+          relationship: 'REQUESTING',
+          status: 'IN_GAME',
+        }}
+        setOpen={() => {}}
+        setDialog={() => {}}
+        profile
+      />
+      <ProfileCard
+        userInfo={{ ...userInfo, name: 'REQUESTED', relationship: 'REQUESTED' }}
+        setOpen={() => {}}
+        setDialog={() => {}}
+        profile
+      />
+      <ProfileCard
+        userInfo={{ ...userInfo, name: 'BLOCKED', relationship: 'BLOCKED' }}
+        setOpen={() => {}}
+        setDialog={() => {}}
+        profile
+      />
+      <ProfileCard
+        userInfo={{ ...userInfo, name: 'BLOCKING', relationship: 'BLOCKING' }}
+        setOpen={() => {}}
+        setDialog={() => {}}
+        profile
       />
     </ContextProvider>
   );
 };
 
+export const OthersList = () => {
+  const userInfo: UserInfoType = {
+    id: '550e8400-e29b-41d4-a716-446655440000', // 의미없는 uuid입니다
+    name: 'USERNAME',
+    avatar: '',
+    status: 'OFFLINE',
+    relationship: 'NONE',
+  };
+
+  return (
+    <ContextProvider>
+      <Typo align="center">유저 리스트에서는 이렇게 보입니다.</Typo>
+      <List height="70vh" scroll>
+        <ListItem>
+          <ProfileCard
+            userInfo={{
+              ...userInfo,
+              name: 'NONE',
+              relationship: 'NONE',
+              status: 'ONLINE',
+            }}
+            setOpen={() => {}}
+            setDialog={() => {}}
+          />
+        </ListItem>
+        <ListItem>
+          <ProfileCard
+            userInfo={{
+              ...userInfo,
+              name: 'FRIEND',
+              relationship: 'FRIEND',
+              status: 'IN_GAME',
+            }}
+            setOpen={() => {}}
+            setDialog={() => {}}
+          />
+        </ListItem>
+        <ListItem>
+          <ProfileCard
+            userInfo={{ ...userInfo, name: 'REQUESTING', relationship: 'REQUESTING' }}
+            setOpen={() => {}}
+            setDialog={() => {}}
+          />
+        </ListItem>
+        <ListItem>
+          <ProfileCard
+            userInfo={{ ...userInfo, name: 'REQUESTED', relationship: 'REQUESTED' }}
+            setOpen={() => {}}
+            setDialog={() => {}}
+          />
+        </ListItem>
+        <ListItem>
+          <ProfileCard
+            userInfo={{ ...userInfo, name: 'BLOCKED', relationship: 'BLOCKED' }}
+            setOpen={() => {}}
+            setDialog={() => {}}
+          />
+        </ListItem>
+        <ListItem>
+          <ProfileCard
+            userInfo={{ ...userInfo, name: 'BLOCKING', relationship: 'BLOCKING' }}
+            setOpen={() => {}}
+            setDialog={() => {}}
+          />
+        </ListItem>
+      </List>
+    </ContextProvider>
+  );
+};
+
 const ProfileCardWithContext = () => {
-  const handleClick = () => {};
   const userDispatch = useUserDispatch();
   const userInfo: UserInfoType = {
     id: '550e8400-e29b-41d4-a716-446655440000', // 의미없는 uuid입니다
-    name: 'MYNAME',
+    name: 'ME',
     avatar: '',
     status: 'ONLINE',
+    relationship: 'NONE',
   };
 
   useEffect(() => {
@@ -61,11 +173,9 @@ const ProfileCardWithContext = () => {
   return (
     <ProfileCard
       userInfo={userInfo}
-      onProfileEdit={handleClick}
-      onFriendAdd={handleClick}
-      onUserBlock={handleClick}
-      onDMClick={handleClick}
-      onMatchInvite={handleClick}
+      setOpen={() => {}}
+      setDialog={() => {}}
+      profile
     />
   );
 };
@@ -76,35 +186,27 @@ export const MyProfile = () => (
   </ContextProvider>
 );
 
-export const OthersProfileWithTemplate = () => {
-  const handleClick = () => {};
-  const userInfo: UserInfoType = {
-    id: '550e8400-e29b-41d4-a716-446655440000', // 의미없는 uuid입니다
-    name: 'USERNAME',
-    avatar: '',
-    status: 'IN_GAME',
-  };
+export const OthersProfileWithTemplate = () => (
+  <BrowserRouter>
+    <ContextProvider>
+      <MainTemplate
+        main={<OthersProfile />}
+        chat={<h1>chat</h1>}
+      />
+    </ContextProvider>
+  </BrowserRouter>
+);
 
-  return (
-    <BrowserRouter>
-      <ContextProvider>
-        <MainTemplate
-          main={(
-            <ProfileCard
-              onProfileEdit={handleClick}
-              onFriendAdd={handleClick}
-              onUserBlock={handleClick}
-              onDMClick={handleClick}
-              onMatchInvite={handleClick}
-              userInfo={userInfo}
-            />
-        )}
-          chat={<h1>chat</h1>}
-        />
-      </ContextProvider>
-    </BrowserRouter>
-  );
-};
+export const OthersListWithTemplate = () => (
+  <BrowserRouter>
+    <ContextProvider>
+      <MainTemplate
+        main={<OthersList />}
+        chat={<h1>chat</h1>}
+      />
+    </ContextProvider>
+  </BrowserRouter>
+);
 
 export const MyProfileWithTemplate = () => (
   <BrowserRouter>

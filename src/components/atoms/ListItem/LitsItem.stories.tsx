@@ -90,22 +90,19 @@ export const WithMainTemplate = () => (
 );
 
 export const WithListAndProfileCard = () => {
-  const handleClick = () => {};
   const userInfo: UserInfoType = {
     id: '550e8400-e29b-41d4-a716-446655440000', // 의미없는 uuid입니다
     name: 'USERNAME',
     avatar: '',
     status: 'OFFLINE',
+    relationship: 'NONE',
   };
   const ProfileList = () => (
     <ListItem>
       <ProfileCard
         userInfo={userInfo}
-        onProfileEdit={handleClick}
-        onFriendAdd={handleClick}
-        onUserBlock={handleClick}
-        onDMClick={handleClick}
-        onMatchInvite={handleClick}
+        setOpen={() => {}}
+        setDialog={() => {}}
       />
     </ListItem>
   );
