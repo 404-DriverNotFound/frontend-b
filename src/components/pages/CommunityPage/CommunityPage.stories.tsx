@@ -1,6 +1,6 @@
 import React from 'react';
 import { Meta } from '@storybook/react';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import CommunityPage from './CommunityPage';
 import { ContextProvider } from '../../../utils/hooks/useContext';
@@ -25,9 +25,14 @@ export const Community = () => (
         draggable
         pauseOnHover
       />
-      <MainTemplate
-        main={<CommunityPage />}
-        chat={<h1>chat</h1>}
+      <Route
+        path={['/community', '/']}
+        render={() => (
+          <MainTemplate
+            main={<CommunityPage />}
+            chat={<h1>chat</h1>}
+          />
+        )}
       />
     </ContextProvider>
   </BrowserRouter>
