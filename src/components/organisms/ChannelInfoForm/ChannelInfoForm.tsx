@@ -1,23 +1,35 @@
 import React, { useState } from 'react';
-import { Grid } from '@material-ui/core';
+import { Grid, makeStyles } from '@material-ui/core';
 import Input from '../../atoms/Input/Input';
 import Switch from '../../atoms/Switch/Switch';
 import Typo from '../../atoms/Typo/Typo';
+import Button from '../../atoms/Button/Button';
+
+const useStyles = makeStyles({
+  root: {
+    padding: '5em 0',
+    width: '300px',
+  },
+  margin: {
+    marginBottom: '1em',
+  },
+  button: {
+    margin: '2.15em',
+  },
+});
 
 const ChannelInfoForm = () => {
   const [channelName, setChannelName] = useState<string>('');
   const [isValidChannelName, setValidChannelName] = useState<boolean>(false);
   const [helperTextChannelName, setHelperTextChannelName] = useState<string>('영문+숫자 5-25자');
-
   const [isToggleChecked, setToggleCheck] = useState(false);
-
   const [password, setPassword] = useState<string>('');
   const [isValidPassword, setValidPassword] = useState<boolean>(false);
   const [helperTextPassword, setHelperTextPassword] = useState<string>('영문+숫자 4-12자');
-
   const [checkPassword, setCheckPassword] = useState<string>('');
   const [isValidCheckPassword, setValidCheckPassword] = useState<boolean>(false);
   const [helperTextCheckPassword, setHelperTextCheckPassword] = useState<string>('영문+숫자 4-12자');
+  const classes = useStyles();
 
   const handleChannelNameChange = (event: React.ChangeEvent<Element>) => {
     const { value } = (event as React.ChangeEvent<HTMLInputElement>).target;
@@ -65,51 +77,87 @@ const ChannelInfoForm = () => {
     setCheckPassword(value);
   };
 
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+  };
+
   return (
-    <Grid container flex-direction="column" alignItems="center">
-      <form>
-        <Grid item>
-          <Input
-            onChange={handleChannelNameChange}
-            label="채널명 입력 *"
-            value={channelName}
-            helperText={helperTextChannelName}
-            error={!isValidChannelName}
-          />
-        </Grid>
-        <Grid item container>
-          <Switch
-            name="private toggle"
-            checked={isToggleChecked}
-            onChange={() => { setToggleCheck(!isToggleChecked); }}
-          />
-          <Typo>Private</Typo>
-        </Grid>
-        <Grid item>
-          {isToggleChecked && (
-          <>
+    <Grid container justifyContent="center">
+      <Grid
+        item
+        container
+        className={classes.root}
+        direction="column"
+        justifyContent="space-evenly"
+        spacing={3}
+      >
+        <Typo variant="h3" align="center" gutterBottom>Channel Form</Typo>
+        <Typo className={classes.margin}>* 표시: 필수 입력 항목</Typo>
+        <form onSubmit={handleSubmit}>
+          <Grid item container alignItems="center" justifyContent="center">
             <Input
-              onChange={handlePasswordChange}
-              label="비밀번호 입력 *"
-              type="password"
-              value={password}
-              helperText={helperTextPassword}
-              error={!isValidPassword}
-              autoComplete
+              onChange={handleChannelNameChange}
+              label="채널명 입력 *"
+              value={channelName}
+              helperText={helperTextChannelName}
+              error={!isValidChannelName}
             />
-            <Input
-              onChange={handleCheckPasswordChange}
-              label="비밀번호 검증 입력 *"
-              type="password"
-              value={checkPassword}
-              helperText={helperTextCheckPassword}
-              error={!isValidCheckPassword}
-              autoComplete
+          </Grid>
+          <Grid item container alignItems="center" justifyContent="center">
+            <Switch
+              name="private toggle"
+              checked={isToggleChecked}
+              onChange={() => { setToggleCheck(!isToggleChecked); }}
             />
-          </>
-          )}
-        </Grid>
-      </form>
+            <Typo>Private</Typo>
+          </Grid>
+          <Grid>
+            {isToggleChecked && (
+              <Grid
+                item
+                container
+                direction="column"
+                justifyContent="center"
+                alignItems="center"
+              >
+                <Grid item>
+                  <Input
+                    onChange={handlePasswordChange}
+                    label="비밀번호 입력 *"
+                    type="password"
+                    value={password}
+                    helperText={helperTextPassword}
+                    error={!isValidPassword}
+                    autoComplete
+                  />
+                </Grid>
+                <Grid item>
+                  <Input
+                    onChange={handleCheckPasswordChange}
+                    label="비밀번호 검증 입력 *"
+                    type="password"
+                    value={checkPassword}
+                    helperText={helperTextCheckPassword}
+                    error={!isValidCheckPassword}
+                    autoComplete
+                  />
+                </Grid>
+              </Grid>
+            )}
+          </Grid>
+          <Grid container justifyContent="center">
+            <Button
+              type="submit"
+              disabled={(!isToggleChecked && !isValidChannelName)
+                || (isToggleChecked && (!isValidPassword || !isValidCheckPassword
+                  || !isValidChannelName))}
+              className={classes.button}
+            >
+              채널 만들기
+            </Button>
+          </Grid>
+        </form>
+      </Grid>
     </Grid>
   );
 };
