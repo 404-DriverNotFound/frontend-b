@@ -6,8 +6,8 @@ import Grid from '@material-ui/core/Grid';
 import Button from '../../atoms/Button/Button';
 import Dialog from '../../molecules/Dialog/Dialog';
 import LoginTemplate from '../../templates/LoginTemplate/LoginTemplate';
-import { useAppDispatch } from '../../../utils/hooks/useContext';
-import makeAPIPath from '../../../utils/utils';
+import { useAppDispatch, useUserState } from '../../../utils/hooks/useContext';
+import { makeAPIPath } from '../../../utils/utils';
 import Typo from '../../atoms/Typo/Typo';
 import useDialog from '../../../utils/hooks/useDialog';
 
@@ -25,9 +25,15 @@ const MFARegisterPage = () => {
   } = useDialog();
   const classes = useStyles();
   const appDispatch = useAppDispatch();
+  const { enable2FA, authenticatorSecret } = useUserState();
   const history = useHistory();
 
   useEffect(() => {
+    if (!enable2FA || (enable2FA && authenticatorSecret)) {
+      toast.error('잘못된 접근입니다.');
+      history.replace('/');
+    }
+
     appDispatch({ type: 'loading' });
 
     fetch(makeAPIPath('/auth/otp/qrcode'), { credentials: 'include' })
@@ -44,10 +50,10 @@ const MFARegisterPage = () => {
       <Button variant="text" onClick={() => { setOpen(false); }}>아니오, 아직 등록하지 않았습니다</Button>
       <Button onClick={() => {
         setDialog({
-          title: '회원가입 완료',
-          content: '회원가입이 완료되어 로그인 화면으로 돌아갑니다. 서비스를 이용하시려면 로그인 해주세요.',
-          buttons: <Button variant="text" onClick={() => { history.push('/'); }}>확인</Button>,
-          onClose: () => { history.push('/'); },
+          title: 'QR코드 등록 완료',
+          content: 'QR코드 등록이 완료되어 2FA 인증 화면으로 이동합니다.',
+          buttons: <Button variant="text" onClick={() => { history.replace('/2fa'); }}>확인</Button>,
+          onClose: () => { history.replace('/2fa'); },
         });
       }}
       >
