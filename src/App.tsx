@@ -68,7 +68,7 @@ const App = () => {
           info: {
             id,
             name,
-            avatar,
+            avatar: makeAPIPath(`/${avatar}`),
             enable2FA,
             authenticatorSecret,
             isSecondFactorAuthenticated,

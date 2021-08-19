@@ -12,13 +12,14 @@ import Input from '../../atoms/Input/Input';
 import Button from '../../atoms/Button/Button';
 import Switch from '../../atoms/Switch/Switch';
 import { DialogProps } from '../../../utils/hooks/useDialog';
+import useLogout from '../../../utils/hooks/useLogout';
 
 const useStyles = makeStyles({
   root: {
     padding: '5em 0',
     width: '350px',
   },
-  margin: {
+  marginBottom: {
     marginBottom: '1em',
   },
   button: {
@@ -52,6 +53,7 @@ const UserInfoForm = ({
   const [previewSrc, setPreviewSrc] = useState<string>(currentAvatarSrc || makeAPIPath('/files/avatar/default.png'));
   const appDispatch = useAppDispatch();
   const userDispatch = useUserDispatch();
+  const handleLogout = useLogout();
   const classes = useStyles();
   const history = useHistory();
 
@@ -182,15 +184,23 @@ const UserInfoForm = ({
           info: {
             id,
             name,
-            avatar,
+            avatar: makeAPIPath(`/${avatar}`),
             enable2FA,
             authenticatorSecret,
             isSecondFactorAuthenticated,
           },
         });
-        setOpen(false);
-        if (is2FAChanged && is2FAEnabled) toast('다음 로그인 시 2FA 인증을 위한 QR코드 등록 절차가 진행됩니다.');
-        history.push('/profile');
+        if (is2FAChanged && is2FAEnabled) {
+          setDialog({
+            title: '2FA 활성화 완료',
+            content: '2FA를 활성화하여 로그아웃됩니다. 다음 로그인 시 2FA 인증을 위한 QR코드 등록 절차가 진행됩니다.',
+            buttons: <Button variant="text" onClick={handleLogout}>Close</Button>,
+            onClose: handleLogout,
+          });
+        } else {
+          setOpen(false);
+          history.push('/profile');
+        }
       })
       .catch((error) => {
         if (error.response) {
@@ -219,7 +229,7 @@ const UserInfoForm = ({
         <Avatar size="large" alt={username} src={previewSrc} />
       </Grid>
       <form onSubmit={currentName ? handleEdit : handleRegister}>
-        <Grid item container className={classes.margin} justifyContent="space-between">
+        <Grid item container className={classes.marginBottom} justifyContent="space-between">
           <Input
             onChange={handleNameChange}
             label="닉네임 *"
@@ -229,7 +239,7 @@ const UserInfoForm = ({
           />
           <Button onClick={handleNameCheck} disabled={!isValidName}>중복 체크</Button>
         </Grid>
-        <Grid item container className={classes.margin} direction="column">
+        <Grid item container className={classes.marginBottom} direction="column">
           <Grid item container justifyContent="space-between" alignItems="center">
             <Typo variant="subtitle1">프로필 사진 등록</Typo>
             <MaterialButton className={classes.button} variant="contained" color="primary" component="label">
@@ -245,9 +255,12 @@ const UserInfoForm = ({
           </Grid>
           <Typo variant="caption">{filename || '선택된 파일이 없습니다.'}</Typo>
         </Grid>
-        <Grid item container className={classes.margin} justifyContent="space-between">
-          <Typo variant="subtitle1">2 Factor 인증 사용 여부</Typo>
-          <Switch checked={is2FAEnabled} onChange={() => { set2FA(!is2FAEnabled); }} />
+        <Grid item container className={classes.marginBottom} direction="column">
+          <Grid item container justifyContent="space-between">
+            <Typo variant="subtitle1">2 Factor 인증 사용 여부</Typo>
+            <Switch checked={is2FAEnabled} onChange={() => { set2FA(!is2FAEnabled); }} />
+          </Grid>
+          {currentName && <Typo variant="caption">2FA 활성화 시 자동 로그아웃됩니다</Typo>}
         </Grid>
         <Grid item container justifyContent="center">
           {
