@@ -100,6 +100,7 @@ export const WithListAndProfileCard = () => {
   const ProfileList = () => (
     <ListItem>
       <ProfileCard
+        setUser={() => {}}
         userInfo={userInfo}
         setOpen={() => {}}
         setDialog={() => {}}

@@ -8,6 +8,8 @@ import MainTemplate from '../../templates/MainTemplate/MainTemplate';
 import Typo from '../../atoms/Typo/Typo';
 import List from '../../atoms/List/List';
 import ListItem from '../../atoms/ListItem/ListItem';
+import useDialog from '../../../utils/hooks/useDialog';
+import Dialog from '../../molecules/Dialog/Dialog';
 
 export default {
   title: 'organisms/ProfileCard',
@@ -15,6 +17,9 @@ export default {
 } as Meta;
 
 export const OthersProfile = () => {
+  const {
+    isOpen, setOpen, dialog, setDialog,
+  } = useDialog();
   const userInfo: RelatedInfoType = {
     id: '550e8400-e29b-41d4-a716-446655440000', // 의미없는 uuid입니다
     name: 'USERNAME',
@@ -25,11 +30,19 @@ export const OthersProfile = () => {
 
   return (
     <ContextProvider>
+      <Dialog
+        isOpen={isOpen}
+        title={dialog.title}
+        content={dialog.content}
+        buttons={dialog.buttons}
+        onClose={dialog.onClose}
+      />
       <Typo align="center">프로필에서는 이렇게 보입니다.</Typo>
       <ProfileCard
         userInfo={{ ...userInfo, name: 'NONE' }}
-        setOpen={() => {}}
-        setDialog={() => {}}
+        setUser={() => {}}
+        setOpen={setOpen}
+        setDialog={setDialog}
         profile
       />
       <ProfileCard
@@ -39,8 +52,9 @@ export const OthersProfile = () => {
           relationship: 'FRIEND',
           status: 'ONLINE',
         }}
-        setOpen={() => {}}
-        setDialog={() => {}}
+        setUser={() => {}}
+        setOpen={setOpen}
+        setDialog={setDialog}
         profile
       />
       <ProfileCard
@@ -50,26 +64,30 @@ export const OthersProfile = () => {
           relationship: 'REQUESTING',
           status: 'IN_GAME',
         }}
-        setOpen={() => {}}
-        setDialog={() => {}}
+        setUser={() => {}}
+        setOpen={setOpen}
+        setDialog={setDialog}
         profile
       />
       <ProfileCard
         userInfo={{ ...userInfo, name: 'REQUESTED', relationship: 'REQUESTED' }}
-        setOpen={() => {}}
-        setDialog={() => {}}
+        setUser={() => {}}
+        setOpen={setOpen}
+        setDialog={setDialog}
         profile
       />
       <ProfileCard
         userInfo={{ ...userInfo, name: 'BLOCKED', relationship: 'BLOCKED' }}
-        setOpen={() => {}}
-        setDialog={() => {}}
+        setUser={() => {}}
+        setOpen={setOpen}
+        setDialog={setDialog}
         profile
       />
       <ProfileCard
         userInfo={{ ...userInfo, name: 'BLOCKING', relationship: 'BLOCKING' }}
-        setOpen={() => {}}
-        setDialog={() => {}}
+        setUser={() => {}}
+        setOpen={setOpen}
+        setDialog={setDialog}
         profile
       />
     </ContextProvider>
@@ -77,6 +95,9 @@ export const OthersProfile = () => {
 };
 
 export const OthersList = () => {
+  const {
+    isOpen, setOpen, dialog, setDialog,
+  } = useDialog();
   const userInfo: RelatedInfoType = {
     id: '550e8400-e29b-41d4-a716-446655440000', // 의미없는 uuid입니다
     name: 'USERNAME',
@@ -87,58 +108,71 @@ export const OthersList = () => {
 
   return (
     <ContextProvider>
+      <Dialog
+        isOpen={isOpen}
+        title={dialog.title}
+        content={dialog.content}
+        buttons={dialog.buttons}
+        onClose={dialog.onClose}
+      />
       <Typo align="center">유저 리스트에서는 이렇게 보입니다.</Typo>
       <List height="70vh" scroll>
         <ListItem>
           <ProfileCard
+            setUser={() => {}}
             userInfo={{
               ...userInfo,
               name: 'NONE',
               relationship: 'NONE',
               status: 'ONLINE',
             }}
-            setOpen={() => {}}
-            setDialog={() => {}}
+            setOpen={setOpen}
+            setDialog={setDialog}
           />
         </ListItem>
         <ListItem>
           <ProfileCard
+            setUser={() => {}}
             userInfo={{
               ...userInfo,
               name: 'FRIEND',
               relationship: 'FRIEND',
               status: 'IN_GAME',
             }}
-            setOpen={() => {}}
-            setDialog={() => {}}
+            setOpen={setOpen}
+            setDialog={setDialog}
           />
         </ListItem>
         <ListItem>
           <ProfileCard
+            setUser={() => {}}
             userInfo={{ ...userInfo, name: 'REQUESTING', relationship: 'REQUESTING' }}
-            setOpen={() => {}}
-            setDialog={() => {}}
+            setOpen={setOpen}
+            setDialog={setDialog}
           />
         </ListItem>
         <ListItem>
           <ProfileCard
+            setUser={() => {}}
             userInfo={{ ...userInfo, name: 'REQUESTED', relationship: 'REQUESTED' }}
-            setOpen={() => {}}
-            setDialog={() => {}}
+            setOpen={setOpen}
+            setDialog={setDialog}
           />
         </ListItem>
         <ListItem>
           <ProfileCard
+            setUser={() => {}}
             userInfo={{ ...userInfo, name: 'BLOCKED', relationship: 'BLOCKED' }}
-            setOpen={() => {}}
-            setDialog={() => {}}
+            setOpen={setOpen}
+            setDialog={setDialog}
           />
         </ListItem>
         <ListItem>
           <ProfileCard
+            setUser={() => {}}
             userInfo={{ ...userInfo, name: 'BLOCKING', relationship: 'BLOCKING' }}
-            setOpen={() => {}}
-            setDialog={() => {}}
+            setOpen={setOpen}
+            setDialog={setDialog}
           />
         </ListItem>
       </List>
@@ -147,6 +181,9 @@ export const OthersList = () => {
 };
 
 const ProfileCardWithContext = () => {
+  const {
+    isOpen, setOpen, dialog, setDialog,
+  } = useDialog();
   const userDispatch = useUserDispatch();
   const userInfo: RelatedInfoType = {
     id: '550e8400-e29b-41d4-a716-446655440000', // 의미없는 uuid입니다
@@ -171,12 +208,22 @@ const ProfileCardWithContext = () => {
   }, []);
 
   return (
-    <ProfileCard
-      userInfo={userInfo}
-      setOpen={() => {}}
-      setDialog={() => {}}
-      profile
-    />
+    <>
+      <Dialog
+        isOpen={isOpen}
+        title={dialog.title}
+        content={dialog.content}
+        buttons={dialog.buttons}
+        onClose={dialog.onClose}
+      />
+      <ProfileCard
+        setUser={() => {}}
+        userInfo={userInfo}
+        setOpen={setOpen}
+        setDialog={setDialog}
+        profile
+      />
+    </>
   );
 };
 

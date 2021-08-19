@@ -41,6 +41,7 @@ export type RawFriendInfoType = {
  * - friendship.id: 관계 table의 id
  * ### API Endpoint
  * - GET /users
+ * - GET /users/:name
  */
 export type RawRelatedInfoType = RawUserInfoType & {
   friendship: null | RawFriendInfoType,
