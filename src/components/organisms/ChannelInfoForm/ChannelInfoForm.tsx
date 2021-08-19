@@ -3,6 +3,10 @@ import { Grid } from '@material-ui/core';
 import Input from '../../atoms/Input/Input';
 
 const ChannelInfoForm = () => {
+  const [channelName, setChannelName] = useState<string>('');
+  const [isValidChannelName, setValidChannelName] = useState<boolean>(false);
+  const [helperTextChannelName, setHelperTextChannelName] = useState<string>('영문+숫자 30자 이내');
+
   const [password, setPassword] = useState<string>('');
   const [isValidPassword, setValidPassword] = useState<boolean>(false);
   const [helperTextPassword, setHelperTextPassword] = useState<string>('영문+숫자 4-12자');
@@ -10,6 +14,16 @@ const ChannelInfoForm = () => {
   const [checkPassword, setCheckPassword] = useState<string>('');
   const [isValidCheckPassword, setValidCheckPassword] = useState<boolean>(false);
   const [helperTextCheckPassword, setHelperTextCheckPassword] = useState<string>('영문+숫자 4-12자');
+
+  const handleChannelNameChange = (event: React.ChangeEvent<Element>) => {
+    const { value } = (event as React.ChangeEvent<HTMLInputElement>).target;
+    if (value.length > 25) return;
+    if (value.length > 0) {
+      setValidChannelName(true);
+      setHelperTextChannelName('사용할 수 있는 채널이름');
+    }
+    setChannelName(value);
+  };
 
   const handlePasswordChange = (event: React.ChangeEvent<Element>) => {
     const { value } = (event as React.ChangeEvent<HTMLInputElement>).target;
@@ -36,6 +50,15 @@ const ChannelInfoForm = () => {
 
   return (
     <Grid flex-direction="column" alignItems="center">
+      <Grid>
+        <Input
+          onChange={handleChannelNameChange}
+          label="채널명 입력 *"
+          value={channelName}
+          helperText={helperTextChannelName}
+          error={!isValidChannelName}
+        />
+      </Grid>
       <Grid>
         <Input
           onChange={handlePasswordChange}
