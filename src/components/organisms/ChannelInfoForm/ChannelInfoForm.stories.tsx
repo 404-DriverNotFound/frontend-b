@@ -8,5 +8,5 @@ export default {
 } as Meta;
 
 export const Default = () => (
-  <ChannelInfoForm />
+  <ChannelInfoForm setOpen={() => {}} />
 );

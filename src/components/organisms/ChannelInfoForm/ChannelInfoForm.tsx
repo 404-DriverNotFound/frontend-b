@@ -14,11 +14,15 @@ const useStyles = makeStyles({
     marginBottom: '1em',
   },
   button: {
-    margin: '2.15em',
+    marginTop: '1.68em',
+    width: '32.8%',
   },
 });
 
-const ChannelInfoForm = () => {
+// eslint-disable-next-line no-unused-vars
+type ChannelInfoFormProps = { setOpen: (isOpen:boolean) => void };
+
+const ChannelInfoForm = ({ setOpen }: ChannelInfoFormProps) => {
   const [channelName, setChannelName] = useState<string>('');
   const [isValidChannelName, setValidChannelName] = useState<boolean>(false);
   const [helperTextChannelName, setHelperTextChannelName] = useState<string>('영문+숫자 5-25자');
@@ -46,13 +50,11 @@ const ChannelInfoForm = () => {
 
   const handlePasswordChange = (event: React.ChangeEvent<Element>) => {
     const { value } = (event as React.ChangeEvent<HTMLInputElement>).target;
-
     if (value.length > 12) return;
     if (/^[A-Za-z0-9]{4,12}$/.test(value)) {
       setValidPassword(true);
       setHelperTextPassword('사용할 수 있는 비밀번호');
     } else setValidPassword(false);
-    // NOTE: 아래는 비밀번호 검증 후, 비밀번호를 바꿨을 때 생기는 문제를 위한 코드
     if (checkPassword === value) {
       setValidCheckPassword(true);
       setHelperTextCheckPassword('비밀번호 일치');
@@ -65,7 +67,6 @@ const ChannelInfoForm = () => {
 
   const handleCheckPasswordChange = (event: React.ChangeEvent<Element>) => {
     const { value } = (event as React.ChangeEvent<HTMLInputElement>).target;
-
     if (value.length > 12) return;
     if (value === password) {
       setValidCheckPassword(true);
@@ -79,6 +80,7 @@ const ChannelInfoForm = () => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    // FIXME: API 확정된 후 추가하기
   };
 
   return (
@@ -146,6 +148,13 @@ const ChannelInfoForm = () => {
             )}
           </Grid>
           <Grid container justifyContent="center">
+            <Button
+              variant="text"
+              className={classes.button}
+              onClick={() => { setOpen(false); }}
+            >
+              Cancel
+            </Button>
             <Button
               type="submit"
               disabled={(!isToggleChecked && !isValidChannelName)
