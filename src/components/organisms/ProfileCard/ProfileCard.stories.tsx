@@ -3,7 +3,7 @@ import { Meta } from '@storybook/react';
 import { BrowserRouter } from 'react-router-dom';
 import { ContextProvider, useUserDispatch } from '../../../utils/hooks/useContext';
 import ProfileCard from './ProfileCard';
-import { UserInfoType } from '../../../types/User';
+import { RelatedInfoType } from '../../../types/User';
 import MainTemplate from '../../templates/MainTemplate/MainTemplate';
 import Typo from '../../atoms/Typo/Typo';
 import List from '../../atoms/List/List';
@@ -15,7 +15,7 @@ export default {
 } as Meta;
 
 export const OthersProfile = () => {
-  const userInfo: UserInfoType = {
+  const userInfo: RelatedInfoType = {
     id: '550e8400-e29b-41d4-a716-446655440000', // 의미없는 uuid입니다
     name: 'USERNAME',
     avatar: '',
@@ -77,7 +77,7 @@ export const OthersProfile = () => {
 };
 
 export const OthersList = () => {
-  const userInfo: UserInfoType = {
+  const userInfo: RelatedInfoType = {
     id: '550e8400-e29b-41d4-a716-446655440000', // 의미없는 uuid입니다
     name: 'USERNAME',
     avatar: '',
@@ -148,7 +148,7 @@ export const OthersList = () => {
 
 const ProfileCardWithContext = () => {
   const userDispatch = useUserDispatch();
-  const userInfo: UserInfoType = {
+  const userInfo: RelatedInfoType = {
     id: '550e8400-e29b-41d4-a716-446655440000', // 의미없는 uuid입니다
     name: 'ME',
     avatar: '',

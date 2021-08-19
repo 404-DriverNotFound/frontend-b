@@ -3,7 +3,7 @@ import { createStyles, makeStyles, withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Badge from '@material-ui/core/Badge';
 import StarRoundedIcon from '@material-ui/icons/StarRounded';
-import { UserInfoType, UserStatusType } from '../../../types/User';
+import { RelatedInfoType, UserStatusType } from '../../../types/User';
 import Avatar from '../../atoms/Avatar/Avatar';
 import Typo from '../../atoms/Typo/Typo';
 
@@ -34,7 +34,7 @@ const StyledBadge = withStyles(() => createStyles({
 }))(Badge);
 
 export type UserProfileProps = {
-  userInfo: UserInfoType,
+  userInfo: RelatedInfoType,
   profile?: boolean,
 };
 

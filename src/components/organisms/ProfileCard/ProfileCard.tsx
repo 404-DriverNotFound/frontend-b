@@ -2,7 +2,7 @@ import React from 'react';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 import { useUserState } from '../../../utils/hooks/useContext';
-import { UserInfoType } from '../../../types/User';
+import { RelatedInfoType } from '../../../types/User';
 import Button from '../../atoms/Button/Button';
 import UserProfile from '../../molecules/UserProfile/UserProfile';
 import { DialogProps, initialDialog } from '../../../utils/hooks/useDialog';
@@ -19,7 +19,7 @@ const useStyles = makeStyles({
 });
 
 type ProfileCardProps = {
-  userInfo: UserInfoType,
+  userInfo: RelatedInfoType,
   // eslint-disable-next-line no-unused-vars
   setOpen: (value: boolean) => void,
   // eslint-disable-next-line no-unused-vars

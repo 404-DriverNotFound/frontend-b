@@ -10,7 +10,7 @@ import List from '../List/List';
 import MainTemplate from '../../templates/MainTemplate/MainTemplate';
 import { ContextProvider } from '../../../utils/hooks/useContext';
 import ProfileCard from '../../organisms/ProfileCard/ProfileCard';
-import { UserInfoType } from '../../../types/User';
+import { RelatedInfoType } from '../../../types/User';
 
 export default {
   component: ListItem,
@@ -90,7 +90,7 @@ export const WithMainTemplate = () => (
 );
 
 export const WithListAndProfileCard = () => {
-  const userInfo: UserInfoType = {
+  const userInfo: RelatedInfoType = {
     id: '550e8400-e29b-41d4-a716-446655440000', // 의미없는 uuid입니다
     name: 'USERNAME',
     avatar: '',
