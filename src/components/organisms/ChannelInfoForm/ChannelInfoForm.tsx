@@ -19,20 +19,30 @@ const useStyles = makeStyles({
   },
 });
 
+const CHANNEL_NAME_AVAILABLE = '사용할 수 있는 채널이름';
+const CHANNEL_NAME_HELPER_TEXT = '영문+숫자 5-25자';
+const CHANNEL_PASSWORD_AVAILABLE = '사용할 수 있는 비밀번호';
+const CHANNEL_PASSWORD_HELPER_TEXT = '영문+숫자 4-12자';
+const PASSWORD_CHECK_YES = '비밀번호 일치';
+const PASSWORD_CHECK_NO = '비밀번호 일치하지 않음';
+
 // eslint-disable-next-line no-unused-vars
 type ChannelInfoFormProps = { setOpen: (isOpen:boolean) => void };
 
 const ChannelInfoForm = ({ setOpen }: ChannelInfoFormProps) => {
   const [channelName, setChannelName] = useState<string>('');
   const [isValidChannelName, setValidChannelName] = useState<boolean>(false);
-  const [helperTextChannelName, setHelperTextChannelName] = useState<string>('영문+숫자 5-25자');
+  // eslint-disable-next-line max-len
+  const [helperTextChannelName, setHelperTextChannelName] = useState<string>(CHANNEL_NAME_HELPER_TEXT);
   const [isToggleChecked, setToggleCheck] = useState(false);
   const [password, setPassword] = useState<string>('');
   const [isValidPassword, setValidPassword] = useState<boolean>(false);
-  const [helperTextPassword, setHelperTextPassword] = useState<string>('영문+숫자 4-12자');
+  // eslint-disable-next-line max-len
+  const [helperTextPassword, setHelperTextPassword] = useState<string>(CHANNEL_PASSWORD_HELPER_TEXT);
   const [checkPassword, setCheckPassword] = useState<string>('');
   const [isValidCheckPassword, setValidCheckPassword] = useState<boolean>(false);
-  const [helperTextCheckPassword, setHelperTextCheckPassword] = useState<string>('영문+숫자 4-12자');
+  // eslint-disable-next-line max-len
+  const [helperTextCheckPassword, setHelperTextCheckPassword] = useState<string>(CHANNEL_PASSWORD_HELPER_TEXT);
   const classes = useStyles();
 
   const handleChannelNameChange = (event: React.ChangeEvent<Element>) => {
@@ -40,10 +50,10 @@ const ChannelInfoForm = ({ setOpen }: ChannelInfoFormProps) => {
     if (value.length > 25) return;
     if (/^[A-Za-z0-9]{5,25}$/.test(value)) {
       setValidChannelName(true);
-      setHelperTextChannelName('사용할 수 있는 채널이름');
+      setHelperTextChannelName(CHANNEL_NAME_AVAILABLE);
     } else {
       setValidChannelName(false);
-      setHelperTextChannelName('영문+숫자 5-25자');
+      setHelperTextChannelName(CHANNEL_NAME_HELPER_TEXT);
     }
     setChannelName(value);
   };
@@ -53,14 +63,14 @@ const ChannelInfoForm = ({ setOpen }: ChannelInfoFormProps) => {
     if (value.length > 12) return;
     if (/^[A-Za-z0-9]{4,12}$/.test(value)) {
       setValidPassword(true);
-      setHelperTextPassword('사용할 수 있는 비밀번호');
+      setHelperTextPassword(CHANNEL_PASSWORD_AVAILABLE);
     } else setValidPassword(false);
     if (checkPassword === value) {
       setValidCheckPassword(true);
-      setHelperTextCheckPassword('비밀번호 일치');
+      setHelperTextCheckPassword(PASSWORD_CHECK_YES);
     } else {
       setValidCheckPassword(false);
-      setHelperTextCheckPassword('비밀번호 일치하지 않음');
+      setHelperTextCheckPassword(PASSWORD_CHECK_NO);
     }
     setPassword(value);
   };
@@ -70,10 +80,10 @@ const ChannelInfoForm = ({ setOpen }: ChannelInfoFormProps) => {
     if (value.length > 12) return;
     if (value === password) {
       setValidCheckPassword(true);
-      setHelperTextCheckPassword('비밀번호 일치');
+      setHelperTextCheckPassword(PASSWORD_CHECK_YES);
     } else {
       setValidCheckPassword(false);
-      setHelperTextCheckPassword('비밀번호 일치하지 않음');
+      setHelperTextCheckPassword(PASSWORD_CHECK_NO);
     }
     setCheckPassword(value);
   };
@@ -81,6 +91,15 @@ const ChannelInfoForm = ({ setOpen }: ChannelInfoFormProps) => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     // FIXME: API 확정된 후 추가하기
+  };
+
+  const isValidForm = () => {
+    if (!isToggleChecked) {
+      if (isValidChannelName) return true;
+      return false;
+    }
+    if (isValidChannelName && isValidPassword && isValidCheckPassword) return true;
+    return false;
   };
 
   return (
@@ -157,9 +176,7 @@ const ChannelInfoForm = ({ setOpen }: ChannelInfoFormProps) => {
             </Button>
             <Button
               type="submit"
-              disabled={(!isToggleChecked && !isValidChannelName)
-                || (isToggleChecked && (!isValidPassword || !isValidCheckPassword
-                  || !isValidChannelName))}
+              disabled={!isValidForm()}
               className={classes.button}
             >
               채널 만들기
