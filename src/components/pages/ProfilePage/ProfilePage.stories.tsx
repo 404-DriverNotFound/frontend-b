@@ -28,6 +28,8 @@ const ProfilePageWithContext = () => {
         name: userInfo.name,
         avatar: userInfo.avatar,
         enable2FA: false,
+        authenticatorSecret: false,
+        isSecondFactorAuthenticated: false,
       },
     });
   }, []);

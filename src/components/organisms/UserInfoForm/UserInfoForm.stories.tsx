@@ -26,7 +26,8 @@ export const Default = () => (
             currentName=""
             currentAvatarSrc=""
             current2FA={false}
-            setDialogOpen={() => {}}
+            setOpen={() => {}}
+            setDialog={() => {}}
           />
         </Grid>
       </Grid>
@@ -50,7 +51,8 @@ export const ExistingUser = () => (
             currentName="jikang"
             currentAvatarSrc="https://cdn.intra.42.fr/users/medium_jikang.jpg"
             current2FA
-            setDialogOpen={() => {}}
+            setOpen={() => {}}
+            setDialog={() => {}}
           />
         </Grid>
       </Grid>

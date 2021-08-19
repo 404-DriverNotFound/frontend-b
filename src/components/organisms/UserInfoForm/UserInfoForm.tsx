@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { Grid, makeStyles } from '@material-ui/core';
@@ -6,11 +6,12 @@ import MaterialButton from '@material-ui/core/Button';
 import { useHistory } from 'react-router-dom';
 import Typo from '../../atoms/Typo/Typo';
 import Avatar from '../../atoms/Avatar/Avatar';
-import makeAPIPath from '../../../utils/utils';
+import { makeAPIPath } from '../../../utils/utils';
 import { useAppDispatch, useUserDispatch } from '../../../utils/hooks/useContext';
 import Input from '../../atoms/Input/Input';
 import Button from '../../atoms/Button/Button';
 import Switch from '../../atoms/Switch/Switch';
+import { DialogProps } from '../../../utils/hooks/useDialog';
 
 const useStyles = makeStyles({
   root: {
@@ -30,13 +31,16 @@ type UserInfoFormProps = {
   currentAvatarSrc: string,
   current2FA: boolean,
   // eslint-disable-next-line no-unused-vars
-  setDialogOpen: (isOpen: boolean) => void,
+  setOpen: (isOpen: boolean) => void,
+  // eslint-disable-next-line no-unused-vars
+  setDialog: (value: DialogProps) => void,
+  ftId?: string,
 };
 
 const UserInfoForm = ({
-  currentName, currentAvatarSrc, current2FA, setDialogOpen,
+  currentName, currentAvatarSrc, current2FA, setDialog, setOpen, ftId,
 }: UserInfoFormProps) => {
-  const [name, setName] = useState<string>(currentName);
+  const [username, setUsername] = useState<string>(currentName);
   const [helperText, setHelperText] = useState<string>('영문+숫자 3-12자');
   const [isValidName, setNameValid] = useState<boolean>(false);
   const [isNameChecked, setNameChecked] = useState<boolean>(false);
@@ -77,7 +81,7 @@ const UserInfoForm = ({
     setHelperText('영문+숫자 3-12자');
     if (/^[A-Za-z0-9]{3,12}$/.test(value)) setNameValid(true);
     else setNameValid(false);
-    setName(value);
+    setUsername(value);
     if (currentName === value) {
       setNameChecked(true);
       setNameValid(false);
@@ -88,7 +92,7 @@ const UserInfoForm = ({
 
   const handleNameCheck = () => {
     appDispatch({ type: 'loading' });
-    axios.get(makeAPIPath(`/users/${name}`))
+    axios.head(makeAPIPath(`/users/${username}`))
       .finally(() => {
         appDispatch({ type: 'endLoading' });
       })
@@ -98,7 +102,7 @@ const UserInfoForm = ({
         setNameChecked(false);
       })
       .catch((error) => {
-        if (error.response) {
+        if (error.response && error.response.status === 404) {
           setHelperText('사용할 수 있는 닉네임입니다.');
           setNameChecked(true);
         } else toast.error(error.message);
@@ -117,8 +121,9 @@ const UserInfoForm = ({
 
     const formData = new FormData();
     formData.append('avatar', imageFile);
-    formData.append('name', name);
+    formData.append('name', username);
     formData.append('enable2FA', String(is2FAEnabled));
+    formData.append('ftId', ftId!);
     appDispatch({ type: 'loading' });
     axios({
       url: makeAPIPath('/users'),
@@ -130,10 +135,19 @@ const UserInfoForm = ({
       })
       .then(() => {
         if (is2FAEnabled) {
-          history.push('/register/2fa');
+          setDialog({
+            title: '회원가입 완료',
+            content: '회원가입이 완료되어 로그인 화면으로 돌아갑니다. 로그인 시 2FA 등록을 진행합니다.',
+            onClose: () => { history.push('/'); },
+          });
         } else {
-          setDialogOpen(true);
+          setDialog({
+            title: '회원가입 완료',
+            content: '회원가입이 완료되어 로그인 화면으로 돌아갑니다. 서비스를 이용하시려면 로그인 해주세요.',
+            onClose: () => { history.push('/'); },
+          });
         }
+        setOpen(true);
       })
       .catch((error) => {
         if (error.response) {
@@ -148,7 +162,7 @@ const UserInfoForm = ({
     event.preventDefault();
     const formData = new FormData();
     if (isAvatarChanged) formData.append('avatar', imageFile);
-    if (name !== currentName) formData.append('name', name);
+    if (username !== currentName) formData.append('name', username);
     if (is2FAChanged) formData.append('enable2FA', String(is2FAEnabled));
     appDispatch({ type: 'loading' });
     axios({
@@ -160,16 +174,21 @@ const UserInfoForm = ({
         appDispatch({ type: 'endLoading' });
       })
       .then(({ data }) => {
+        const {
+          id, name, avatar, enable2FA, authenticatorSecret, isSecondFactorAuthenticated,
+        } = data;
         userDispatch({
           type: 'edit',
           info: {
-            id: data.id,
-            name: data.name,
-            avatar: data.avatar,
-            enable2FA: data.enable2FA,
+            id,
+            name,
+            avatar,
+            enable2FA,
+            authenticatorSecret,
+            isSecondFactorAuthenticated,
           },
         });
-        setDialogOpen(false);
+        setOpen(false);
         if (is2FAChanged && is2FAEnabled) toast('다음 로그인 시 2FA 인증을 위한 QR코드 등록 절차가 진행됩니다.');
         history.push('/profile');
       })
@@ -184,29 +203,29 @@ const UserInfoForm = ({
 
   const isValidForm = () => {
     if (is2FAChanged) {
-      if (name === currentName) return is2FAChanged;
+      if (username === currentName) return is2FAChanged;
       return isNameChecked && is2FAChanged;
     } if (isAvatarChanged) {
-      if (name === currentName) return isAvatarChanged;
+      if (username === currentName) return isAvatarChanged;
       return isNameChecked && isAvatarChanged;
     }
-    if (name !== currentName) return isNameChecked;
+    if (username !== currentName) return isNameChecked;
     return false;
   };
 
   return (
     <>
       <Grid item container justifyContent="space-evenly" alignItems="center">
-        <Avatar size="large" alt={name} src={previewSrc} />
+        <Avatar size="large" alt={username} src={previewSrc} />
       </Grid>
       <form onSubmit={currentName ? handleEdit : handleRegister}>
         <Grid item container className={classes.margin} justifyContent="space-between">
           <Input
             onChange={handleNameChange}
             label="닉네임 *"
-            value={name}
+            value={username}
             helperText={helperText}
-            error={!isValidName && (currentName !== name)}
+            error={!isValidName && (currentName !== username)}
           />
           <Button onClick={handleNameCheck} disabled={!isValidName}>중복 체크</Button>
         </Grid>
@@ -235,7 +254,7 @@ const UserInfoForm = ({
             currentName
               ? (
                 <>
-                  <Button variant="text" onClick={() => { setDialogOpen(false); }}>cancel</Button>
+                  <Button variant="text" onClick={() => { setOpen(false); }}>cancel</Button>
                   <Button type="submit" disabled={!(isValidForm())}>submit</Button>
                 </>
               ) : (<Button type="submit" disabled={!isNameChecked}>회원 가입</Button>)
@@ -244,6 +263,10 @@ const UserInfoForm = ({
       </form>
     </>
   );
+};
+
+UserInfoForm.defaultProps = {
+  ftId: '',
 };
 
 export default UserInfoForm;

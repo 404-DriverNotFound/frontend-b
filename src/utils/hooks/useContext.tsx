@@ -13,7 +13,7 @@ const initialUserState: MyInfoType = {
 };
 
 type UserActionType = { type: 'login', info: MyInfoType } | { type: 'logout' }
-                    | { type: 'reset' };
+                    | { type: 'reset' } | { type: 'edit', info: MyInfoType };
 
 type AppStateType = {
   isLoading: boolean,

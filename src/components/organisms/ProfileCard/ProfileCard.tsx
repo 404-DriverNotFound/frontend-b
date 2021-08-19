@@ -5,7 +5,8 @@ import { useUserState } from '../../../utils/hooks/useContext';
 import { RelatedInfoType } from '../../../types/User';
 import Button from '../../atoms/Button/Button';
 import UserProfile from '../../molecules/UserProfile/UserProfile';
-import { DialogProps, initialDialog } from '../../../utils/hooks/useDialog';
+import { DialogProps } from '../../../utils/hooks/useDialog';
+import UserInfoForm from '../UserInfoForm/UserInfoForm';
 
 const useStyles = makeStyles({
   root: {
@@ -35,15 +36,30 @@ type ButtonObjType = {
 const ProfileCard = ({
   userInfo, setOpen, setDialog, profile,
 }: ProfileCardProps) => {
+  const {
+    // eslint-disable-next-line no-unused-vars
+    id, name, avatar, status, relationship, relationshipId,
+  } = userInfo;
   const me = useUserState();
   const classes = useStyles();
 
   const myButton: ButtonObjType = {
     text: '정보 수정',
     onClick: () => {
-      // TODO: ProfilePage와 합치기
-      // FIXME: initialDialog 삭제
-      setDialog(initialDialog);
+      const content = (
+        <UserInfoForm
+          currentName={me.name}
+          currentAvatarSrc={me.avatar}
+          current2FA={me.enable2FA!}
+          setOpen={setOpen}
+          setDialog={setDialog}
+        />
+      );
+      setDialog({
+        title: 'Edit Profile',
+        content,
+        onClose: () => { setOpen(false); },
+      });
       setOpen(true);
     },
   };

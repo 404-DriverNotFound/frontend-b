@@ -11,7 +11,7 @@ export type UserStatusType = 'ONLINE' | 'OFFLINE' | 'IN_GAME';
 export type FriendshipType = 'ACCEPT' | 'DECLINE' | 'PENDING' | 'BLOCK';
 
 /**
- * UserStatusType
+ * RelationshipType
  * @description 프론트엔드에서 후처리한 관계 종류
  */
 export type RelationshipType = 'NONE' | 'FRIEND' | 'REQUESTING' | 'REQUESTED' | 'BLOCKING' | 'BLOCKED';
@@ -40,7 +40,6 @@ export type UserInfoType = {
   name: string,
   avatar: string,
   status: UserStatusType,
-  enable2FA?: boolean,
 };
 
 /**
@@ -63,5 +62,5 @@ export type FriendInfoType = {
  */
 export type RelatedInfoType = UserInfoType & {
   relationship: RelationshipType,
-  relationshipId?: null | string,
+  relationshipId?: string,
 };

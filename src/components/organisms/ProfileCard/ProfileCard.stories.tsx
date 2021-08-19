@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Meta, Story } from '@storybook/react';
+import { Meta } from '@storybook/react';
 import { BrowserRouter } from 'react-router-dom';
 import { ContextProvider, useUserDispatch } from '../../../utils/hooks/useContext';
 import ProfileCard from './ProfileCard';

@@ -2,32 +2,30 @@ import React, { useEffect, useState } from 'react';
 import { RouteComponentProps, useHistory } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import Grid from '@material-ui/core/Grid';
-import { RelationshipType, UserInfoType } from '../../../types/User';
+import { RelatedInfoType } from '../../../types/User';
 import { useAppDispatch, useUserState } from '../../../utils/hooks/useContext';
-import makeAPIPath from '../../../utils/utils';
+import { asyncGetRequest, makeAPIPath } from '../../../utils/utils';
 import List from '../../atoms/List/List';
 import Typo from '../../atoms/Typo/Typo';
 import ProfileCard from '../../organisms/ProfileCard/ProfileCard';
-import { asyncGetRequest } from '../../../utils/api/asyncRequest';
 import Dialog from '../../molecules/Dialog/Dialog';
 import useDialog from '../../../utils/hooks/useDialog';
-import UserInfoForm from '../../organisms/UserInfoForm/UserInfoForm';
+import makeRelatedInfo from '../../../utils/friendship';
 
 type MatchParams = {
   username: string,
 };
 
-const initalUserInfo: UserInfoType = {
+const initialUserInfo: RelatedInfoType = {
   id: '',
   name: '',
   avatar: '',
   status: 'OFFLINE',
-  enable2FA: false,
+  relationship: 'NONE',
 };
 
 const ProfilePage = ({ match }: RouteComponentProps<MatchParams>) => {
-  const [user, setUser] = useState<UserInfoType>(initalUserInfo);
-  const [relationship, setRelationship] = useState<RelationshipType>('none');
+  const [user, setUser] = useState<RelatedInfoType>(initialUserInfo);
   const {
     isOpen, setOpen, dialog, setDialog,
   } = useDialog();
@@ -39,17 +37,11 @@ const ProfilePage = ({ match }: RouteComponentProps<MatchParams>) => {
   useEffect(() => {
     appDispatch({ type: 'loading' });
     asyncGetRequest(makeAPIPath(`/users/${username}`))
+      .finally(() => {
+        appDispatch({ type: 'endLoading' });
+      })
       .then(({ data }) => {
-        const {
-          id, name, avatar, enable2FA, status,
-        } = data;
-        setUser({
-          id,
-          name,
-          enable2FA: id === me.id ? enable2FA : false,
-          avatar: makeAPIPath(`/${avatar}`),
-          status,
-        });
+        setUser(makeRelatedInfo(me, data));
       })
       .catch((error) => {
         if (error.response && error.response.status >= 400 && error.response.status < 500) {
@@ -58,55 +50,7 @@ const ProfilePage = ({ match }: RouteComponentProps<MatchParams>) => {
           toast.error(error.message);
         }
       });
-    if (me.id !== user.id) {
-      // FIXME: Friendship API 수정 시 구현
-      setRelationship('none');
-      appDispatch({ type: 'endLoading' });
-    } else {
-      appDispatch({ type: 'endLoading' });
-    }
   }, []);
-
-  const handleProfileEdit = () => {
-    const content = (
-      <UserInfoForm
-        currentName={user.name}
-        currentAvatarSrc={user.avatar}
-        current2FA={user.enable2FA!}
-        setDialogOpen={setOpen}
-      />
-    );
-    setDialog({
-      title: 'Edit Profile',
-      content,
-      onClose: () => { setOpen(false); },
-    });
-    setOpen(true);
-  };
-
-  const handleFriendAdd = () => {
-    // TODO: 추후 구현
-  };
-
-  const handleFriendRemove = () => {
-    // TODO: 추후 구현
-  };
-
-  const handleUserBlock = () => {
-    // TODO: 추후 구현
-  };
-
-  const handleUserUnblock = () => {
-    // TODO: 추후 구현
-  };
-
-  const handleDMClick = () => {
-    // TODO: 추후 구현
-  };
-
-  const handleMatchInvite = () => {
-    // TODO: 추후 구현
-  };
 
   return (
     <>
@@ -121,14 +65,9 @@ const ProfilePage = ({ match }: RouteComponentProps<MatchParams>) => {
         <Grid item>
           <ProfileCard
             userInfo={user}
-            relationship={relationship}
-            onProfileEdit={handleProfileEdit}
-            onFriendAdd={handleFriendAdd}
-            onFriendRemove={handleFriendRemove}
-            onUserBlock={handleUserBlock}
-            onUserUnblock={handleUserUnblock}
-            onDMClick={handleDMClick}
-            onMatchInvite={handleMatchInvite}
+            setOpen={setOpen}
+            setDialog={setDialog}
+            profile
           />
         </Grid>
         <Grid item>
