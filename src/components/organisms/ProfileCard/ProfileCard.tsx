@@ -178,7 +178,7 @@ const ProfileCard = ({
                   <Button
                     type="button"
                     onClick={
-                      () => handlePatchRequest('DECLINE', '친구를 삭제했습니다.')
+                      () => handlePatchRequest('DECLINE', '친구 요청을 취소했습니다.')
                     }
                   >
                     confirm
