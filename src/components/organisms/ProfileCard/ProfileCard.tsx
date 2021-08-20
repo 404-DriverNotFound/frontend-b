@@ -110,8 +110,7 @@ const ProfileCard = ({
           ...userInfo,
           status: data ? data.addressee.status : userInfo.status,
           relationship: makeRelationship(true, status),
-          relationshipId: data ? data.id : undefined,
-          // NOTE: API 구현 후, 의도대로 동작하는 지 확인
+          relationshipId: (status !== 'DECLINE' && data) ? data.id : undefined,
         });
         toast(comment);
       })
@@ -236,7 +235,6 @@ const ProfileCard = ({
                     onClick={
                       () => handlePatchRequest('DECLINE', '차단 해제했습니다.')
                     }
-                  // NOTE: API 구현 후, 의도대로 동작하는 지 확인
                   >
                     confirm
                   </Button>
@@ -258,10 +256,12 @@ const ProfileCard = ({
                   <Button variant="text" onClick={() => { setOpen(false); }}>cancel</Button>
                   <Button
                     type="button"
-                    onClick={
-                      () => handlePatchRequest('BLOCK', '해당 유저를 차단했습니다.')
-                    }
-                    // NOTE: API 구현 후, 의도대로 동작하는 지 확인
+                    onClick={(relationshipId
+                      ? () => handlePatchRequest('BLOCK', '해당 유저를 차단했습니다.')
+                      : () => {
+                        // TODO: POST status: 'BLOCK'으로 요청
+                      }
+                    )}
                   >
                     confirm
                   </Button>
