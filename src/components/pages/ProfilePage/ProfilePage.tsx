@@ -10,7 +10,7 @@ import Typo from '../../atoms/Typo/Typo';
 import ProfileCard from '../../organisms/ProfileCard/ProfileCard';
 import Dialog from '../../molecules/Dialog/Dialog';
 import useDialog from '../../../utils/hooks/useDialog';
-import { makeRelatedInfo } from '../../../utils/friendship';
+import { makeRelatedInfo } from '../../../utils/friendships';
 
 type MatchParams = {
   username: string,

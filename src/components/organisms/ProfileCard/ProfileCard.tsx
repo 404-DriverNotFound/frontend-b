@@ -11,7 +11,7 @@ import UserProfile from '../../molecules/UserProfile/UserProfile';
 import { DialogProps } from '../../../utils/hooks/useDialog';
 import UserInfoForm from '../UserInfoForm/UserInfoForm';
 import { makeAPIPath } from '../../../utils/utils';
-import { makeRelationship } from '../../../utils/friendship';
+import { makeRelationship } from '../../../utils/friendships';
 
 const useStyles = makeStyles({
   root: {
@@ -74,8 +74,8 @@ const ProfileCard = ({
 
   const handleAddFriend = () => {
     appDispatch({ type: 'loading' });
-    axios.post(makeAPIPath('/friendship'), {
-      addresseeName: me.name,
+    axios.post(makeAPIPath('/friendships'), {
+      addresseeName: name,
     })
       .finally(() => {
         appDispatch({ type: 'endLoading' });
@@ -99,7 +99,7 @@ const ProfileCard = ({
     comment: string,
   ) => {
     appDispatch({ type: 'loading' });
-    axios.patch(makeAPIPath(`/friendship/${relationshipId}/status`), {
+    axios.patch(makeAPIPath(`/friendships/${relationshipId}/status`), {
       status,
     })
       .finally(() => {
