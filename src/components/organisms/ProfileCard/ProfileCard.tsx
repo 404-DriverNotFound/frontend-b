@@ -214,6 +214,15 @@ const ProfileCard = ({
                   <Button variant="text" onClick={() => { setOpen(false); }}>cancel</Button>
                   <Button
                     type="button"
+                    color="secondary"
+                    onClick={
+                      () => handlePatchRequest('친구 요청을 거절했습니다.', 'DECLINE')
+                    }
+                  >
+                    decline
+                  </Button>
+                  <Button
+                    type="button"
                     onClick={
                       () => handlePatchRequest('친구 요청을 수락했습니다.', 'ACCEPT')
                     }
