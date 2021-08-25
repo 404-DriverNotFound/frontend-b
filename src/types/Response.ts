@@ -6,7 +6,7 @@ import { FriendshipType, UserStatusType } from './User';
  * - id: user의 id
  * ### API Endpoint
  * - GET /users/me
- * - GET /users에서 friendship을 제외한 부분
+ * - GET /users
  */
 export type RawUserInfoType = {
   id: string,
@@ -18,30 +18,40 @@ export type RawUserInfoType = {
   isSecondFactorAuthenticated: boolean,
 };
 
+export const initialRawUserInfo: RawUserInfoType = {
+  id: '',
+  name: '',
+  avatar: '',
+  status: 'OFFLINE',
+  enable2FA: false,
+  authenticatorSecret: false,
+  isSecondFactorAuthenticated: false,
+};
+
 /**
  * RawFriendInfoType
  * @description API에서 얻을 수 있는 응답 형식
- * - id: 관계 table의 id
  * ### API Endpoint
  * - GET /friendship
- * - GET /users에서 RawUserInfoType을 제외한 부분
  */
 export type RawFriendInfoType = {
-  id: string,
   status: FriendshipType,
   updatedAt: Date,
   requester: RawUserInfoType,
   addressee: RawUserInfoType,
 };
 
+export const initialRawFriendInfo: RawFriendInfoType = {
+  status: 'DECLINED',
+  updatedAt: new Date(),
+  requester: initialRawUserInfo,
+  addressee: initialRawUserInfo,
+};
+
 /**
  * RawRelatedInfoType
  * @description API에서 받아온 raw한 user 정보 타입
  * - id: user의 id
- * - friendship.id: 관계 table의 id
- * ### API Endpoint
- * - GET /users
- * - GET /users/:name
  */
 export type RawRelatedInfoType = RawUserInfoType & {
   friendship: null | RawFriendInfoType,

@@ -6,13 +6,13 @@ import { makeAPIPath } from './utils';
 
 const makeRelationship = (isMeRequester: boolean, status: FriendshipType): RelationshipType => {
   switch (status) {
-    case 'ACCEPT':
+    case 'ACCEPTED':
       return 'FRIEND';
-    case 'PENDING':
+    case 'REQUESTED':
       return isMeRequester ? 'REQUESTING' : 'REQUESTED';
-    case 'BLOCK':
+    case 'BLOCKED':
       return isMeRequester ? 'BLOCKING' : 'BLOCKED';
-    case 'DECLINE':
+    case 'DECLINED':
     default:
       return 'NONE';
   }
@@ -31,7 +31,6 @@ const makeRelatedInfo = (me: MyInfoType, rawData: RawRelatedInfoType): RelatedIn
   };
 
   if (!friendship) return result;
-  result.relationshipId = friendship.id;
 
   const isMeRequester: boolean = friendship.requester.id === me.id;
   result.relationship = makeRelationship(isMeRequester, friendship.status);

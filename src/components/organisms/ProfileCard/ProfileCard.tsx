@@ -44,7 +44,7 @@ const ProfileCard = ({
   userInfo, setUser, setOpen, setDialog, profile,
 }: ProfileCardProps) => {
   const {
-    id, name, relationship, relationshipId,
+    id, name, relationship,
   } = userInfo;
   const me = useUserState();
   const appDispatch = useAppDispatch();
@@ -76,27 +76,24 @@ const ProfileCard = ({
     comment: string,
     status?: FriendshipType,
   ) => {
-    const body: {
-      addresseeName: string,
-      status?: FriendshipType,
-    } = { addresseeName: name };
-    if (status) body.status = status;
-
     appDispatch({ type: 'loading' });
-    axios.post(makeAPIPath('/friendships'), body)
+    axios.post(makeAPIPath(status ? '/blacks' : '/friendships'), {
+      addresseeName: name,
+    })
       .finally(() => {
         appDispatch({ type: 'endLoading' });
       })
-      .then((response) => {
+      .then(() => {
         setUser({
           ...userInfo,
-          relationship: makeRelationship(true, status || 'PENDING'),
-          relationshipId: response.data.id,
+          relationship: makeRelationship(true, status || 'REQUESTED'),
         });
         toast(comment);
       })
       .catch((error) => {
-        toast.error(error.message);
+        if (error.response && error.response.data && error.response.data.message) {
+          toast.error(error.response.data.message);
+        } else toast.error(error.message);
       });
     setOpen(false);
   };
@@ -106,7 +103,7 @@ const ProfileCard = ({
     status: FriendshipType,
   ) => {
     appDispatch({ type: 'loading' });
-    axios.patch(makeAPIPath(`/friendships/${relationshipId}/status`), {
+    axios.patch(makeAPIPath(`/friendships/${name}/status`), {
       status,
     })
       .finally(() => {
@@ -117,12 +114,37 @@ const ProfileCard = ({
           ...userInfo,
           status: data ? data.addressee.status : userInfo.status,
           relationship: makeRelationship(true, status),
-          relationshipId: (status !== 'DECLINE' && data) ? data.id : undefined,
         });
         toast(comment);
       })
       .catch((error) => {
-        toast.error(error.message);
+        if (error.response && error.response.data && error.response.data.message) {
+          toast.error(error.response.data.message);
+        } else toast.error(error.message);
+      });
+    setOpen(false);
+  };
+
+  const handleDeleteRequest = (
+    comment: string,
+    path: string,
+  ) => {
+    appDispatch({ type: 'loading' });
+    axios.delete(makeAPIPath(`${path}/${name}`))
+      .finally(() => {
+        appDispatch({ type: 'endLoading' });
+      })
+      .then(() => {
+        setUser({
+          ...userInfo,
+          relationship: 'NONE',
+        });
+        toast(comment);
+      })
+      .catch((error) => {
+        if (error.response && error.response.data && error.response.data.message) {
+          toast.error(error.response.data.message);
+        } else toast.error(error.message);
       });
     setOpen(false);
   };
@@ -167,7 +189,7 @@ const ProfileCard = ({
                   <Button
                     type="button"
                     onClick={
-                      () => handlePatchRequest('친구를 삭제했습니다.', 'DECLINE')
+                      () => handleDeleteRequest('친구를 삭제했습니다.', '/friends')
                     }
                   >
                     confirm
@@ -191,7 +213,7 @@ const ProfileCard = ({
                   <Button
                     type="button"
                     onClick={
-                      () => handlePatchRequest('친구 요청을 취소했습니다.', 'DECLINE')
+                      () => handleDeleteRequest('친구 요청을 취소했습니다.', '/friendships')
                     }
                   >
                     confirm
@@ -216,7 +238,7 @@ const ProfileCard = ({
                     type="button"
                     color="secondary"
                     onClick={
-                      () => handlePatchRequest('친구 요청을 거절했습니다.', 'DECLINE')
+                      () => handlePatchRequest('친구 요청을 거절했습니다.', 'DECLINED')
                     }
                   >
                     decline
@@ -224,7 +246,7 @@ const ProfileCard = ({
                   <Button
                     type="button"
                     onClick={
-                      () => handlePatchRequest('친구 요청을 수락했습니다.', 'ACCEPT')
+                      () => handlePatchRequest('친구 요청을 수락했습니다.', 'ACCEPTED')
                     }
                   >
                     confirm
@@ -256,7 +278,7 @@ const ProfileCard = ({
                   <Button
                     type="button"
                     onClick={
-                      () => handlePatchRequest('차단 해제했습니다.', 'DECLINE')
+                      () => handleDeleteRequest('차단 해제했습니다.', '/blacks')
                     }
                   >
                     confirm
@@ -279,10 +301,7 @@ const ProfileCard = ({
                   <Button variant="text" onClick={() => { setOpen(false); }}>cancel</Button>
                   <Button
                     type="button"
-                    onClick={(relationshipId
-                      ? () => handlePatchRequest('해당 유저를 차단했습니다.', 'BLOCK')
-                      : () => handlePostRequest('해당 유저를 차단했습니다.', 'BLOCK')
-                    )}
+                    onClick={() => handlePostRequest('해당 유저를 차단했습니다.', 'BLOCKED')}
                   >
                     confirm
                   </Button>

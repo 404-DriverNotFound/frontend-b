@@ -11,6 +11,7 @@ import ProfileCard from '../../organisms/ProfileCard/ProfileCard';
 import Dialog from '../../molecules/Dialog/Dialog';
 import useDialog from '../../../utils/hooks/useDialog';
 import { makeRelatedInfo } from '../../../utils/friendships';
+import { initialRawFriendInfo, initialRawUserInfo, RawRelatedInfoType } from '../../../types/Response';
 
 type MatchParams = {
   username: string,
@@ -35,13 +36,27 @@ const ProfilePage = ({ match }: RouteComponentProps<MatchParams>) => {
   const me = useUserState();
 
   useEffect(() => {
+    const userInfo: RawRelatedInfoType = {
+      ...initialRawUserInfo,
+      friendship: initialRawFriendInfo,
+    };
     appDispatch({ type: 'loading' });
     asyncGetRequest(makeAPIPath(`/users/${username}`))
-      .finally(() => {
-        appDispatch({ type: 'endLoading' });
-      })
       .then(({ data }) => {
-        setUser(makeRelatedInfo(me, data));
+        Object.assign(userInfo, data);
+        return (
+          asyncGetRequest(makeAPIPath(`/friendships/${username}`))
+            .then((response) => {
+              Object.assign(userInfo.friendship, response.data);
+              setUser(makeRelatedInfo(me, userInfo));
+            })
+            .catch((error) => {
+              if (error.response && [404, 409].includes(error.response.status)) {
+                userInfo.friendship = null;
+                setUser(makeRelatedInfo(me, userInfo));
+              } else toast.error(error.message);
+            })
+        );
       })
       .catch((error) => {
         if (error.response && error.response.status >= 400 && error.response.status < 500) {
@@ -49,6 +64,9 @@ const ProfilePage = ({ match }: RouteComponentProps<MatchParams>) => {
         } else {
           toast.error(error.message);
         }
+      })
+      .finally(() => {
+        appDispatch({ type: 'endLoading' });
       });
   }, []);
 

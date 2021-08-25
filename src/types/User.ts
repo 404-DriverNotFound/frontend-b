@@ -8,7 +8,7 @@ export type UserStatusType = 'ONLINE' | 'OFFLINE' | 'IN_GAME';
  * FriendshipType
  * @description 관계 table상 관계 종류
  */
-export type FriendshipType = 'ACCEPT' | 'DECLINE' | 'PENDING' | 'BLOCK';
+export type FriendshipType = 'ACCEPTED' | 'DECLINED' | 'REQUESTED' | 'BLOCKED';
 
 /**
  * RelationshipType
@@ -45,10 +45,8 @@ export type UserInfoType = {
 /**
  * FriendInfoType
  * @description RawFriendInfoType을 후처리한 정보 타입
- * - id: 관계 table의 id
  */
 export type FriendInfoType = {
-  id: string,
   status: FriendshipType,
   updatedAt: Date,
   requester: UserInfoType,
@@ -62,5 +60,4 @@ export type FriendInfoType = {
  */
 export type RelatedInfoType = UserInfoType & {
   relationship: RelationshipType,
-  relationshipId?: string,
 };
