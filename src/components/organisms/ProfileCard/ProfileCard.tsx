@@ -77,7 +77,7 @@ const ProfileCard = ({
     status?: FriendshipType,
   ) => {
     appDispatch({ type: 'loading' });
-    axios.post(makeAPIPath(status ? '/blacks' : '/friendships'), {
+    axios.post(makeAPIPath(status ? '/blocks' : '/friendships'), {
       addresseeName: name,
     })
       .finally(() => {
@@ -278,7 +278,7 @@ const ProfileCard = ({
                   <Button
                     type="button"
                     onClick={
-                      () => handleDeleteRequest('차단 해제했습니다.', '/blacks')
+                      () => handleDeleteRequest('차단 해제했습니다.', '/blocks')
                     }
                   >
                     confirm
