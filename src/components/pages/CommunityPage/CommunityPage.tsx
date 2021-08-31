@@ -56,7 +56,9 @@ const UserList = ({ type }: ListProps) => {
         if (data.length === 0 || data.length < COUNTS_PER_PAGE) setListEnd(true);
       })
       .catch((error) => {
+        source.cancel();
         toast.error(error.message);
+        setListEnd(true);
       });
   };
 
@@ -86,7 +88,9 @@ const UserList = ({ type }: ListProps) => {
           setUsers((prev) => prev.concat(typed.map((oneUser) => ({ ...oneUser, avatar: makeAPIPath(`/${oneUser.avatar}`), relationship: 'REQUESTED' }))));
         })
         .catch((error) => {
+          source.cancel();
           toast.error(error.message);
+          setListEnd(true);
         });
     }
     return () => {
