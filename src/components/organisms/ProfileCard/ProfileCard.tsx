@@ -403,8 +403,8 @@ const ProfileCard = ({
       return array;
     }
     if (friendButton) array.push(friendButton);
-    if (profile) array.push(blockButton);
-    return array.concat(otherButtons);
+    if (profile || relationship === 'BLOCKING') array.push(blockButton);
+    return relationship === 'NONE' ? otherButtons : array.concat(otherButtons);
   };
 
   const Buttons = buttonArray().map((button) => (

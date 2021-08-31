@@ -1,126 +1,100 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Redirect, Route, Switch, useParams,
-} from 'react-router-dom';
+import { Redirect, Route, Switch } from 'react-router-dom';
+import axios from 'axios';
 import { toast } from 'react-toastify';
-import { useUserState } from '../../../utils/hooks/useContext';
+import Grid from '@material-ui/core/Grid';
 import { asyncGetRequest, makeAPIPath } from '../../../utils/utils';
 import List from '../../atoms/List/List';
 import ListItem from '../../atoms/ListItem/ListItem';
 import SubMenu from '../../molecules/SubMenu/SubMenu';
 import ProfileCard, { ProfileCardSkeleton } from '../../organisms/ProfileCard/ProfileCard';
-import { RelatedInfoType, UserInfoType } from '../../../types/User';
+import { RelatedInfoType, RelationshipType, UserInfoType } from '../../../types/User';
 import { RawUserInfoType } from '../../../types/Response';
 import useDialog from '../../../utils/hooks/useDialog';
 import Dialog from '../../molecules/Dialog/Dialog';
+import useIntersect from '../../../utils/hooks/useIntersect';
 
 const ALL_PATH = '/community/all';
 const FRIEND_PATH = '/community/friend';
 const BLOCKED_PATH = '/community/block';
 
+const COUNTS_PER_PAGE = 10;
+
 type ListProps = {
-  users: RelatedInfoType[],
+  type: 'friends' | 'blocks' | 'all',
 };
 
-const list = [
-  { name: 'ALL USERS', link: ALL_PATH },
-  { name: 'FRIENDS LIST', link: FRIEND_PATH },
-  { name: 'BLOCKED USER', link: BLOCKED_PATH },
-];
-const CommunityPage = () => {
-  const [allUsers, setAllUsers] = useState<RelatedInfoType[]>([]);
-  const [allFriends, setAllFriends] = useState<RelatedInfoType[]>([]);
-  const [all, setAll] = useState<RelatedInfoType[]>([]);
-  const [friends, setFriends] = useState<RelatedInfoType[]>([]);
-  const [addressees, setAddressees] = useState<RelatedInfoType[]>([]);
-  const [requesters, setRequesters] = useState<RelatedInfoType[]>([]);
-  const [blocks, setBlocks] = useState<RelatedInfoType[]>([]);
-  const [isLoading, setLoading] = useState(true);
-  const { id } = useUserState();
-  const params = useParams();
+type RelationListType = {
+  [index: string]: RelationshipType,
+};
+
+const relationships: RelationListType = {
+  friends: 'FRIEND',
+  blocks: 'BLOCKING',
+  all: 'NONE',
+};
+
+const UserList = ({ type }: ListProps) => {
+  const { CancelToken } = axios;
+  const source = CancelToken.source();
+  const path = type === 'all' ? makeAPIPath('/users') : makeAPIPath(`/${type}`);
+  const relationship = relationships[type];
+  const [users, setUsers] = useState<RelatedInfoType[]>([]);
+  const [isListEnd, setListEnd] = useState(false);
+  const [page, setPage] = useState<number>(1);
   const {
     isOpen, setOpen, dialog, setDialog,
   } = useDialog();
 
-  useEffect(() => {
-    setLoading(true);
-    asyncGetRequest(makeAPIPath('/users'))
+  const fetchItems = () => {
+    if (isListEnd) return;
+
+    asyncGetRequest(`${path}?perPage=${COUNTS_PER_PAGE}&page=${page}`, source)
       .then(({ data }: { data: RawUserInfoType[] }) => {
         const typed: UserInfoType[] = data;
-        setAll(typed.filter((oneUser) => oneUser.id !== id)
-          .map((oneUser) => ({ ...oneUser, avatar: makeAPIPath(`/${oneUser.avatar}`), relationship: 'NONE' })));
-        return (asyncGetRequest(makeAPIPath('/friends')));
-      })
-      .then(({ data }: { data: RawUserInfoType[] }) => {
-        const typed: UserInfoType[] = data;
-        setFriends(typed.filter((oneUser) => oneUser.id !== id)
-          .map((oneUser) => ({ ...oneUser, avatar: makeAPIPath(`/${oneUser.avatar}`), relationship: 'FRIEND' })));
-        return (asyncGetRequest(makeAPIPath('/friends?status=REQUESTED&me=REQUESTER')));
-      })
-      .then(({ data }: { data: RawUserInfoType[] }) => {
-        const typed: UserInfoType[] = data;
-        setAddressees(typed.filter((oneUser) => oneUser.id !== id)
-          .map((oneUser) => ({ ...oneUser, avatar: makeAPIPath(`/${oneUser.avatar}`), relationship: 'REQUESTING' })));
-        return (asyncGetRequest(makeAPIPath('/friends?status=REQUESTED&me=ADDRESSEE')));
-      })
-      .then(({ data }: { data: RawUserInfoType[] }) => {
-        const typed: UserInfoType[] = data;
-        setRequesters(typed.filter((oneUser) => oneUser.id !== id)
-          .map((oneUser) => ({ ...oneUser, avatar: makeAPIPath(`/${oneUser.avatar}`), relationship: 'REQUESTED' })));
-        return (
-          asyncGetRequest(makeAPIPath('/blocks'))
-            .finally(() => setLoading(false))
-            .then((response) => {
-              const innerTyped: UserInfoType[] = response.data;
-              setBlocks(innerTyped.map((block) => ({ ...block, avatar: makeAPIPath(`/${block.avatar}`), relationship: 'BLOCKING' })));
-            })
-        );
+        setUsers((prev) => prev.concat(typed.map((user) => ({ ...user, avatar: makeAPIPath(`/${user.avatar}`), relationship }))));
+        if (data.length === 0 || data.length < COUNTS_PER_PAGE) setListEnd(true);
       })
       .catch((error) => {
-        setLoading(false);
         toast.error(error.message);
       });
-  }, [params]);
-  // TODO: 효율 검증 필요할 듯 합니다
+  };
 
   useEffect(() => {
-    setAllFriends([...addressees, ...requesters, ...friends]);
-  }, [friends, addressees, requesters]);
+    fetchItems();
+  }, [page]);
+
+  // eslint-disable-next-line no-unused-vars
+  const [_, setRef] = useIntersect(async (entry: any, observer: any) => {
+    observer.unobserve(entry.target);
+    await new Promise((resolve) => setTimeout(resolve, 250));
+    setPage((prev) => prev + 1);
+    observer.observe(entry.target);
+  });
 
   useEffect(() => {
-    const tempUsers = [...addressees, ...requesters, ...friends, ...blocks];
-    setAllUsers(all.map((one) => {
-      const user = tempUsers.filter((oneUser) => oneUser.id === one.id);
-      return user.length ? user[0] : one;
-    }));
-  }, [all, friends, addressees, requesters, blocks]);
-
-  const UserList = ({ users }: ListProps) => (
-    <>
-      {(isLoading ? (
-        <>
-          <ListItem><ProfileCardSkeleton /></ListItem>
-          <ListItem><ProfileCardSkeleton /></ListItem>
-          <ListItem><ProfileCardSkeleton /></ListItem>
-          <ListItem><ProfileCardSkeleton /></ListItem>
-          <ListItem><ProfileCardSkeleton /></ListItem>
-        </>
-      ) : (
-        users.map((user) => (
-          <ListItem key={user.id}>
-            <ProfileCard
-              userInfo={user}
-              setUser={(userInfo) => {
-                setAllUsers(allUsers.filter((one) => one.id !== userInfo.id).concat(userInfo));
-              }}
-              setOpen={setOpen}
-              setDialog={setDialog}
-            />
-          </ListItem>
-        ))
-      ))}
-    </>
-  );
+    if (type === 'friends') {
+      asyncGetRequest(makeAPIPath('/friends?status=REQUESTED&me=REQUESTER'), source)
+        .then(({ data }: { data: RawUserInfoType[] }) => {
+          const typed: UserInfoType[] = data;
+          setUsers(typed.map((oneUser) => ({ ...oneUser, avatar: makeAPIPath(`/${oneUser.avatar}`), relationship: 'REQUESTING' })));
+        })
+        .catch((error) => { toast.error(error.message); });
+      asyncGetRequest(makeAPIPath('/friends?status=REQUESTED&me=ADDRESSEE'), source)
+        .then(({ data }: { data: RawUserInfoType[] }) => {
+          const typed: UserInfoType[] = data;
+          setUsers((prev) => prev.concat(typed.map((oneUser) => ({ ...oneUser, avatar: makeAPIPath(`/${oneUser.avatar}`), relationship: 'REQUESTED' }))));
+        })
+        .catch((error) => {
+          toast.error(error.message);
+        });
+    }
+    return () => {
+      source.cancel();
+      setUsers([]);
+      setListEnd(false);
+    }; // NOTE 메모리 leak 방지 (https://stackoverflow.com/a/65007703/13614207)
+  }, []);
 
   return (
     <>
@@ -131,19 +105,68 @@ const CommunityPage = () => {
         buttons={dialog.buttons}
         onClose={dialog.onClose}
       />
-      <SubMenu current={window.location.pathname} list={list} />
-      <List height="78vh" scroll>
-        <Switch>
-          <Route exact path={FRIEND_PATH} render={() => <UserList users={allFriends} />} />
-          <Route exact path={BLOCKED_PATH} render={() => <UserList users={blocks} />} />
-          <Route exact path={ALL_PATH} render={() => <UserList users={allUsers} />} />
-          <Route path="/">
-            <Redirect to={FRIEND_PATH} />
-          </Route>
-        </Switch>
-      </List>
+      {users.map((user) => (
+        <ListItem key={user.id}>
+          <ProfileCard
+            userInfo={user}
+            setUser={(userInfo) => {
+              setUsers(users.filter((one) => one.id !== userInfo.id).concat(userInfo));
+            }}
+            setOpen={setOpen}
+            setDialog={setDialog}
+          />
+        </ListItem>
+      ))}
+      <div
+        style={{ display: 'flex', justifyContent: 'center', marginTop: '4px' }}
+        hidden={isListEnd}
+        ref={isListEnd ? null : setRef as React.LegacyRef<HTMLDivElement>}
+      >
+        {!isListEnd && (
+          <Grid
+            item
+            container
+            direction="column"
+            justifyContent="flex-start"
+            alignItems="stretch"
+            wrap="nowrap"
+            spacing={1}
+            xs={12}
+          >
+            <ListItem><ProfileCardSkeleton /></ListItem>
+            <ListItem><ProfileCardSkeleton /></ListItem>
+            <ListItem><ProfileCardSkeleton /></ListItem>
+          </Grid>
+        )}
+      </div>
     </>
   );
 };
+
+const FriendList = () => <UserList type="friends" />;
+const BlockList = () => <UserList type="blocks" />;
+const AllList = () => <UserList type="all" />;
+
+const list = [
+  { name: 'ALL USERS', link: ALL_PATH },
+  { name: 'FRIENDS LIST', link: FRIEND_PATH },
+  { name: 'BLOCKED USER', link: BLOCKED_PATH },
+];
+
+const CommunityPage = () => (
+  <>
+    <SubMenu current={window.location.pathname} list={list} />
+    <List height="78vh" scroll>
+      <Switch>
+        <Route exact path={FRIEND_PATH} component={FriendList} />
+        <Route exact path={BLOCKED_PATH} component={BlockList} />
+        <Route exact path={ALL_PATH} component={AllList} />
+        <Route path="/">
+          <Redirect to={FRIEND_PATH} />
+        </Route>
+      </Switch>
+    </List>
+  </>
+);
 
 export default CommunityPage;
