@@ -20,7 +20,7 @@ const useStyles = makeStyles({
   },
 });
 
-export const Watch = () => <GameOptionCard option="watch" />;
+export const Watch = () => <GameOptionCard option="watch" onClick={() => {}} />;
 
 export const WithMainTemplate = () => {
   const classes = useStyles();
@@ -30,18 +30,18 @@ export const WithMainTemplate = () => {
       <ContextProvider>
         <MainTemplate
           main={(
-            <Grid container>
+            <Grid container justifyContent="space-evenly" alignItems="center">
               <Grid item>
-                <GameOptionCard option="classic" />
+                <GameOptionCard option="classic" onClick={() => {}} />
               </Grid>
               <Grid item>
-                <GameOptionCard option="speed" />
+                <GameOptionCard option="speed" onClick={() => {}} />
               </Grid>
               <Grid item>
-                <GameOptionCard option="reverse" />
+                <GameOptionCard option="reverse" onClick={() => {}} />
               </Grid>
               <Grid item>
-                <GameOptionCard option="watch" />
+                <GameOptionCard option="watch" onClick={() => {}} />
               </Grid>
             </Grid>
           )}
