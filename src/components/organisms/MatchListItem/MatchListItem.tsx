@@ -15,13 +15,13 @@ const useStyles = makeStyles({
   },
 });
 
-type MatchCardProps = {
+type MatchListItemProps = {
   matchInfo: UserInfoType & { date: Date, winner: string }, // FIXME 임시 type
 }
 
 const makeDateString = (date: Date) => `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()} ${date.getHours()}:${date.getMinutes()}`;
 
-const MatchCard = ({ matchInfo }: MatchCardProps) => {
+const MatchListItem = ({ matchInfo }: MatchListItemProps) => {
   const {
     name, avatar, date, winner,
   } = matchInfo;
@@ -55,4 +55,4 @@ const MatchCard = ({ matchInfo }: MatchCardProps) => {
   );
 };
 
-export default MatchCard;
+export default MatchListItem;
