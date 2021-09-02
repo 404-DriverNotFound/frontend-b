@@ -20,9 +20,10 @@ const useStyles = makeStyles({
   },
 });
 
-type GameOptionCardProps = { option: 'classic' | 'speed' | 'reverse' | 'watch' };
+type GameOptionType = 'classic' | 'speed' | 'reverse' | 'watch';
 
-// eslint-disable-next-line no-unused-vars
+type GameOptionCardProps = { option: GameOptionType };
+
 const GameOptionCard = ({ option } : GameOptionCardProps) => {
   const classes = useStyles();
 
@@ -98,18 +99,21 @@ const GameOptionCard = ({ option } : GameOptionCardProps) => {
     </CardActionArea>
   );
 
-  return (
-    <>
-      <ClassicGame />
-      <SpeedGame />
-      <ReverseGame />
-      <WatchGame />
-    </>
-  );
-};
+  const ChooseOption = (opt: GameOptionType) => {
+    switch (opt) {
+      case 'watch':
+        return (<WatchGame />);
+      case 'speed':
+        return (<SpeedGame />);
+      case 'reverse':
+        return (<ReverseGame />);
+      case 'classic':
+      default:
+        return (<ClassicGame />);
+    }
+  };
 
-// GameOptionCard.defaultProps = {
-//   option: 'classic',
-// };
+  return (<>{ ChooseOption(option) }</>);
+};
 
 export default GameOptionCard;
