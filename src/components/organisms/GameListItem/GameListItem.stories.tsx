@@ -15,14 +15,14 @@ export default {
 const userFirst: UserInfoType = {
   id: '550e8400-e29b-41d4-a716-446655440000', // 의미없는 uuid입니다
   name: 'userFirst',
-  avatar: '/images/PongNormal.png',
+  avatar: 'https://material-ui.com/static/images/avatar/1.jpg',
   status: 'OFFLINE',
 };
 
 const userSecond: UserInfoType = {
   id: '550e8400-e29b-41d4-a716-446655440000', // 의미없는 uuid입니다
   name: 'userSecond',
-  avatar: '/images/CuteEyes.png',
+  avatar: 'https://material-ui.com/static/images/avatar/2.jpg',
   status: 'OFFLINE',
 };
 
