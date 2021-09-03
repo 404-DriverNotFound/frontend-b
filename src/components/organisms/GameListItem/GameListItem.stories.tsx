@@ -30,6 +30,7 @@ const Normal = () => (
   <GameListItem
     leftUser={userFirst}
     rightUser={userSecond}
+    mode="classic"
     onClick={() => {}}
   />
 );
@@ -38,6 +39,16 @@ const Reverse = () => (
   <GameListItem
     leftUser={userSecond}
     rightUser={userFirst}
+    mode="reverse"
+    onClick={() => {}}
+  />
+);
+
+const Speed = () => (
+  <GameListItem
+    leftUser={userFirst}
+    rightUser={userSecond}
+    mode="speed"
     onClick={() => {}}
   />
 );
@@ -48,10 +59,11 @@ export const WithList = () => (
   <List scroll height="15em">
     <Normal />
     <Reverse />
-    <Normal />
+    <Speed />
     <Reverse />
     <Normal />
     <Reverse />
+    <Speed />
   </List>
 );
 
