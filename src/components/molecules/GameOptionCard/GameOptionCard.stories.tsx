@@ -20,7 +20,7 @@ const useStyles = makeStyles({
   },
 });
 
-export const Watch = () => <GameOptionCard option="watch" onClick={() => {}} />;
+export const Watch = () => <Grid xs={4}><GameOptionCard option="watch" onClick={() => {}} /></Grid>;
 
 export const WithMainTemplate = () => {
   const classes = useStyles();
@@ -30,20 +30,24 @@ export const WithMainTemplate = () => {
       <ContextProvider>
         <MainTemplate
           main={(
-            <Grid container justifyContent="space-evenly" alignItems="center">
-              <Grid item>
-                <GameOptionCard option="classic" onClick={() => {}} />
+            <>
+              <Grid container justifyContent="space-evenly" alignItems="center" spacing={1}>
+                <Grid item xs={6}>
+                  <GameOptionCard option="classic" onClick={() => {}} />
+                </Grid>
+                <Grid item xs={6}>
+                  <GameOptionCard option="speed" onClick={() => {}} />
+                </Grid>
               </Grid>
-              <Grid item>
-                <GameOptionCard option="speed" onClick={() => {}} />
+              <Grid container justifyContent="space-evenly" alignItems="center" spacing={1}>
+                <Grid item xs={6}>
+                  <GameOptionCard option="reverse" onClick={() => {}} />
+                </Grid>
+                <Grid item xs={6}>
+                  <GameOptionCard option="watch" onClick={() => {}} />
+                </Grid>
               </Grid>
-              <Grid item>
-                <GameOptionCard option="reverse" onClick={() => {}} />
-              </Grid>
-              <Grid item>
-                <GameOptionCard option="watch" onClick={() => {}} />
-              </Grid>
-            </Grid>
+            </>
           )}
           chat={<div className={classes.div}>chat. 배경색은 스토리에서 적용한 것입니다!</div>}
         />
