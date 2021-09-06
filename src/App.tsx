@@ -3,15 +3,15 @@ import {
   Switch, Route, Redirect, useHistory,
 } from 'react-router-dom';
 import axios from 'axios';
+import { io } from 'socket.io-client';
 // eslint-disable-next-line camelcase
 import { unstable_createMuiStrictModeTheme } from '@material-ui/core';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { makeStyles, ThemeProvider } from '@material-ui/core/styles';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import {
-  useAppDispatch, useAppState, useUserDispatch, useUserState,
-} from './utils/hooks/useContext';
+import { useUserDispatch, useUserState } from './utils/hooks/useUserContext';
+import { useAppDispatch, useAppState } from './utils/hooks/useAppContext';
 import LoginPage from './components/pages/LoginPage/LoginPage';
 import { asyncGetRequest, makeAPIPath } from './utils/utils';
 import RegisterPage from './components/pages/RegisterPage/RegisterPage';
@@ -75,6 +75,14 @@ const App = () => {
             isSecondFactorAuthenticated,
           },
         });
+        if ((!enable2FA) || (enable2FA && isSecondFactorAuthenticated)) {
+          const socket = io(String(process.env.REACT_APP_API_URL)!);
+          socket.on('connect', () => {
+            appDispatch({ type: 'connect', socket });
+            socket.on('message', () => {});
+            socket.on('dm', () => {});
+          });
+        }
         if (enable2FA && !authenticatorSecret) history.push('/register/2fa');
         else if (enable2FA && !isSecondFactorAuthenticated) history.push('/2fa');
       })
@@ -85,6 +93,8 @@ const App = () => {
           toast.error(error.message);
         }
       });
+
+    return () => { if (appState.socket) appState.socket.disconnect(); };
   }, []);
 
   const children = userState.id ? (

@@ -5,7 +5,7 @@ import MainTemplate from './templates/MainTemplate/MainTemplate';
 import ListItem from './atoms/ListItem/ListItem';
 import List from './atoms/List/List';
 import ChatInput from './atoms/ChatInput/ChatInput';
-import { ContextProvider } from '../utils/hooks/useContext';
+import ContextProvider from '../utils/hooks/useContext';
 import Typo from './atoms/Typo/Typo';
 
 export default {

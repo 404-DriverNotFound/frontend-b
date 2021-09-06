@@ -3,7 +3,7 @@ import { Meta } from '@storybook/react';
 import { BrowserRouter, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import ChannelPage from './ChannelPage';
-import { ContextProvider } from '../../../utils/hooks/useContext';
+import ContextProvider from '../../../utils/hooks/useContext';
 import MainTemplate from '../../templates/MainTemplate/MainTemplate';
 
 export default {

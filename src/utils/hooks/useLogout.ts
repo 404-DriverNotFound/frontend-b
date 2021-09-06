@@ -2,7 +2,8 @@ import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { makeAPIPath } from '../utils';
-import { useAppDispatch, useUserDispatch } from './useContext';
+import { useAppDispatch } from './useAppContext';
+import { useUserDispatch } from './useUserContext';
 
 const useLogout = () => {
   const history = useHistory();
