@@ -405,7 +405,7 @@ const ProfileCard = ({
     }
     if (friendButton) array.push(friendButton);
     if (profile || relationship === 'BLOCKING') array.push(blockButton);
-    return relationship === 'NONE' ? otherButtons : array.concat(otherButtons);
+    return (!profile && relationship === 'NONE') ? otherButtons : array.concat(otherButtons);
   };
 
   const Buttons = buttonArray().map((button) => (
