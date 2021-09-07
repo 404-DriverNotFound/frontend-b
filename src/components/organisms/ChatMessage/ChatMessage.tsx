@@ -87,7 +87,7 @@ const ChatMessage = ({
           overlap="circular"
           badgeContent={['ADMIN', 'OWNER'].includes(userRole) ? (
             <SecurityRoundedIcon
-              color="primary"
+              color={userRole === 'OWNER' ? 'secondary' : 'primary'}
               fontSize="small"
             />
           ) : <></>}
