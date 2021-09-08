@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import LockIcon from '@material-ui/icons/Lock';
 import Badge from '@material-ui/core/Badge';
 import Typo from '../../atoms/Typo/Typo';
-import { DialogProps } from '../../../utils/hooks/useDialog';
+import { SetDialogType, SetOpenType } from '../../../utils/hooks/useDialog';
 import ListItem from '../../atoms/ListItem/ListItem';
 import { MembershipRole, ChannelType } from '../../../types/Chat';
 import Button from '../../atoms/Button/Button';
@@ -79,10 +79,8 @@ export const ChannelListItemSkeleton = () => {
 // FIXME: API구현되고 나서 Dialog, setOpen 구현하기
 type ChannelListItemProps = {
   info: ChannelType,
-  // eslint-disable-next-line no-unused-vars
-  setOpen: (value: boolean) => void,
-  // eslint-disable-next-line no-unused-vars
-  setDialog: (value: DialogProps) => void,
+  setOpen: SetOpenType,
+  setDialog: SetDialogType,
 };
 
 const makeDateString = (date: Date) => `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()} ${date.getHours()}:${date.getMinutes()}`;

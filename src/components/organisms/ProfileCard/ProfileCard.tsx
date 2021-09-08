@@ -9,7 +9,7 @@ import { useAppDispatch } from '../../../utils/hooks/useAppContext';
 import { FriendshipType, RelatedInfoType } from '../../../types/User';
 import Button from '../../atoms/Button/Button';
 import UserProfile from '../../molecules/UserProfile/UserProfile';
-import { DialogProps } from '../../../utils/hooks/useDialog';
+import { SetDialogType, SetOpenType } from '../../../utils/hooks/useDialog';
 import UserInfoForm from '../UserInfoForm/UserInfoForm';
 import { makeAPIPath } from '../../../utils/utils';
 import { makeRelationship } from '../../../utils/friendships';
@@ -88,10 +88,8 @@ type ProfileCardProps = {
   userInfo: RelatedInfoType,
   // eslint-disable-next-line no-unused-vars
   setUser: (value: RelatedInfoType) => void,
-  // eslint-disable-next-line no-unused-vars
-  setOpen: (value: boolean) => void,
-  // eslint-disable-next-line no-unused-vars
-  setDialog: (value: DialogProps) => void,
+  setOpen: SetOpenType,
+  setDialog: SetDialogType,
   profile?: boolean,
 };
 

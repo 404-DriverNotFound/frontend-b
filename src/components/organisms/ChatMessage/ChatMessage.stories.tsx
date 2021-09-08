@@ -9,7 +9,7 @@ import MainTemplate from '../../templates/MainTemplate/MainTemplate';
 import Typo from '../../atoms/Typo/Typo';
 import ChatMessage from './ChatMessage';
 import Dialog from '../../molecules/Dialog/Dialog';
-import useDialog, { DialogProps } from '../../../utils/hooks/useDialog';
+import useDialog, { SetOpenType, SetDialogType } from '../../../utils/hooks/useDialog';
 
 export default {
   title: 'organisms/ChatMessage',
@@ -94,10 +94,8 @@ export const Default = () => (
 );
 
 type WithListProps = {
-  // eslint-disable-next-line no-unused-vars
-  setOpen: (value: boolean) => void,
-  // eslint-disable-next-line no-unused-vars
-  setDialog: (value: DialogProps) => void,
+  setOpen: SetOpenType,
+  setDialog: SetDialogType,
 };
 
 export const WithList = ({ setOpen, setDialog }: WithListProps) => (

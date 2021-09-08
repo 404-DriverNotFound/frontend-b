@@ -6,7 +6,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { MessageType } from '../../../types/Chat';
 import Avatar from '../../atoms/Avatar/Avatar';
 import Typo from '../../atoms/Typo/Typo';
-import { DialogProps } from '../../../utils/hooks/useDialog';
+import { SetDialogType, SetOpenType } from '../../../utils/hooks/useDialog';
 
 type StyleProps = { me: boolean };
 
@@ -38,10 +38,8 @@ type ChatProps = {
   info: MessageType,
   userRole: 'OWNER' | 'ADMIN' | 'MEMBER',
   me?: boolean,
-  // eslint-disable-next-line no-unused-vars
-  setOpen: (value: boolean) => void,
-  // eslint-disable-next-line no-unused-vars
-  setDialog: (value: DialogProps) => void,
+  setOpen: SetOpenType,
+  setDialog: SetDialogType,
 };
 
 const makeDateString = (date: Date) => {

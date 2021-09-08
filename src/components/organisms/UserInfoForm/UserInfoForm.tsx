@@ -12,7 +12,7 @@ import { useAppDispatch } from '../../../utils/hooks/useAppContext';
 import Input from '../../atoms/Input/Input';
 import Button from '../../atoms/Button/Button';
 import Switch from '../../atoms/Switch/Switch';
-import { DialogProps } from '../../../utils/hooks/useDialog';
+import { SetDialogType, SetOpenType } from '../../../utils/hooks/useDialog';
 import useLogout from '../../../utils/hooks/useLogout';
 
 const useStyles = makeStyles({
@@ -32,10 +32,8 @@ type UserInfoFormProps = {
   currentName: string,
   currentAvatarSrc: string,
   current2FA: boolean,
-  // eslint-disable-next-line no-unused-vars
-  setOpen: (isOpen: boolean) => void,
-  // eslint-disable-next-line no-unused-vars
-  setDialog: (value: DialogProps) => void,
+  setOpen: SetOpenType,
+  setDialog: SetDialogType,
   ftId?: string,
 };
 
