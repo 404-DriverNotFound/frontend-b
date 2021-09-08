@@ -14,6 +14,7 @@ import useDialog from '../../../utils/hooks/useDialog';
 import useIntersect from '../../../utils/hooks/useIntersect';
 import { ChannelType, RawChannelType } from '../../../types/Chat';
 import makeChannelInfo from '../../../utils/channels';
+import ChannelInfoForm from '../../organisms/ChannelInfoForm/ChannelInfoForm';
 
 const ALL_PATH = '/channel/all';
 const JOINED_PATH = '/channel/joined';
@@ -134,7 +135,8 @@ const ChannelPage = () => {
     <>
       <Dialog
         isOpen={isOpen}
-        content={<></>} // FIXME ChannelInfoForm 넣기
+        title="Channel Register"
+        content={<ChannelInfoForm setOpen={setOpen} />}
         onClose={() => setOpen(false)}
       />
       <Grid container>

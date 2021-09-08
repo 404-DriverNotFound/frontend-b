@@ -1,4 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
+import axios from 'axios';
+import { useHistory } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 import LockIcon from '@material-ui/icons/Lock';
@@ -6,8 +9,12 @@ import Badge from '@material-ui/core/Badge';
 import Typo from '../../atoms/Typo/Typo';
 import { SetDialogType, SetOpenType } from '../../../utils/hooks/useDialog';
 import ListItem from '../../atoms/ListItem/ListItem';
-import { MembershipRole, ChannelType } from '../../../types/Chat';
+import { ChannelType } from '../../../types/Chat';
 import Button from '../../atoms/Button/Button';
+import { useAppDispatch } from '../../../utils/hooks/useAppContext';
+import { makeAPIPath } from '../../../utils/utils';
+import { useUserState } from '../../../utils/hooks/useUserContext';
+import Input from '../../atoms/Input/Input';
 
 const useStyles = makeStyles({
   root: {
@@ -76,46 +83,148 @@ export const ChannelListItemSkeleton = () => {
   );
 };
 
-// FIXME: API구현되고 나서 Dialog, setOpen 구현하기
 type ChannelListItemProps = {
   info: ChannelType,
   setOpen: SetOpenType,
   setDialog: SetDialogType,
 };
 
+type ChannelJoinFormProps = {
+  info: ChannelType,
+  setOpen: SetOpenType,
+};
+
 const makeDateString = (date: Date) => `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()} ${date.getHours()}:${date.getMinutes()}`;
 
+const ChannelJoinForm = ({ info, setOpen }: ChannelJoinFormProps) => {
+  const { name, isLocked } = info;
+  const [password, setPassword] = useState<string>('');
+  const userState = useUserState();
+  const appDispatch = useAppDispatch();
+  const history = useHistory();
+
+  const handleJoinChannel = () => {
+    appDispatch({ type: 'loading' });
+    axios.post(makeAPIPath(`/channels/${name}/members`), isLocked ? {
+      memberName: userState.name, password,
+    } : { memberName: userState.name })
+      .finally(() => {
+        appDispatch({ type: 'endLoading' });
+      })
+      .then(() => {
+        toast(`${name} 채널에 가입하였습니다.`);
+        history.push('/channel');
+      })
+      .catch((error) => {
+        if (error.response && error.response.data && error.response.data.message) {
+          toast.error(error.response.data.message);
+        } else toast.error(error.message);
+      });
+  };
+
+  return (
+    <>
+      {isLocked ? (
+        <form onSubmit={(e) => e.preventDefault()}>
+          <Input
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              // eslint-disable-next-line no-console
+              console.log(e.target.value);
+              setPassword(e.target.value);
+            }}
+            label="채널 비밀번호 입력"
+            type="password"
+            value={password}
+            helperText="공백 제외 모든 문자+숫자 4-32자"
+            autoComplete
+          />
+        </form>
+      ) : <Typo gutterBottom>{`${name} 채널에 가입하시겠습니까?`}</Typo>}
+      <Grid container justifyContent="flex-end">
+        <Button variant="text" onClick={() => { setPassword(''); setOpen(false); }}>cancel</Button>
+        <Button type="button" onClick={handleJoinChannel}>join</Button>
+      </Grid>
+    </>
+  );
+};
+
 const ChannelListItem = ({
-  // eslint-disable-next-line no-unused-vars
   info, setOpen, setDialog,
 }: ChannelListItemProps) => {
   const {
     name, role, unreads, isLocked, updatedAt,
   } = info;
   const dateStr = makeDateString(updatedAt);
+  const userState = useUserState();
+  const appDispatch = useAppDispatch();
+  const history = useHistory();
   const classes = useStyles();
-  const JoinButton = () => (<Button variant="outlined" onClick={() => {}}>채널 가입</Button>);
+
+  const handleLeaveChannel = () => {
+    appDispatch({ type: 'loading' });
+    axios.delete(makeAPIPath(`/channels/${name}/members/${userState.name}`))
+      .finally(() => {
+        appDispatch({ type: 'endLoading' });
+      })
+      .then(() => {
+        toast(`${name} 채널에서 탈퇴하였습니다.`);
+        // FIXME: 현재 채팅중인 채널의 경우 채팅 닫아주기
+        history.push('/channel');
+      })
+      .catch((error) => {
+        if (error.response && error.response.data && error.response.data.message) {
+          toast.error(error.response.data.message);
+        } else toast.error(error.message);
+      });
+  };
+
+  const openJoinDialog = () => {
+    setDialog({
+      title: 'Join Channel',
+      content: <ChannelJoinForm info={info} setOpen={setOpen} />,
+      onClose: () => { setOpen(false); },
+    });
+    setOpen(true);
+  };
+
+  const openLeaveDialog = () => {
+    setDialog({
+      title: 'Leave Channel',
+      content: role === 'OWNER'
+        ? `${name} 채널에서 탈퇴하시겠습니까? 채널의 소유권은 관리자가 있는 경우 관리자에게, 없는 경우 임의의 멤버에게 양도되며, 현재 참가 인원이 1명인 경우 탈퇴 직후 채널이 삭제됩니다.`
+        : `${name} 채널에서 탈퇴하시겠습니까?`,
+      buttons: (
+        <>
+          <Button variant="text" onClick={() => { setOpen(false); }}>cancel</Button>
+          <Button type="button" onClick={handleLeaveChannel}>leave</Button>
+        </>),
+      onClose: () => { setOpen(false); },
+    });
+    setOpen(true);
+  };
+
+  // FIXME: 채팅 참가, 채널 관리 구현
+  const JoinButton = () => (<Button variant="outlined" onClick={openJoinDialog}>채널 가입</Button>);
   const ManageButton = () => (<Button variant="outlined" onClick={() => {}}>채널 관리</Button>);
   const GoChatButton = () => (<Button variant="outlined" onClick={() => {}}>채팅 참가</Button>);
+  const LeaveButton = () => (<Button variant="outlined" onClick={openLeaveDialog}>채널 탈퇴</Button>);
 
-  const Buttons = (opt: MembershipRole) => {
-    switch (opt) {
+  const Buttons = () => {
+    switch (role) {
       case 'MEMBER':
         return (
-          <Grid item>
+          <>
             <GoChatButton />
-          </Grid>
+            <LeaveButton />
+          </>
         );
       case 'OWNER':
       case 'ADMIN':
         return (
           <>
-            <Grid item>
-              <ManageButton />
-            </Grid>
-            <Grid item>
-              <GoChatButton />
-            </Grid>
+            <ManageButton />
+            <GoChatButton />
+            <LeaveButton />
           </>
         );
       case 'NONE':
@@ -140,7 +249,7 @@ const ChannelListItem = ({
           { isLocked ? <LockIcon fontSize="medium" /> : undefined }
         </Grid>
         <Grid item container justifyContent="flex-end" alignItems="center" xs={4}>
-          { Buttons(role) }
+          { Buttons() }
         </Grid>
       </Grid>
     </ListItem>

@@ -1,19 +1,17 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useHistory } from 'react-router-dom';
 import { Grid, makeStyles } from '@material-ui/core';
 import { toast } from 'react-toastify';
 import { useAppDispatch } from '../../../utils/hooks/useAppContext';
 import { makeAPIPath } from '../../../utils/utils';
+import { SetOpenType } from '../../../utils/hooks/useDialog';
 import Input from '../../atoms/Input/Input';
 import Switch from '../../atoms/Switch/Switch';
 import Typo from '../../atoms/Typo/Typo';
 import Button from '../../atoms/Button/Button';
 
 const useStyles = makeStyles({
-  root: {
-    padding: '5em 0',
-    width: '350px',
-  },
   margin: {
     marginBottom: '1em',
   },
@@ -26,12 +24,13 @@ const useStyles = makeStyles({
 const CHANNEL_NAME_AVAILABLE = '채널명 중복검사를 실행하세요';
 const CHANNEL_NAME_HELPER_TEXT = '맨 앞, 뒤 공백 없는 모든 문자 3-18자';
 const CHANNEL_PASSWORD_AVAILABLE = '사용할 수 있는 비밀번호';
-const CHANNEL_PASSWORD_HELPER_TEXT = '공백 제외 모든 문자+숫자 8-32자';
+const CHANNEL_PASSWORD_HELPER_TEXT = '공백 제외 모든 문자+숫자 4-32자';
 const PASSWORD_CHECK_YES = '비밀번호 일치';
 const PASSWORD_CHECK_NO = '비밀번호 일치하지 않음';
 
-// eslint-disable-next-line no-unused-vars
-type ChannelInfoFormProps = { setOpen: (isOpen:boolean) => void };
+type ChannelInfoFormProps = {
+  setOpen: SetOpenType,
+};
 
 const ChannelInfoForm = ({ setOpen }: ChannelInfoFormProps) => {
   const [channelName, setChannelName] = useState<string>('');
@@ -50,6 +49,7 @@ const ChannelInfoForm = ({ setOpen }: ChannelInfoFormProps) => {
   const [isDuplicateChecked, setDuplicateChecked] = useState<boolean>(false);
   const appDispatch = useAppDispatch();
   const classes = useStyles();
+  const history = useHistory();
 
   const handleChannelNameChange = (event: React.ChangeEvent<Element>) => {
     const { value } = (event as React.ChangeEvent<HTMLInputElement>).target;
@@ -68,7 +68,7 @@ const ChannelInfoForm = ({ setOpen }: ChannelInfoFormProps) => {
   const handlePasswordChange = (event: React.ChangeEvent<Element>) => {
     const { value } = (event as React.ChangeEvent<HTMLInputElement>).target;
     if (value.length > 32) return;
-    if (/^[\S]{8,32}$/.test(value)) {
+    if (/^[\S]{4,32}$/.test(value)) {
       setValidPassword(true);
       setHelperTextPassword(CHANNEL_PASSWORD_AVAILABLE);
     } else {
@@ -100,7 +100,25 @@ const ChannelInfoForm = ({ setOpen }: ChannelInfoFormProps) => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // FIXME: API 확정된 후 추가하기
+    appDispatch({ type: 'loading' });
+    axios.post(makeAPIPath('/channels'),
+      isToggleChecked ? { name: channelName, password: checkPassword }
+        : { name: channelName })
+      .finally(() => {
+        appDispatch({ type: 'endLoading' });
+      })
+      .then(() => {
+        setOpen(false);
+        toast(`${channelName} 채널이 생성되었습니다.`);
+        history.push('/channel');
+      })
+      .catch((error) => {
+        if (error.response) {
+          if (error.response.status === 500) {
+            toast.error('서버에 문제가 있습니다. 잠시 후 다시 시도해주세요.');
+          } else toast.error('입력값이 잘못되었습니다. 다시 확인해주세요.');
+        } else toast.error(error.message);
+      });
   };
 
   const handleChannelNameCheck = () => {
@@ -137,10 +155,8 @@ const ChannelInfoForm = ({ setOpen }: ChannelInfoFormProps) => {
       <Grid
         item
         container
-        className={classes.root}
         direction="column"
         justifyContent="space-evenly"
-        spacing={3}
       >
         <Typo className={classes.margin}>* 표시: 필수 입력 항목</Typo>
         <form onSubmit={handleSubmit}>
