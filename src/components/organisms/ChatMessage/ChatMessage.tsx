@@ -3,7 +3,7 @@ import Badge from '@material-ui/core/Badge';
 import Grid from '@material-ui/core/Grid';
 import SecurityRoundedIcon from '@material-ui/icons/SecurityRounded';
 import { makeStyles } from '@material-ui/core/styles';
-import { MessageType } from '../../../types/Chat';
+import { MembershipRole, MessageType } from '../../../types/Chat';
 import Avatar from '../../atoms/Avatar/Avatar';
 import Typo from '../../atoms/Typo/Typo';
 import { SetDialogType, SetOpenType } from '../../../utils/hooks/useDialog';
@@ -36,7 +36,7 @@ const useStyles = makeStyles({
 
 type ChatProps = {
   info: MessageType,
-  userRole: 'OWNER' | 'ADMIN' | 'MEMBER',
+  userRole: MembershipRole,
   me?: boolean,
   setOpen: SetOpenType,
   setDialog: SetDialogType,

@@ -9,7 +9,7 @@ type AppStateType = {
   socket: Socket | null,
   chatting: string | null,
   channels: ChannelType[],
-  dms: DMRoomType[],
+  DMs: DMRoomType[],
   /**
    * 'message'나 'dm' 이벤트를 수신하면
    * 어떤 채널에 온 이벤트인지 확인해서
@@ -22,15 +22,16 @@ const initialAppState: AppStateType = {
   socket: null,
   chatting: null,
   channels: [],
-  dms: [],
+  DMs: [],
 };
 
 type AppActionType =
   { type: 'loading' } |
   { type: 'endLoading' } |
   { type: 'connect', socket: Socket } |
-  { type: 'join', channels: ChannelType[], dms: DMRoomType[] } |
+  { type: 'join', channels?: ChannelType[], DMs?: DMRoomType[] } |
   { type: 'enterRoom', name: string } |
+  { type: 'leaveRoom' } |
   { type: 'newMessage', message: MessageType } |
   { type: 'disconnect' };
 
@@ -47,19 +48,29 @@ function AppReducer(state: AppStateType, action: AppActionType): AppStateType {
       return { ...state, socket: action.socket };
     case 'disconnect':
       return { ...state, socket: null };
+    case 'enterRoom':
+      return { ...state, chatting: action.name };
+    case 'leaveRoom':
+      return { ...state, chatting: null };
+    case 'join':
+      return {
+        ...state,
+        channels: action.channels || state.channels,
+        DMs: action.DMs || state.DMs,
+      };
     case 'newMessage':
       return {
         ...state,
         channels: state.channels.map((channel: ChannelType) => {
-          if (channel.name === action.message.channel.name) {
+          if (channel.name === action.message.name) {
             return { ...channel, unreads: channel.unreads + 1 };
           } return { ...channel };
+        }), // FIXME 수정할 내용 있는지 확인
+        DMs: state.DMs.map((dmRoom: DMRoomType) => {
+          if (dmRoom.name === action.message.name) {
+            return { ...dmRoom, unreads: dmRoom.unreads + 1 };
+          } return { ...dmRoom };
         }),
-        // dms: state.dms.map((dmRoom: DMRoomType) => {
-        //   if (dmRoom.name === action.message.name) {
-        //     return { ...dmRoom, unreads: dmRoom.unreads + 1 };
-        //   } return { ...dmRoom };
-        // }), FIXME: DMType 만든 뒤 AppDispatch 수정할 것
       };
     default:
       return { ...state };

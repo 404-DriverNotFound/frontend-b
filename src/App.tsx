@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Switch, Route, Redirect, useHistory,
 } from 'react-router-dom';
@@ -21,10 +21,12 @@ import MFAPage from './components/pages/MFAPage/MFAPage';
 import CommunityPage from './components/pages/CommunityPage/CommunityPage';
 import ProfilePage from './components/pages/ProfilePage/ProfilePage';
 import {
-  ChannelType, DMRoomType, MessageType, RawChannelType,
+  ChannelType, DMRoomType, MessageType, RawChannelType, RawDMType, RawMessageType,
 } from './types/Chat';
 import ChannelPage from './components/pages/ChannelPage/ChannelPage';
 import makeChannelInfo from './utils/channels';
+import ChatPage from './components/pages/ChatPage/ChatPage';
+import { DMToMessage, messageToMessage } from './utils/chats';
 
 const useStyles = makeStyles({
   progress: {
@@ -52,8 +54,14 @@ const App = () => {
   const userDispatch = useUserDispatch();
   const classes = useStyles();
   const history = useHistory();
-  let channels: ChannelType[] = [];
-  let dms: DMRoomType[] = [];
+  const [channels, setChannels] = useState<ChannelType[]>([]);
+  const [DMs, setDMs] = useState<DMRoomType[]>([]);
+
+  const handleMessageEvent = (message: MessageType) => {
+    if (message.name === appState.chatting) {
+      // TODO: 채팅 Page로 메시지 내려주기
+    } else appDispatch({ type: 'newMessage', message });
+  };
 
   useEffect(() => {
     if (userState.id) {
@@ -61,26 +69,25 @@ const App = () => {
       socket.on('connect', () => {
         appDispatch({ type: 'connect', socket });
         socket.emit('join', { id: userState.id });
-        appDispatch({ type: 'join', channels, dms });
+        appDispatch({ type: 'join', channels, DMs });
         appDispatch({ type: 'endLoading' });
 
-        socket.on('message', (message: MessageType) => {
-          if (message.channel.name === appState.chatting) {
-          // TODO: 채팅 Page로 메시지 내려주기
-          } else appDispatch({ type: 'newMessage', message });
+        socket.on('message', (data: RawMessageType) => {
+          const message = messageToMessage(data);
+          handleMessageEvent(message);
+        });
+
+        socket.on('dm', (data: RawDMType) => {
+          const message = DMToMessage(data, userState.name);
+          handleMessageEvent(message);
         });
       });
     }
-  }, [userState.id]);
+  }, [DMs]);
 
   useEffect(() => {
     axios.defaults.withCredentials = true;
     appDispatch({ type: 'loading' });
-    /**
-     * NOTE 서버가 실패 응답(예: 403)을 주면 콘솔에 오류가 뜹니다.
-     * 서버에서 콘솔에 적도록 하는 것이라 프론트에서 핸들링이 불가한데,
-     * 이 부분은 서브젝트 요구사항과 안 맞는 듯해서 추후 고민해봐야 할 것 같습니다.
-    */
     asyncGetRequest(makeAPIPath('/users/me'))
       .finally(() => {
         appDispatch({ type: 'endLoading' });
@@ -106,15 +113,15 @@ const App = () => {
         return (asyncGetRequest(makeAPIPath('/channels/me')));
       })
       .then(({ data }) => {
-        channels = data.map((channel: RawChannelType) => makeChannelInfo(channel));
+        setChannels(data.map((channel: RawChannelType) => makeChannelInfo(channel)));
         return (asyncGetRequest(makeAPIPath('/dmers')));
       })
       .then(({ data }) => {
-        dms = data.map((dm: any) => ({
+        setDMs(data.map((dm: any) => ({
           id: dm.id,
           name: dm.name,
           unreads: 0,
-        }));
+        })));
       })
       .catch((error) => {
         if (error.response) {
@@ -150,7 +157,7 @@ const App = () => {
               </Route>
             </Switch>
       )}
-          chat={<h3>chat</h3>}
+          chat={<ChatPage />}
         />
       </Route>
     </Switch>

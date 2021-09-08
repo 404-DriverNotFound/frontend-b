@@ -1,3 +1,4 @@
+import { RawUserInfoType } from './Response';
 import { UserInfoType } from './User';
 
 export type MembershipRole = 'ADMIN' | 'OWNER' | 'MEMBER' | 'NONE';
@@ -16,10 +17,26 @@ export type RawChannelType = {
   memberships: MembershipType[],
 };
 
-export type MessageType = { // 서버의 'message' 이벤트가 emit
+export type RawMessageType = {
   content: string,
   user: UserInfoType, // 나 자신일 수도 있음
   channel: RawChannelType,
+  id: string, // message의 id
+  createdAt: Date,
+};
+
+export type RawDMType = {
+  content: string,
+  receiver: RawUserInfoType,
+  sender: RawUserInfoType,
+  id: string, // message의 id
+  createdAt: Date,
+};
+
+export type MessageType = { // 서버의 'message' 이벤트가 emit
+  content: string,
+  user: UserInfoType, // 나 자신일 수도 있음
+  name: string,
   id: string, // message의 id
   createdAt: Date,
 }; // FIXME TEMP

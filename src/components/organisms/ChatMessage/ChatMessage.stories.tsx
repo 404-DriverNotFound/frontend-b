@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { Meta } from '@storybook/react';
 import Grid from '@material-ui/core/Grid/Grid';
-import { MessageType, RawChannelType } from '../../../types/Chat';
+import { MessageType } from '../../../types/Chat';
 import List from '../../atoms/List/List';
 import ContextProvider from '../../../utils/hooks/useContext';
 import MainTemplate from '../../templates/MainTemplate/MainTemplate';
@@ -16,15 +16,6 @@ export default {
   component: ChatMessage,
 } as Meta;
 
-const channel: RawChannelType = {
-  id: '550e8400-e29b-41d4-a716-446655440000', // 의미없는 uuid입니다
-  name: 'temp',
-  password: null,
-  createdAt: (new Date()).toString(),
-  updatedAt: (new Date()).toString(),
-  memberships: [],
-};
-
 const shortMessage: MessageType = {
   id: '550e8400-e29b-41d4-a716-446655440000', // 의미없는 uuid입니다
   content: 'Lorem ipsum dolor sit amet',
@@ -35,7 +26,7 @@ const shortMessage: MessageType = {
     avatar: '',
     status: 'OFFLINE',
   },
-  channel,
+  name: 'temp',
 };
 
 const longMessage: MessageType = {
@@ -48,7 +39,7 @@ const longMessage: MessageType = {
     avatar: '',
     status: 'OFFLINE',
   },
-  channel,
+  name: 'temp',
 };
 
 export const Default = () => (

@@ -11,7 +11,7 @@ import { SetDialogType, SetOpenType } from '../../../utils/hooks/useDialog';
 import ListItem from '../../atoms/ListItem/ListItem';
 import { ChannelType } from '../../../types/Chat';
 import Button from '../../atoms/Button/Button';
-import { useAppDispatch } from '../../../utils/hooks/useAppContext';
+import { useAppDispatch, useAppState } from '../../../utils/hooks/useAppContext';
 import { makeAPIPath } from '../../../utils/utils';
 import { useUserState } from '../../../utils/hooks/useUserContext';
 import Input from '../../atoms/Input/Input';
@@ -101,6 +101,7 @@ const ChannelJoinForm = ({ info, setOpen }: ChannelJoinFormProps) => {
   const [password, setPassword] = useState<string>('');
   const userState = useUserState();
   const appDispatch = useAppDispatch();
+  const appState = useAppState();
   const history = useHistory();
 
   const handleJoinChannel = () => {
@@ -111,8 +112,18 @@ const ChannelJoinForm = ({ info, setOpen }: ChannelJoinFormProps) => {
       .finally(() => {
         appDispatch({ type: 'endLoading' });
       })
-      .then(() => {
+      .then(({ data }) => {
         toast(`${name} 채널에 가입하였습니다.`);
+        appDispatch({
+          type: 'join',
+          channels: appState.channels.concat({
+            name: data.channel.name,
+            role: data.role,
+            unreads: 0,
+            isLocked: data.channel.password !== null,
+            updatedAt: new Date(data.channel.updatedAt),
+          }),
+        });
         history.push('/channel');
       })
       .catch((error) => {
@@ -157,6 +168,7 @@ const ChannelListItem = ({
   const dateStr = makeDateString(updatedAt);
   const userState = useUserState();
   const appDispatch = useAppDispatch();
+  const appState = useAppState();
   const history = useHistory();
   const classes = useStyles();
 
@@ -168,7 +180,8 @@ const ChannelListItem = ({
       })
       .then(() => {
         toast(`${name} 채널에서 탈퇴하였습니다.`);
-        // FIXME: 현재 채팅중인 채널의 경우 채팅 닫아주기
+        appDispatch({ type: 'join', channels: appState.channels.filter((channel) => channel.name !== appState.chatting) });
+        if (appState.chatting === name) appDispatch({ type: 'leaveRoom' });
         history.push('/channel');
       })
       .catch((error) => {
@@ -206,7 +219,7 @@ const ChannelListItem = ({
   // FIXME: 채팅 참가, 채널 관리 구현
   const JoinButton = () => (<Button variant="outlined" onClick={openJoinDialog}>채널 가입</Button>);
   const ManageButton = () => (<Button variant="outlined" onClick={() => {}}>채널 관리</Button>);
-  const GoChatButton = () => (<Button variant="outlined" onClick={() => {}}>채팅 참가</Button>);
+  const GoChatButton = () => (<Button variant="outlined" onClick={() => appDispatch({ type: 'enterRoom', name })}>채팅 참가</Button>);
   const LeaveButton = () => (<Button variant="outlined" onClick={openLeaveDialog}>채널 탈퇴</Button>);
 
   const Buttons = () => {
