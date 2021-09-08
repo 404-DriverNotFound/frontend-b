@@ -115,9 +115,9 @@ const ChannelInfoForm = ({ setOpen }: ChannelInfoFormProps) => {
       })
       .catch((error) => {
         // eslint-disable-next-line no-console
-        console.log(error.response); // FIXME: APP에서 검증 후 지우기
-        if (error.response.status === 404) {
-          setHelperTextChannelName('사용할 수 있는 닉네임입니다.');
+        console.log(error.response); // FIXME: APP에서 검증 후 지우기 404가 올바른 응답
+        if (error.response) {
+          setHelperTextChannelName('사용할 수 있는 채널명입니다.');
           setValidChannelName(true);
           setDuplicateChecked(true);
         } else toast.error(error.message);
