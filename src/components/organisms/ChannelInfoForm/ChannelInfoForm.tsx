@@ -20,9 +20,9 @@ const useStyles = makeStyles({
 });
 
 const CHANNEL_NAME_AVAILABLE = '사용할 수 있는 채널이름';
-const CHANNEL_NAME_HELPER_TEXT = '영문+숫자 5-25자';
+const CHANNEL_NAME_HELPER_TEXT = '맨 앞, 뒤 공백 없는 모든 문자 3-18자';
 const CHANNEL_PASSWORD_AVAILABLE = '사용할 수 있는 비밀번호';
-const CHANNEL_PASSWORD_HELPER_TEXT = '영문+숫자 4-12자';
+const CHANNEL_PASSWORD_HELPER_TEXT = '공백 제외 모든 문자+숫자 8-32자';
 const PASSWORD_CHECK_YES = '비밀번호 일치';
 const PASSWORD_CHECK_NO = '비밀번호 일치하지 않음';
 
@@ -47,8 +47,8 @@ const ChannelInfoForm = ({ setOpen }: ChannelInfoFormProps) => {
 
   const handleChannelNameChange = (event: React.ChangeEvent<Element>) => {
     const { value } = (event as React.ChangeEvent<HTMLInputElement>).target;
-    if (value.length > 25) return;
-    if (/^[A-Za-z0-9]{5,25}$/.test(value)) {
+    if (value.length > 18) return;
+    if (/^[^\s]+(\s+[^\s]+)*$/.test(value) && /^.{3,18}$/.test(value)) {
       setValidChannelName(true);
       setHelperTextChannelName(CHANNEL_NAME_AVAILABLE);
     } else {
@@ -60,11 +60,14 @@ const ChannelInfoForm = ({ setOpen }: ChannelInfoFormProps) => {
 
   const handlePasswordChange = (event: React.ChangeEvent<Element>) => {
     const { value } = (event as React.ChangeEvent<HTMLInputElement>).target;
-    if (value.length > 12) return;
-    if (/^[A-Za-z0-9]{4,12}$/.test(value)) {
+    if (value.length > 32) return;
+    if (/^[\S]{8,32}$/.test(value)) {
       setValidPassword(true);
       setHelperTextPassword(CHANNEL_PASSWORD_AVAILABLE);
-    } else setValidPassword(false);
+    } else {
+      setValidPassword(false);
+      setHelperTextPassword(CHANNEL_PASSWORD_HELPER_TEXT);
+    }
     if (checkPassword === value) {
       setValidCheckPassword(true);
       setHelperTextCheckPassword(PASSWORD_CHECK_YES);
@@ -77,7 +80,7 @@ const ChannelInfoForm = ({ setOpen }: ChannelInfoFormProps) => {
 
   const handleCheckPasswordChange = (event: React.ChangeEvent<Element>) => {
     const { value } = (event as React.ChangeEvent<HTMLInputElement>).target;
-    if (value.length > 12) return;
+    if (value.length > 32) return;
     if (value === password) {
       setValidCheckPassword(true);
       setHelperTextCheckPassword(PASSWORD_CHECK_YES);
