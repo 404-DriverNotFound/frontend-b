@@ -1,6 +1,7 @@
 import React from 'react';
 import { Meta } from '@storybook/react';
 import ChannelInfoForm from './ChannelInfoForm';
+import { ContextProvider } from '../../../utils/hooks/useContext';
 
 export default {
   title: 'organisms/ChannelInfoForm',
@@ -8,5 +9,7 @@ export default {
 } as Meta;
 
 export const Default = () => (
-  <ChannelInfoForm setOpen={() => {}} />
+  <ContextProvider>
+    <ChannelInfoForm setOpen={() => {}} />
+  </ContextProvider>
 );

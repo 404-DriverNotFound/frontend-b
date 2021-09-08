@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { Grid, makeStyles } from '@material-ui/core';
+import { toast } from 'react-toastify';
+import { useAppDispatch } from '../../../utils/hooks/useContext';
+import { makeAPIPath } from '../../../utils/utils';
 import Input from '../../atoms/Input/Input';
 import Switch from '../../atoms/Switch/Switch';
 import Typo from '../../atoms/Typo/Typo';
@@ -19,7 +23,7 @@ const useStyles = makeStyles({
   },
 });
 
-const CHANNEL_NAME_AVAILABLE = '사용할 수 있는 채널이름';
+const CHANNEL_NAME_AVAILABLE = '채널명 중복검사를 실행하세요';
 const CHANNEL_NAME_HELPER_TEXT = '맨 앞, 뒤 공백 없는 모든 문자 3-18자';
 const CHANNEL_PASSWORD_AVAILABLE = '사용할 수 있는 비밀번호';
 const CHANNEL_PASSWORD_HELPER_TEXT = '공백 제외 모든 문자+숫자 8-32자';
@@ -43,6 +47,8 @@ const ChannelInfoForm = ({ setOpen }: ChannelInfoFormProps) => {
   const [isValidCheckPassword, setValidCheckPassword] = useState<boolean>(false);
   // eslint-disable-next-line max-len
   const [helperTextCheckPassword, setHelperTextCheckPassword] = useState<string>(CHANNEL_PASSWORD_HELPER_TEXT);
+  const [isDuplicateChecked, setDuplicateChecked] = useState<boolean>(false);
+  const appDispatch = useAppDispatch();
   const classes = useStyles();
 
   const handleChannelNameChange = (event: React.ChangeEvent<Element>) => {
@@ -56,6 +62,7 @@ const ChannelInfoForm = ({ setOpen }: ChannelInfoFormProps) => {
       setHelperTextChannelName(CHANNEL_NAME_HELPER_TEXT);
     }
     setChannelName(value);
+    setDuplicateChecked(false);
   };
 
   const handlePasswordChange = (event: React.ChangeEvent<Element>) => {
@@ -96,12 +103,33 @@ const ChannelInfoForm = ({ setOpen }: ChannelInfoFormProps) => {
     // FIXME: API 확정된 후 추가하기
   };
 
+  const handleChannelNameCheck = () => {
+    appDispatch({ type: 'loading' });
+    axios.head(makeAPIPath(`/channels/${channelName}`))
+      .finally(() => {
+        appDispatch({ type: 'endLoading' });
+      })
+      .then(() => {
+        setHelperTextChannelName('중복된 채널명입니다. 다른 채널명을 입력해주세요.');
+        setValidChannelName(false);
+      })
+      .catch((error) => {
+        console.log(error.response);
+        if (error.response.status === 404) {
+          setHelperTextChannelName('사용할 수 있는 닉네임입니다.');
+          setValidChannelName(true);
+          setDuplicateChecked(true);
+        } else toast.error(error.message);
+      });
+  };
+
   const isValidForm = () => {
     if (!isToggleChecked) {
-      if (isValidChannelName) return true;
+      if (isValidChannelName && isDuplicateChecked) return true;
       return false;
     }
-    if (isValidChannelName && isValidPassword && isValidCheckPassword) return true;
+    if (isValidChannelName && isValidPassword
+      && isValidCheckPassword && isDuplicateChecked) return true;
     return false;
   };
 
@@ -118,7 +146,7 @@ const ChannelInfoForm = ({ setOpen }: ChannelInfoFormProps) => {
         <Typo variant="h3" align="center" gutterBottom>Channel Form</Typo>
         <Typo className={classes.margin}>* 표시: 필수 입력 항목</Typo>
         <form onSubmit={handleSubmit}>
-          <Grid item container alignItems="center" justifyContent="center">
+          <Grid item container className={classes.margin} justifyContent="center">
             <Input
               onChange={handleChannelNameChange}
               label="채널명 입력 *"
@@ -126,6 +154,7 @@ const ChannelInfoForm = ({ setOpen }: ChannelInfoFormProps) => {
               helperText={helperTextChannelName}
               error={!isValidChannelName}
             />
+            <Button onClick={handleChannelNameCheck} disabled={!isValidChannelName}>중복 체크</Button>
           </Grid>
           <Grid item container alignItems="center" justifyContent="center">
             <Switch
