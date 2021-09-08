@@ -114,9 +114,7 @@ const ChannelInfoForm = ({ setOpen }: ChannelInfoFormProps) => {
         setValidChannelName(false);
       })
       .catch((error) => {
-        // eslint-disable-next-line no-console
-        console.log(error.response); // FIXME: APP에서 검증 후 지우기 404가 올바른 응답
-        if (error.response) {
+        if (error.response && error.response.status === 404) {
           setHelperTextChannelName('사용할 수 있는 채널명입니다.');
           setValidChannelName(true);
           setDuplicateChecked(true);
@@ -144,7 +142,6 @@ const ChannelInfoForm = ({ setOpen }: ChannelInfoFormProps) => {
         justifyContent="space-evenly"
         spacing={3}
       >
-        <Typo variant="h3" align="center" gutterBottom>Channel Form</Typo>
         <Typo className={classes.margin}>* 표시: 필수 입력 항목</Typo>
         <form onSubmit={handleSubmit}>
           <Grid item container className={classes.margin} justifyContent="center">
