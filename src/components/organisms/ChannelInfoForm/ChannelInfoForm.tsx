@@ -12,7 +12,7 @@ import Button from '../../atoms/Button/Button';
 const useStyles = makeStyles({
   root: {
     padding: '5em 0',
-    width: '300px',
+    width: '350px',
   },
   margin: {
     marginBottom: '1em',
@@ -114,7 +114,8 @@ const ChannelInfoForm = ({ setOpen }: ChannelInfoFormProps) => {
         setValidChannelName(false);
       })
       .catch((error) => {
-        console.log(error.response);
+        // eslint-disable-next-line no-console
+        console.log(error.response); // FIXME: APP에서 검증 후 지우기
         if (error.response.status === 404) {
           setHelperTextChannelName('사용할 수 있는 닉네임입니다.');
           setValidChannelName(true);
