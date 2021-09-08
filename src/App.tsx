@@ -21,9 +21,10 @@ import MFAPage from './components/pages/MFAPage/MFAPage';
 import CommunityPage from './components/pages/CommunityPage/CommunityPage';
 import ProfilePage from './components/pages/ProfilePage/ProfilePage';
 import {
-  ChannelType, DMRoomType, MessageType,
+  ChannelType, DMRoomType, MessageType, RawChannelType,
 } from './types/Chat';
 import ChannelPage from './components/pages/ChannelPage/ChannelPage';
+import makeChannelInfo from './utils/channels';
 
 const useStyles = makeStyles({
   progress: {
@@ -58,12 +59,8 @@ const App = () => {
     if (userState.id) {
       const socket = io(String(process.env.REACT_APP_API_URL)!);
       socket.on('connect', () => {
-      // eslint-disable-next-line no-console
-        console.log('socket connected');
         appDispatch({ type: 'connect', socket });
         socket.emit('join', { id: userState.id });
-        // eslint-disable-next-line no-console
-        console.log(`join event emit with id ${userState.id}`);
         appDispatch({ type: 'join', channels, dms });
         appDispatch({ type: 'endLoading' });
 
@@ -106,30 +103,10 @@ const App = () => {
         if (enable2FA && !authenticatorSecret) history.push('/register/2fa');
         else if (enable2FA && !isSecondFactorAuthenticated) history.push('/2fa');
         appDispatch({ type: 'loading' });
-        // FIXME 소켓 연결 되면 로딩 바 부활시키기
         return (asyncGetRequest(makeAPIPath('/channels/me')));
       })
       .then(({ data }) => {
-        channels = data.map((channel: any) => ({
-          id: channel.id,
-          name: channel.name,
-          role: channel.memberships[0].role, // FIXME memberships가 배열이 아니게 되면 그 때 수정
-          unreads: 0,
-        }));
-        /** NOTE 9/6 21:35 기준 JSON 양식
-         * {
-         "id": "76358162-56ce-4872-ac76-55ef8c3e1240",
-         "name": "채팅하실분",
-         "createdAt": "2021-09-06T12:33:47.685Z",
-         "updatedAt": "2021-09-06T12:33:47.685Z",
-         "memberships": [
-           {
-             "createdAt": "2021-09-06T12:33:47.715Z",
-             "role": "OWNER"
-            }
-          ]
-        } 의 배열
-        */
+        channels = data.map((channel: RawChannelType) => makeChannelInfo(channel));
         return (asyncGetRequest(makeAPIPath('/dmers')));
       })
       .then(({ data }) => {
@@ -138,21 +115,6 @@ const App = () => {
           name: dm.name,
           unreads: 0,
         }));
-        /** NOTE 9/6 22:00 기준 JSON 양식
-        * [
-          {
-            "id": "c7ab9b44-3e21-4a16-a72b-d0624ca64fed",
-            "name": "Jikang",
-            "avatar": "files/avatar/default.png",
-            "enable2FA": false,
-            "status": "ONLINE",
-            "authenticatorSecret": null,
-            "isSecondFactorAuthenticated": false
-          }
-        ] User의 배열인데,
-        FIXME DM 목록이다 보니 마지막으로 보내거나 받은 메시지 내용 필요
-        + 마지막 메시지 보낸 시간
-       */
       })
       .catch((error) => {
         if (error.response) {

@@ -2,12 +2,18 @@ import { UserInfoType } from './User';
 
 export type MembershipRole = 'ADMIN' | 'OWNER' | 'MEMBER' | 'NONE';
 
+type MembershipType = {
+  role: MembershipRole,
+  createdAt: Date,
+};
+
 export type RawChannelType = {
   id: string,
   name: string,
   password: 'HIDDEN' | null,
-  createdAt: Date,
-  updatedAt: Date,
+  createdAt: string,
+  updatedAt: string,
+  memberships: MembershipType[],
 };
 
 export type MessageType = { // 서버의 'message' 이벤트가 emit

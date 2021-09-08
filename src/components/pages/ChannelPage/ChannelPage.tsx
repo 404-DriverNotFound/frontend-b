@@ -6,13 +6,14 @@ import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import { asyncGetRequest, makeAPIPath } from '../../../utils/utils';
 import List from '../../atoms/List/List';
-import ListItem from '../../atoms/ListItem/ListItem';
 import SubMenu from '../../molecules/SubMenu/SubMenu';
-import Typo from '../../atoms/Typo/Typo';
 import Button from '../../atoms/Button/Button';
 import Dialog from '../../molecules/Dialog/Dialog';
+import ChannelListItem, { ChannelListItemSkeleton } from '../../organisms/ChannelListItem/ChannelListItem';
 import useDialog from '../../../utils/hooks/useDialog';
 import useIntersect from '../../../utils/hooks/useIntersect';
+import { ChannelType, RawChannelType } from '../../../types/Chat';
+import makeChannelInfo from '../../../utils/channels';
 
 const ALL_PATH = '/channel/all';
 const JOINED_PATH = '/channel/joined';
@@ -38,12 +39,11 @@ const ChannelList = ({ type }: ListProps) => {
   const { CancelToken } = axios;
   const source = CancelToken.source();
   const path = type === 'joined' ? makeAPIPath('/channels/me') : makeAPIPath('/channels');
-  const [channels, setChannels] = useState([]);
+  const [channels, setChannels] = useState<ChannelType[]>([]);
   const [isListEnd, setListEnd] = useState(false);
   const [page, setPage] = useState<number>(1);
   const {
-    // eslint-disable-next-line no-unused-vars
-    isOpen, setOpen, dialog, setDialog, // FIXME: ListItem으로 내려주기
+    isOpen, setOpen, dialog, setDialog,
   } = useDialog();
 
   const fetchItems = () => {
@@ -51,7 +51,8 @@ const ChannelList = ({ type }: ListProps) => {
 
     asyncGetRequest(`${path}?perPage=${COUNTS_PER_PAGE}&page=${page}`, source)
       .then(({ data }) => {
-        const typed = data;
+        const typed: ChannelType[] = data.map((channel: RawChannelType) => (
+          makeChannelInfo(channel)));
         setChannels((prev) => prev.concat(typed));
         if (data.length === 0 || data.length < COUNTS_PER_PAGE) setListEnd(true);
       })
@@ -74,13 +75,10 @@ const ChannelList = ({ type }: ListProps) => {
     observer.observe(entry.target);
   });
 
-  // eslint-disable-next-line arrow-body-style
-  useEffect(() => {
-    return () => {
-      source.cancel();
-      setChannels([]);
-      setListEnd(true);
-    };
+  useEffect(() => () => {
+    source.cancel();
+    setChannels([]);
+    setListEnd(true);
   }, []);
 
   return (
@@ -93,9 +91,12 @@ const ChannelList = ({ type }: ListProps) => {
         onClose={dialog.onClose}
       />
       {channels.map((channel: any) => (
-        <ListItem key={channel.id}>
-          <Typo>{channel.name}</Typo>
-        </ListItem>
+        <ChannelListItem
+          key={channel.name}
+          info={channel}
+          setOpen={setOpen}
+          setDialog={setDialog}
+        />
       ))}
       {!isListEnd && (
       <div
@@ -111,9 +112,10 @@ const ChannelList = ({ type }: ListProps) => {
           wrap="nowrap"
           spacing={1}
           xs={12}
-          // FIXME 스켈레톤
         >
-          <ListItem>Put Skeleton Here</ListItem>
+          <ChannelListItemSkeleton />
+          <ChannelListItemSkeleton />
+          <ChannelListItemSkeleton />
         </Grid>
       </div>
       )}

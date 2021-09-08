@@ -20,8 +20,9 @@ const channel: RawChannelType = {
   id: '550e8400-e29b-41d4-a716-446655440000', // 의미없는 uuid입니다
   name: 'temp',
   password: null,
-  createdAt: new Date(),
-  updatedAt: new Date(),
+  createdAt: (new Date()).toString(),
+  updatedAt: (new Date()).toString(),
+  memberships: [],
 };
 
 const shortMessage: MessageType = {
