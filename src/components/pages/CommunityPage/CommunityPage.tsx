@@ -41,7 +41,7 @@ const UserList = ({ type }: ListProps) => {
   const relationship = relationships[type];
   const [users, setUsers] = useState<RelatedInfoType[]>([]);
   const [isListEnd, setListEnd] = useState(true);
-  const [page, setPage] = useState<number>(1);
+  const [page, setPage] = useState<number>(0);
   const {
     isOpen, setOpen, dialog, setDialog,
   } = useDialog();
@@ -98,7 +98,7 @@ const UserList = ({ type }: ListProps) => {
     return () => {
       source.cancel();
       setUsers([]);
-      setListEnd(false);
+      setListEnd(true);
     }; // NOTE 메모리 leak 방지 (https://stackoverflow.com/a/65007703/13614207)
   }, []);
 
