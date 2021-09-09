@@ -21,10 +21,10 @@ import MFAPage from './components/pages/MFAPage/MFAPage';
 import CommunityPage from './components/pages/CommunityPage/CommunityPage';
 import ProfilePage from './components/pages/ProfilePage/ProfilePage';
 import {
-  ChannelType, DMRoomType, MessageType, RawChannelType, RawDMType, RawMessageType,
+  ChannelType, DMRoomType, RawChannelType, RawDMType, RawMessageType,
 } from './types/Chat';
 import ChannelPage from './components/pages/ChannelPage/ChannelPage';
-import makeChannelInfo from './utils/channels';
+import { makeChannelInfo } from './utils/channels';
 import ChatPage from './components/pages/ChatPage/ChatPage';
 import { DMToMessage, messageToMessage } from './utils/chats';
 
@@ -57,12 +57,6 @@ const App = () => {
   const [channels, setChannels] = useState<ChannelType[]>([]);
   const [DMs, setDMs] = useState<DMRoomType[]>([]);
 
-  const handleMessageEvent = (message: MessageType) => {
-    if (message.name === appState.chatting) {
-      // TODO: 채팅 Page로 메시지 내려주기
-    } else appDispatch({ type: 'newMessage', message });
-  };
-
   useEffect(() => {
     if (userState.id) {
       const socket = io(String(process.env.REACT_APP_API_URL)!);
@@ -74,12 +68,12 @@ const App = () => {
 
         socket.on('message', (data: RawMessageType) => {
           const message = messageToMessage(data);
-          handleMessageEvent(message);
+          appDispatch({ type: 'newMessage', message });
         });
 
         socket.on('dm', (data: RawDMType) => {
           const message = DMToMessage(data, userState.name);
-          handleMessageEvent(message);
+          appDispatch({ type: 'newMessage', message });
         });
       });
     }

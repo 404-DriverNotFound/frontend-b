@@ -180,8 +180,8 @@ const ChannelListItem = ({
       })
       .then(() => {
         toast(`${name} 채널에서 탈퇴하였습니다.`);
-        appDispatch({ type: 'join', channels: appState.channels.filter((channel) => channel.name !== appState.chatting) });
-        if (appState.chatting === name) appDispatch({ type: 'leaveRoom' });
+        appDispatch({ type: 'join', channels: appState.channels.filter((channel) => channel.name !== appState.chatting?.name) });
+        if (appState.chatting?.name === name) appDispatch({ type: 'leaveRoom' });
         history.push('/channel');
       })
       .catch((error) => {
@@ -216,10 +216,10 @@ const ChannelListItem = ({
     setOpen(true);
   };
 
-  // FIXME: 채팅 참가, 채널 관리 구현
+  // FIXME: 채널 관리 구현
   const JoinButton = () => (<Button variant="outlined" onClick={openJoinDialog}>채널 가입</Button>);
   const ManageButton = () => (<Button variant="outlined" onClick={() => {}}>채널 관리</Button>);
-  const GoChatButton = () => (<Button variant="outlined" onClick={() => appDispatch({ type: 'enterRoom', name })}>채팅 참가</Button>);
+  const GoChatButton = () => (<Button variant="outlined" onClick={() => appDispatch({ type: 'enterRoom', chatting: { type: 'channel', name } })}>채팅 참가</Button>);
   const LeaveButton = () => (<Button variant="outlined" onClick={openLeaveDialog}>채널 탈퇴</Button>);
 
   const Buttons = () => {

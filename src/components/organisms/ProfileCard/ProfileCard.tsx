@@ -377,7 +377,7 @@ const ProfileCard = ({
       {
         text: 'DM',
         onClick: () => {
-          // TODO: API 구현 후, 추가
+          appDispatch({ type: 'enterRoom', chatting: { type: 'DM', name } });
         },
       },
       {

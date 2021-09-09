@@ -1,11 +1,12 @@
 import React from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import AppBar from '@material-ui/core/AppBar';
-import { makeStyles, Toolbar } from '@material-ui/core';
-// import { Badge } from '@material-ui/core';
+import { Badge, makeStyles, Toolbar } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
 import Typo from '../../atoms/Typo/Typo';
 import useLogout from '../../../utils/hooks/useLogout';
+import { useAppState } from '../../../utils/hooks/useAppContext';
+import { getUnreads } from '../../../utils/channels';
 
 const useStyles = makeStyles({
   cursor: {
@@ -16,6 +17,7 @@ const useStyles = makeStyles({
 const Menu = () => {
   const classes = useStyles();
   const handleLogout = useLogout();
+  const { channels, DMs } = useAppState();
 
   const Choices = ['Game', 'DM', 'Channel', 'Community', 'Profile'];
   const RenderChoices = Choices.map((item) => (
@@ -27,16 +29,14 @@ const Menu = () => {
         style={{ textDecoration: 'none', color: 'inherit' }}
         to={`/${item.toLowerCase()}`}
       >
-        {/* <Badge badgeContent={4} color="secondary"> */}
-        <Typo variant="h6">{item}</Typo>
-        {/* </Badge> */}
+        {['Channel', 'DM'].includes(item) ? (
+          <Badge max={9} badgeContent={item === 'DM' ? getUnreads(DMs) : getUnreads(channels)} color="secondary">
+            <Typo variant="h6">{item}</Typo>
+          </Badge>
+        ) : <Typo variant="h6">{item}</Typo>}
       </NavLink>
     </Grid>
   ));
-  /**
-   * NOTE 여기서 unreads 갯수를 context로 받아와서
-   * 'message', 'dm' 이벤트 일어날 때마다 Badge에 숫자 갱신해주는 식
-   */
 
   const menu = RenderChoices.concat(
     <Grid item key="Logout" onClick={handleLogout}>

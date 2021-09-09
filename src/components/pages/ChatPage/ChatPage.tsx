@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import Grid from '@material-ui/core/Grid';
-import { useAppState } from '../../../utils/hooks/useAppContext';
+import { useAppDispatch, useAppState } from '../../../utils/hooks/useAppContext';
 import { asyncGetRequest, makeAPIPath } from '../../../utils/utils';
 import ChatInput from '../../atoms/ChatInput/ChatInput';
 import List from '../../atoms/List/List';
@@ -16,11 +16,18 @@ import useDialog from '../../../utils/hooks/useDialog';
 import ChatMessage from '../../organisms/ChatMessage/ChatMessage';
 import useIntersect from '../../../utils/hooks/useIntersect';
 import { DMToMessage, messageToMessage } from '../../../utils/chats';
+import Button from '../../atoms/Button/Button';
 
 const COUNTS_PER_PAGE = 20;
 
 const postChannelChat = (name: string, content: string) => (axios.post(makeAPIPath(`/channels/${name}/chats`), { content }));
 const postDM = (name: string, content: string) => (axios.post(makeAPIPath('/dms'), { name, content }));
+
+const addNewChat = (prev: MessageType[], message: MessageType) => {
+  const temp = prev.slice();
+  temp.unshift(message);
+  return temp;
+};
 
 const ChatPage = () => {
   const { CancelToken } = axios;
@@ -30,7 +37,8 @@ const ChatPage = () => {
   const [chat, setChat] = useState<string>('');
   const [isChatEnd, setChatEnd] = useState(false);
   const [page, setPage] = useState<number>(0);
-  const { chatting, channels } = useAppState();
+  const { chatting, channels, newMessage } = useAppState();
+  const appDispatch = useAppDispatch();
   const [channel, setChannel] = useState<ChannelType | null>(null);
   const {
     isOpen, setOpen, dialog, setDialog,
@@ -44,7 +52,7 @@ const ChatPage = () => {
     e.preventDefault();
     if (chat.length === 0) return;
 
-    (channel ? postChannelChat(chatting!, chat) : postDM(chatting!, chat))
+    (channel ? postChannelChat(chatting!.name, chat) : postDM(chatting!.name, chat))
       .then(() => {
         setChat('');
       })
@@ -57,13 +65,13 @@ const ChatPage = () => {
 
   const fetchItems = () => {
     if (!chatting || isChatEnd) return;
-    const path = channel ? makeAPIPath(`/channels/${chatting}/chats`) : makeAPIPath(`/dms/opposite/${chatting}`);
+    const path = chatting.type === 'channel' ? makeAPIPath(`/channels/${chatting.name}/chats`) : makeAPIPath(`/dms/opposite/${chatting.name}`);
 
     asyncGetRequest(`${path}?perPage=${COUNTS_PER_PAGE}&page=${page}`, source)
       .then(({ data }) => {
         const typed: MessageType[] = data
           .map((one: RawMessageType | RawDMType) => (
-            channel ? messageToMessage(one as RawMessageType, chatting)
+            chatting.type === 'channel' ? messageToMessage(one as RawMessageType, chatting!.name)
               : DMToMessage(one as RawDMType, userState.name)));
         setChats((prev) => prev.concat(typed));
         if (data.length === 0 || data.length < COUNTS_PER_PAGE) setChatEnd(true);
@@ -78,14 +86,22 @@ const ChatPage = () => {
   useEffect(() => {
     setChats([]);
     setChat('');
-    setPage(isChatEnd ? 1 : 0);
-    setChannel(channels.filter((one) => one.name === chatting)[0] || null);
-    setChatEnd(false);
+    setPage(chatting ? 1 : 0);
+    setChannel((chatting && chatting.type === 'channel')
+      ? (channels.filter((one) => one.name === chatting.name)[0] || null) : null);
+    setChatEnd(!chatting);
   }, [chatting]);
+  // FIXME listEnd false인데서 옮겨가면 0으로 요청보냄
 
   useEffect(() => {
     fetchItems();
   }, [page]);
+
+  useEffect(() => {
+    if (newMessage) {
+      setChats((prev) => addNewChat(prev, newMessage));
+    }
+  }, [newMessage]);
 
   useEffect(() => () => {
     source.cancel();
@@ -110,7 +126,10 @@ const ChatPage = () => {
         buttons={dialog.buttons}
         onClose={dialog.onClose}
       />
-      <Typo variant="h6">{chatting || '참여중인 채팅이 없습니다'}</Typo>
+      <Grid container justifyContent="space-between" alignItems="center">
+        <Typo variant="h6">{chatting?.name || '참여중인 채팅이 없습니다'}</Typo>
+        <Button variant="text" onClick={() => appDispatch({ type: 'leaveRoom' })}>채팅 닫기</Button>
+      </Grid>
       {chatting ? (
         <>
           <List height="70vh" reverse scroll>
@@ -138,7 +157,7 @@ const ChatPage = () => {
                 spacing={1}
                 xs={12}
               >
-                loading...
+                <Typo gutterBottom>Loading...</Typo>
               </Grid>
             </div>
             )}

@@ -6,6 +6,7 @@ const messageToMessage = (message: RawMessageType, channelName?: string): Messag
     content, user, id, createdAt,
   } = message;
   return ({
+    type: 'channel',
     content,
     user: { ...user, avatar: makeAPIPath(`/${user.avatar}`) },
     id,
@@ -19,6 +20,7 @@ const DMToMessage = (message: RawDMType, myName: string): MessageType => {
     content, id, createdAt, receiver, sender,
   } = message;
   return ({
+    type: 'DM',
     content,
     user: { ...sender, avatar: makeAPIPath(`/${sender.avatar}`) },
     id,

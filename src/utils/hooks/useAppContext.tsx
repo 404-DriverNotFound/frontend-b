@@ -4,23 +4,25 @@ import React, {
 import { Socket } from 'socket.io-client';
 import { ChannelType, DMRoomType, MessageType } from '../../types/Chat';
 
+type ChattingType = {
+  type: 'channel' | 'DM',
+  name: string,
+};
+
 type AppStateType = {
   isLoading: boolean,
   socket: Socket | null,
-  chatting: string | null,
+  chatting: ChattingType | null,
+  newMessage: MessageType | null,
   channels: ChannelType[],
   DMs: DMRoomType[],
-  /**
-   * 'message'나 'dm' 이벤트를 수신하면
-   * 어떤 채널에 온 이벤트인지 확인해서
-   * 그 채널의 unreads < 같은 변수 조작 해주면 되지 않을까?
-   */
 };
 
 const initialAppState: AppStateType = {
   isLoading: false,
   socket: null,
   chatting: null,
+  newMessage: null,
   channels: [],
   DMs: [],
 };
@@ -30,7 +32,7 @@ type AppActionType =
   { type: 'endLoading' } |
   { type: 'connect', socket: Socket } |
   { type: 'join', channels?: ChannelType[], DMs?: DMRoomType[] } |
-  { type: 'enterRoom', name: string } |
+  { type: 'enterRoom', chatting: ChattingType } |
   { type: 'leaveRoom' } |
   { type: 'newMessage', message: MessageType } |
   { type: 'disconnect' };
@@ -49,7 +51,20 @@ function AppReducer(state: AppStateType, action: AppActionType): AppStateType {
     case 'disconnect':
       return { ...state, socket: null };
     case 'enterRoom':
-      return { ...state, chatting: action.name };
+      return {
+        ...state,
+        chatting: action.chatting,
+        channels: state.channels.map((channel: ChannelType) => {
+          if (action.chatting.type === 'channel' && channel.name === action.chatting.name) {
+            return { ...channel, unreads: 0 };
+          } return { ...channel };
+        }),
+        DMs: state.DMs.map((dmRoom: DMRoomType) => {
+          if (action.chatting.type === 'DM' && dmRoom.name === action.chatting.name) {
+            return { ...dmRoom, unreads: 0 };
+          } return { ...dmRoom };
+        }),
+      };
     case 'leaveRoom':
       return { ...state, chatting: null };
     case 'join':
@@ -61,14 +76,16 @@ function AppReducer(state: AppStateType, action: AppActionType): AppStateType {
     case 'newMessage':
       return {
         ...state,
+        newMessage: (state.chatting && state.chatting.type === action.message.type
+          && action.message.name === state.chatting.name) ? action.message : null,
         channels: state.channels.map((channel: ChannelType) => {
-          if (channel.name === action.message.name) {
+          if (channel.name === action.message.name && channel.name !== state.chatting?.name) {
             return { ...channel, unreads: channel.unreads + 1 };
           } return { ...channel };
-        }), // FIXME 수정할 내용 있는지 확인
+        }),
         DMs: state.DMs.map((dmRoom: DMRoomType) => {
-          if (dmRoom.name === action.message.name) {
-            return { ...dmRoom, unreads: dmRoom.unreads + 1 };
+          if (dmRoom.name === action.message.name && dmRoom.name !== state.chatting?.name) {
+            return { ...dmRoom, unreads: dmRoom.unreads + 1, latestMessage: action.message };
           } return { ...dmRoom };
         }),
       };

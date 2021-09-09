@@ -1,4 +1,5 @@
-import { ChannelType, RawChannelType } from '../types/Chat';
+/* eslint-disable arrow-body-style */
+import { ChannelType, RawChannelType, DMRoomType } from '../types/Chat';
 
 const makeChannelInfo = (rawData: RawChannelType): ChannelType => {
   const {
@@ -13,4 +14,19 @@ const makeChannelInfo = (rawData: RawChannelType): ChannelType => {
   };
 };
 
-export default makeChannelInfo;
+type ChannelDM = ChannelType | DMRoomType;
+
+const renewUnreads = (innerState: ChannelDM[], appState: ChannelDM[]): ChannelDM[] => {
+  return (innerState.map((one) => {
+    const copy = { ...one };
+    const found = appState.filter((appOne) => appOne.name === copy.name);
+    if (found[0]) copy.unreads = found[0].unreads;
+    return copy;
+  }));
+};
+
+const getUnreads = (state: ChannelDM[]): number => {
+  return (state.reduce((prev, cur) => prev + cur.unreads, 0));
+};
+
+export { makeChannelInfo, renewUnreads, getUnreads };

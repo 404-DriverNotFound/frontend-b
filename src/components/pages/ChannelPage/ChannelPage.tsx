@@ -13,8 +13,9 @@ import ChannelListItem, { ChannelListItemSkeleton } from '../../organisms/Channe
 import useDialog from '../../../utils/hooks/useDialog';
 import useIntersect from '../../../utils/hooks/useIntersect';
 import { ChannelType, RawChannelType } from '../../../types/Chat';
-import makeChannelInfo from '../../../utils/channels';
+import { makeChannelInfo, renewUnreads } from '../../../utils/channels';
 import ChannelInfoForm from '../../organisms/ChannelInfoForm/ChannelInfoForm';
+import { useAppState } from '../../../utils/hooks/useAppContext';
 
 const ALL_PATH = '/channel/all';
 const JOINED_PATH = '/channel/joined';
@@ -40,6 +41,7 @@ const ChannelList = ({ type }: ListProps) => {
   const { CancelToken } = axios;
   const source = CancelToken.source();
   const path = type === 'joined' ? makeAPIPath('/channels/me') : makeAPIPath('/channels');
+  const appState = useAppState();
   const [channels, setChannels] = useState<ChannelType[]>([]);
   const [isListEnd, setListEnd] = useState(false);
   const [page, setPage] = useState<number>(1);
@@ -55,6 +57,9 @@ const ChannelList = ({ type }: ListProps) => {
         const typed: ChannelType[] = data.map((channel: RawChannelType) => (
           makeChannelInfo(channel)));
         setChannels((prev) => prev.concat(typed));
+        if (page === 1) {
+          setChannels((prev) => renewUnreads(prev, appState.channels) as ChannelType[]);
+        }
         if (data.length === 0 || data.length < COUNTS_PER_PAGE) setListEnd(true);
       })
       .catch((error) => {
@@ -81,6 +86,10 @@ const ChannelList = ({ type }: ListProps) => {
     setChannels([]);
     setListEnd(true);
   }, []);
+
+  useEffect(() => {
+    setChannels((prev) => renewUnreads(prev, appState.channels) as ChannelType[]);
+  }, [appState.channels]);
 
   return (
     <>

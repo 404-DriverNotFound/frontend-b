@@ -19,7 +19,7 @@ export type RawChannelType = {
 
 export type RawMessageType = {
   content: string,
-  user: UserInfoType, // 나 자신일 수도 있음
+  user: UserInfoType,
   channel: RawChannelType,
   id: string, // message의 id
   createdAt: Date,
@@ -33,15 +33,14 @@ export type RawDMType = {
   createdAt: Date,
 };
 
-export type MessageType = { // 서버의 'message' 이벤트가 emit
+export type MessageType = {
+  type: 'channel' | 'DM',
   content: string,
-  user: UserInfoType, // 나 자신일 수도 있음
+  user: UserInfoType,
   name: string,
   id: string, // message의 id
   createdAt: Date,
-}; // FIXME TEMP
-
-// FIXME DMType 추가, DM event 추가, appDispatch 수정
+};
 
 export type ChannelType = {
   name: string,
@@ -49,10 +48,10 @@ export type ChannelType = {
   unreads: number,
   isLocked: boolean,
   updatedAt: Date,
-}; // FIXME TEMP
+};
 
 export type DMRoomType = {
   name: string,
-  latestMessage?: MessageType, // FIXME API 추가되면 구현
+  latestMessage?: MessageType,
   unreads: number,
-}; // FIXME TEMP
+};
