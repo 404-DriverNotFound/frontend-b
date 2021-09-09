@@ -166,7 +166,6 @@ const ChannelListItem = ({
     name, role, unreads, isLocked, updatedAt,
   } = info;
   const dateStr = makeDateString(updatedAt);
-  const userState = useUserState();
   const appDispatch = useAppDispatch();
   const appState = useAppState();
   const history = useHistory();
@@ -174,7 +173,7 @@ const ChannelListItem = ({
 
   const handleLeaveChannel = () => {
     appDispatch({ type: 'loading' });
-    axios.delete(makeAPIPath(`/channels/${name}/members/${userState.name}`))
+    axios.delete(makeAPIPath(`/channels/${name}/members/me`))
       .finally(() => {
         appDispatch({ type: 'endLoading' });
       })
