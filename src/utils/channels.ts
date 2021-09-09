@@ -1,5 +1,14 @@
 /* eslint-disable arrow-body-style */
-import { ChannelType, RawChannelType, DMRoomType } from '../types/Chat';
+import {
+  ChannelType, RawChannelType, DMRoomType, MembershipRole, MemberType,
+} from '../types/Chat';
+import { UserInfoType } from '../types/User';
+
+const getMembership = (user: UserInfoType, members: MemberType[]): MembershipRole => {
+  const found = members.find((member) => (member.name === user.name));
+  if (!found) return 'NONE';
+  return found.memberships[0].role;
+};
 
 const makeChannelInfo = (rawData: RawChannelType): ChannelType => {
   const {
@@ -29,4 +38,6 @@ const getUnreads = (state: ChannelDM[]): number => {
   return (state.reduce((prev, cur) => prev + cur.unreads, 0));
 };
 
-export { makeChannelInfo, renewUnreads, getUnreads };
+export {
+  getMembership, makeChannelInfo, renewUnreads, getUnreads,
+};

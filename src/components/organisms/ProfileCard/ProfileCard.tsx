@@ -149,7 +149,7 @@ const ProfileCard = ({
         toast(comment);
       })
       .catch((error) => {
-        if (error.response && error.response.data && error.response.data.message) {
+        if (error.response?.data?.message) {
           toast.error(error.response.data.message[0]);
         } else toast.error(error.message);
       });
@@ -176,7 +176,7 @@ const ProfileCard = ({
         toast(comment);
       })
       .catch((error) => {
-        if (error.response && error.response.data && error.response.data.message) {
+        if (error.response?.data?.message) {
           toast.error(error.response.data.message[0]);
         } else toast.error(error.message);
       });
@@ -200,7 +200,7 @@ const ProfileCard = ({
         toast(comment);
       })
       .catch((error) => {
-        if (error.response && error.response.data && error.response.data.message) {
+        if (error.response?.data?.message) {
           toast.error(error.response.data.message[0]);
         } else toast.error(error.message);
       });
@@ -377,7 +377,7 @@ const ProfileCard = ({
       {
         text: 'DM',
         onClick: () => {
-          appDispatch({ type: 'enterRoom', chatting: { type: 'DM', name } });
+          appDispatch({ type: 'enterChat', chatting: { type: 'DM', name } });
         },
       },
       {

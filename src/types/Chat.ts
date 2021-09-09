@@ -8,6 +8,8 @@ type MembershipType = {
   createdAt: Date,
 };
 
+export type MemberType = UserInfoType & { memberships: MembershipType[] };
+
 export type RawChannelType = {
   id: string,
   name: string,

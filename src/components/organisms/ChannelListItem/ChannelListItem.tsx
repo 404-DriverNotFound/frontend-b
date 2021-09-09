@@ -124,10 +124,11 @@ const ChannelJoinForm = ({ info, setOpen }: ChannelJoinFormProps) => {
             updatedAt: new Date(data.channel.updatedAt),
           }),
         });
+        if (appState?.socket) appState.socket.emit('join', { id: userState.id });
         history.push('/channel');
       })
       .catch((error) => {
-        if (error.response && error.response.data && error.response.data.message) {
+        if (error.response?.data?.message) {
           toast.error(error.response.data.message[0]);
         } else toast.error(error.message);
       });
@@ -139,8 +140,6 @@ const ChannelJoinForm = ({ info, setOpen }: ChannelJoinFormProps) => {
         <form onSubmit={(e) => e.preventDefault()}>
           <Input
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              // eslint-disable-next-line no-console
-              console.log(e.target.value);
               setPassword(e.target.value);
             }}
             label="채널 비밀번호 입력"
@@ -180,11 +179,12 @@ const ChannelListItem = ({
       .then(() => {
         toast(`${name} 채널에서 탈퇴하였습니다.`);
         appDispatch({ type: 'join', channels: appState.channels.filter((channel) => channel.name !== appState.chatting?.name) });
-        if (appState.chatting?.name === name) appDispatch({ type: 'leaveRoom' });
+        if (appState.chatting?.name === name) appDispatch({ type: 'leaveChat' });
+        appDispatch({ type: 'exit', name });
         history.push('/channel');
       })
       .catch((error) => {
-        if (error.response && error.response.data && error.response.data.message) {
+        if (error.response?.data?.message) {
           toast.error(error.response.data.message[0]);
         } else toast.error(error.message);
       });
@@ -218,7 +218,7 @@ const ChannelListItem = ({
   // FIXME: 채널 관리 구현
   const JoinButton = () => (<Button variant="outlined" onClick={openJoinDialog}>채널 가입</Button>);
   const ManageButton = () => (<Button variant="outlined" onClick={() => {}}>채널 관리</Button>);
-  const GoChatButton = () => (<Button variant="outlined" onClick={() => appDispatch({ type: 'enterRoom', chatting: { type: 'channel', name } })}>채팅 참가</Button>);
+  const GoChatButton = () => (<Button variant="outlined" onClick={() => appDispatch({ type: 'enterChat', chatting: { type: 'channel', name } })}>채팅 참가</Button>);
   const LeaveButton = () => (<Button variant="outlined" onClick={openLeaveDialog}>채널 탈퇴</Button>);
 
   const Buttons = () => {

@@ -8,7 +8,7 @@ import ChatInput from '../../atoms/ChatInput/ChatInput';
 import List from '../../atoms/List/List';
 import Typo from '../../atoms/Typo/Typo';
 import {
-  ChannelType, MessageType, RawDMType, RawMessageType,
+  ChannelType, MemberType, MessageType, RawDMType, RawMessageType,
 } from '../../../types/Chat';
 import { useUserState } from '../../../utils/hooks/useUserContext';
 import Dialog from '../../molecules/Dialog/Dialog';
@@ -17,6 +17,7 @@ import ChatMessage from '../../organisms/ChatMessage/ChatMessage';
 import useIntersect from '../../../utils/hooks/useIntersect';
 import { DMToMessage, messageToMessage } from '../../../utils/chats';
 import Button from '../../atoms/Button/Button';
+import { getMembership } from '../../../utils/channels';
 
 const COUNTS_PER_PAGE = 20;
 
@@ -37,6 +38,7 @@ const ChatPage = () => {
   const [chat, setChat] = useState<string>('');
   const [isChatEnd, setChatEnd] = useState(false);
   const [page, setPage] = useState<number>(0);
+  const [members, setMembers] = useState<MemberType[]>([]);
   const { chatting, channels, newMessage } = useAppState();
   const appDispatch = useAppDispatch();
   const [channel, setChannel] = useState<ChannelType | null>(null);
@@ -57,7 +59,7 @@ const ChatPage = () => {
         setChat('');
       })
       .catch((error) => {
-        if (error.response && error.response.data && error.response.data.message) {
+        if (error.response?.data?.message) {
           toast.error(error.response.data.message[0]);
         } else toast.error(error.message);
       });
@@ -90,8 +92,16 @@ const ChatPage = () => {
     setChannel((chatting && chatting.type === 'channel')
       ? (channels.filter((one) => one.name === chatting.name)[0] || null) : null);
     setChatEnd(!chatting);
+    if (chatting && chatting.type === 'channel') {
+      asyncGetRequest(makeAPIPath(`/channels/${chatting.name}/members`))
+        .then(({ data }) => { setMembers(data); })
+        .catch((error) => {
+          if (error.response?.data?.message) {
+            toast.error(error.response.data.message[0]);
+          } else toast.error(error.message);
+        });
+    } else setMembers([]);
   }, [chatting]);
-  // FIXME listEnd false인데서 옮겨가면 0으로 요청보냄
 
   useEffect(() => {
     fetchItems();
@@ -106,6 +116,7 @@ const ChatPage = () => {
   useEffect(() => () => {
     source.cancel();
     setChats([]);
+    setMembers([]);
     setChatEnd(true);
   }, []);
 
@@ -128,7 +139,7 @@ const ChatPage = () => {
       />
       <Grid container justifyContent="space-between" alignItems="center">
         <Typo variant="h6">{chatting?.name || '참여중인 채팅이 없습니다'}</Typo>
-        <Button variant="text" onClick={() => appDispatch({ type: 'leaveRoom' })}>채팅 닫기</Button>
+        {chatting && <Button variant="text" onClick={() => appDispatch({ type: 'leaveChat' })}>채팅 닫기</Button>}
       </Grid>
       {chatting ? (
         <>
@@ -137,7 +148,7 @@ const ChatPage = () => {
               <ChatMessage
                 key={one.id}
                 info={one}
-                userRole={channel ? channel.role : 'MEMBER'}
+                userRole={channel ? getMembership(one.user, members) : 'MEMBER'}
                 me={one.user.name === userState.name}
                 setOpen={setOpen}
                 setDialog={setDialog}

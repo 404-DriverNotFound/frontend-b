@@ -3,13 +3,14 @@ import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 import { Grid, makeStyles } from '@material-ui/core';
 import { toast } from 'react-toastify';
-import { useAppDispatch } from '../../../utils/hooks/useAppContext';
+import { useAppDispatch, useAppState } from '../../../utils/hooks/useAppContext';
 import { makeAPIPath } from '../../../utils/utils';
 import { SetOpenType } from '../../../utils/hooks/useDialog';
 import Input from '../../atoms/Input/Input';
 import Switch from '../../atoms/Switch/Switch';
 import Typo from '../../atoms/Typo/Typo';
 import Button from '../../atoms/Button/Button';
+import { useUserState } from '../../../utils/hooks/useUserContext';
 
 const useStyles = makeStyles({
   margin: {
@@ -48,6 +49,8 @@ const ChannelInfoForm = ({ setOpen }: ChannelInfoFormProps) => {
   const [helperTextCheckPassword, setHelperTextCheckPassword] = useState<string>(CHANNEL_PASSWORD_HELPER_TEXT);
   const [isDuplicateChecked, setDuplicateChecked] = useState<boolean>(false);
   const appDispatch = useAppDispatch();
+  const appState = useAppState();
+  const userState = useUserState();
   const classes = useStyles();
   const history = useHistory();
 
@@ -107,9 +110,20 @@ const ChannelInfoForm = ({ setOpen }: ChannelInfoFormProps) => {
       .finally(() => {
         appDispatch({ type: 'endLoading' });
       })
-      .then(() => {
+      .then(({ data }) => {
         setOpen(false);
         toast(`${channelName} 채널이 생성되었습니다.`);
+        appDispatch({
+          type: 'join',
+          channels: appState.channels.concat({
+            name: data.name,
+            role: 'OWNER',
+            unreads: 0,
+            isLocked: data.password !== null,
+            updatedAt: new Date(data.updatedAt),
+          }),
+        });
+        if (appState?.socket) appState.socket.emit('join', { id: userState.id });
         history.push('/channel');
       })
       .catch((error) => {

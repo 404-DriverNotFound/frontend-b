@@ -32,8 +32,9 @@ type AppActionType =
   { type: 'endLoading' } |
   { type: 'connect', socket: Socket } |
   { type: 'join', channels?: ChannelType[], DMs?: DMRoomType[] } |
-  { type: 'enterRoom', chatting: ChattingType } |
-  { type: 'leaveRoom' } |
+  { type: 'exit', name: string } |
+  { type: 'enterChat', chatting: ChattingType } |
+  { type: 'leaveChat' } |
   { type: 'newMessage', message: MessageType } |
   { type: 'disconnect' };
 
@@ -50,7 +51,7 @@ function AppReducer(state: AppStateType, action: AppActionType): AppStateType {
       return { ...state, socket: action.socket };
     case 'disconnect':
       return { ...state, socket: null };
-    case 'enterRoom':
+    case 'enterChat':
       return {
         ...state,
         chatting: action.chatting,
@@ -65,13 +66,19 @@ function AppReducer(state: AppStateType, action: AppActionType): AppStateType {
           } return { ...dmRoom };
         }),
       };
-    case 'leaveRoom':
+    case 'leaveChat':
       return { ...state, chatting: null };
     case 'join':
       return {
         ...state,
         channels: action.channels || state.channels,
         DMs: action.DMs || state.DMs,
+      };
+    case 'exit':
+      return {
+        ...state,
+        chatting: state?.chatting?.name === action.name ? null : state.chatting,
+        channels: state.channels.filter((one) => one.name !== action.name) || state.channels,
       };
     case 'newMessage':
       return {

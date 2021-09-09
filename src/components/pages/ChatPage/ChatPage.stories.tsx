@@ -15,7 +15,7 @@ export default {
 const ChatWithContext = () => {
   const appDispatch = useAppDispatch();
   useEffect(() => {
-    appDispatch({ type: 'enterRoom', chatting: { type: 'channel', name: 'SampleRoom' } });
+    appDispatch({ type: 'enterChat', chatting: { type: 'channel', name: 'SampleRoom' } });
   }, []);
   return (<ChatPage />);
 };

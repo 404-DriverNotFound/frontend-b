@@ -67,11 +67,15 @@ const App = () => {
         appDispatch({ type: 'endLoading' });
 
         socket.on('message', (data: RawMessageType) => {
+          // eslint-disable-next-line no-console
+          console.log('message', data);
           const message = messageToMessage(data);
           appDispatch({ type: 'newMessage', message });
         });
 
         socket.on('dm', (data: RawDMType) => {
+          // eslint-disable-next-line no-console
+          console.log('dm', data);
           const message = DMToMessage(data, userState.name);
           appDispatch({ type: 'newMessage', message });
         });
