@@ -39,7 +39,7 @@ const useStyles = makeStyles({
     position: 'fixed',
     top: '0',
     left: '0',
-    zIndex: 1200,
+    zIndex: 1500,
     width: '100%',
     height: '100%',
     backgroundColor: 'rgba(255, 255, 255, 0.5)',
