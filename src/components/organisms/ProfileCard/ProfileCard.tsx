@@ -150,7 +150,7 @@ const ProfileCard = ({
       })
       .catch((error) => {
         if (error.response && error.response.data && error.response.data.message) {
-          toast.error(error.response.data.message);
+          toast.error(error.response.data.message[0]);
         } else toast.error(error.message);
       });
     setOpen(false);
@@ -177,7 +177,7 @@ const ProfileCard = ({
       })
       .catch((error) => {
         if (error.response && error.response.data && error.response.data.message) {
-          toast.error(error.response.data.message);
+          toast.error(error.response.data.message[0]);
         } else toast.error(error.message);
       });
     setOpen(false);
@@ -201,7 +201,7 @@ const ProfileCard = ({
       })
       .catch((error) => {
         if (error.response && error.response.data && error.response.data.message) {
-          toast.error(error.response.data.message);
+          toast.error(error.response.data.message[0]);
         } else toast.error(error.message);
       });
     setOpen(false);
