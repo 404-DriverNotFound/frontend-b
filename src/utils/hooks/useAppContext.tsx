@@ -83,18 +83,27 @@ function AppReducer(state: AppStateType, action: AppActionType): AppStateType {
     case 'newMessage':
       return {
         ...state,
-        newMessage: (state.chatting && state.chatting.type === action.message.type
+        newMessage: (state.chatting?.type === action.message.type
           && action.message.name === state.chatting.name) ? action.message : null,
-        channels: state.channels.map((channel: ChannelType) => {
-          if (channel.name === action.message.name && channel.name !== state.chatting?.name) {
-            return { ...channel, unreads: channel.unreads + 1 };
-          } return { ...channel };
-        }),
-        DMs: state.DMs.map((dmRoom: DMRoomType) => {
-          if (dmRoom.name === action.message.name && dmRoom.name !== state.chatting?.name) {
-            return { ...dmRoom, unreads: dmRoom.unreads + 1, latestMessage: action.message };
-          } return { ...dmRoom };
-        }),
+        channels: (action.message.type === 'channel'
+          ? (state.channels.map((channel: ChannelType) => {
+            if (channel.name === action.message.name && channel.name !== state.chatting?.name) {
+              return { ...channel, unreads: channel.unreads + 1 };
+            } return { ...channel };
+          }))
+          : state.channels),
+        // eslint-disable-next-line no-nested-ternary
+        DMs: (action.message.type === 'DM'
+          ? (state.DMs.some((dmRoom) => dmRoom.name === action.message.name)
+            ? state.DMs.map((dmRoom: DMRoomType) => {
+              if (dmRoom.name === action.message.name && dmRoom.name !== state.chatting?.name) {
+                return { ...dmRoom, unreads: dmRoom.unreads + 1, latestMessage: action.message };
+              } return { ...dmRoom };
+            }) : state.DMs.concat({
+              name: action.message.name,
+              latestMessage: action.message,
+              unreads: action.message.user.name === action.message.name ? 1 : 0,
+            })) : state.DMs), // FIXME 삼항연산자 떡칠인데 가독성 좋게 수정
       };
     default:
       return { ...state };
