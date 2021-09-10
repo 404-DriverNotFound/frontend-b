@@ -108,7 +108,7 @@ export const DMListItemSkeleton = () => {
         <Grid item container justifyContent="center" alignItems="center" xs={4}>
           <div className={`${classes.skeletonTypo} ${classes.skeleton}`}> </div>
         </Grid>
-        <Grid item container justifyContent="flex-end" alignItems="center" xs={1}>
+        <Grid item container justifyContent="flex-end" alignItems="center" xs={2}>
           <div className={`${classes.skeletonButton} ${classes.skeleton}`}> </div>
         </Grid>
       </Grid>
@@ -121,11 +121,21 @@ type DMListItemProps = {
 };
 
 const makeDateString = (date: Date) => {
-  const now = new Date();
-  const today = `${now.getFullYear()}.${now.getMonth() + 1}.${now.getDate()}`;
-  const messageDate = `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
-  if (today === messageDate) return `${date.getHours()}:${date.getMinutes()}`;
-  return `${messageDate} ${date.getHours()}:${date.getMinutes()}`;
+  const anYear: number = 31536000000;
+  const aMonth: number = 2628000000;
+  const aDay: number = 86400000;
+  const anHour: number = 3600000;
+  const aMinute: number = 60000;
+  const aSecond: number = 1000;
+  const now: number = Date.now();
+  if (now - date.getTime() > anYear * 10) return ('옛날 옛적에');
+  if (now - date.getTime() > anYear) return (`${Math.floor((now - date.getTime()) / anYear)}년 전`);
+  if (now - date.getTime() > aMonth) return (`${Math.floor((now - date.getTime()) / aMonth)}개월 전`);
+  if (now - date.getTime() > aDay) return (`${Math.floor((now - date.getTime()) / aDay)}일 전`);
+  if (now - date.getTime() > anHour) return (`${Math.floor((now - date.getTime()) / anHour)}시간 전`);
+  if (now - date.getTime() > aMinute) return (`${Math.floor((now - date.getTime()) / aMinute)}분 전`);
+  if (now - date.getTime() > aSecond) return (`${Math.floor((now - date.getTime()) / aSecond)}초 전`);
+  return '방금 전';
 };
 
 const handleClickToProfile = () => {
@@ -146,7 +156,7 @@ const DMListItem = ({ roomInfo }: DMListItemProps) => {
   const classes = useStyles({ status });
 
   const makeContentString = () => {
-    if (content.length > 32) return `${content.substring(0, 29)}...`;
+    if (content.length > 23) return `${content.substring(0, 20)}...`;
     return content;
   };
 
