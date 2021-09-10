@@ -32,7 +32,7 @@ const useStyles = makeStyles({
     },
   },
   badgeMargin: {
-    marginLeft: '1em',
+    margin: '1em 0em 1em 1em',
   },
 });
 
@@ -138,14 +138,15 @@ const handleClickToDM = () => {
 
 // NOTE: 처음 대화일 경우, latestMessage가 없음: avatar와 status를 가져오기 위해 latestMessage 활성화 가정 코드
 const DMListItem = ({ roomInfo }: DMListItemProps) => {
-  const { latestMessage, unreads } = roomInfo;
-  const { content, user, createdAt } = latestMessage;
-  const { name, avatar, status } = user;
+  const {
+    name, avatar, status, latestMessage, unreads,
+  } = roomInfo;
+  const { content, createdAt } = latestMessage;
   const dateStr = makeDateString(createdAt);
   const classes = useStyles({ status });
 
   const makeContentString = () => {
-    if (content.length > 50) return `${content.substring(0, 47)}...`;
+    if (content.length > 32) return `${content.substring(0, 29)}...`;
     return content;
   };
 
