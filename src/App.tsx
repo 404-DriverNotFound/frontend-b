@@ -28,6 +28,7 @@ import { makeChannelInfo } from './utils/channels';
 import ChatPage from './components/pages/ChatPage/ChatPage';
 import { DMToMessage, messageToMessage } from './utils/chats';
 import ChannelManagePage from './components/pages/ChannelManagePage/ChannelManagePage';
+import DMPage from './components/pages/DMPage/DMPage';
 
 const useStyles = makeStyles({
   progress: {
@@ -148,6 +149,7 @@ const App = () => {
               <Route path="/channel/manage/:channelName" component={ChannelManagePage} />
               <Route path="/channel" component={ChannelPage} />
               <Route path="/profile/:username" component={ProfilePage} />
+              <Route exact path="/dm" component={DMPage} />
               <Route exact path="/profile">
                 <Redirect to={`/profile/${userState.name}`} />
               </Route>
