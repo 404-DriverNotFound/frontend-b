@@ -1,10 +1,10 @@
 import React from 'react';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
+import Badge from '@material-ui/core/Badge';
 import Typo from '../../atoms/Typo/Typo';
-import { DialogProps } from '../../../utils/hooks/useDialog';
 import ListItem from '../../atoms/ListItem/ListItem';
-import { MessageType } from '../../../types/Chat';
+import { DMRoomType } from '../../../types/Chat';
 import Avatar from '../../atoms/Avatar/Avatar';
 import { UserStatusType } from '../../../types/User';
 import Button from '../../atoms/Button/Button';
@@ -30,6 +30,9 @@ const useStyles = makeStyles({
           return 'black';
       }
     },
+  },
+  badgeMargin: {
+    marginLeft: '1em',
   },
 });
 
@@ -113,13 +116,8 @@ export const DMListItemSkeleton = () => {
   );
 };
 
-// FIXME: Dialog, setOpen 구현하기
 type DMListItemProps = {
-  info: MessageType,
-  // eslint-disable-next-line no-unused-vars
-  setOpen: (value: boolean) => void,
-  // eslint-disable-next-line no-unused-vars
-  setDialog: (value: DialogProps) => void,
+  roomInfo: DMRoomType,
 };
 
 const makeDateString = (date: Date) => {
@@ -138,12 +136,11 @@ const handleClickToDM = () => {
   // FIXME: 해당 유저의 DM chat 입장
 };
 
-const DMListItem = ({
-  // eslint-disable-next-line no-unused-vars
-  info, setOpen, setDialog,
-}: DMListItemProps) => {
-  const { user, content, createdAt } = info;
-  const { status } = user;
+// NOTE: 처음 대화일 경우, latestMessage가 없음: avatar와 status를 가져오기 위해 latestMessage 활성화 가정 코드
+const DMListItem = ({ roomInfo }: DMListItemProps) => {
+  const { latestMessage, unreads } = roomInfo;
+  const { content, user, createdAt } = latestMessage;
+  const { name, avatar, status } = user;
   const dateStr = makeDateString(createdAt);
   const classes = useStyles({ status });
 
@@ -170,12 +167,12 @@ const DMListItem = ({
         <Grid item container justifyContent="center" alignItems="center" xs={1}>
           <Avatar
             onClick={handleClickToProfile}
-            src={user.avatar}
-            alt={user.name}
+            src={avatar}
+            alt={name}
           />
         </Grid>
         <Grid item container justifyContent="center" alignItems="center" xs={2} direction="column">
-          <Typo variant="h6">{user.name}</Typo>
+          <Typo variant="h6">{name}</Typo>
           <Typo className={classes.status} variant="subtitle1">{makeStatusString()}</Typo>
         </Grid>
         <Grid item container justifyContent="center" alignItems="center" xs={1}>
@@ -183,6 +180,9 @@ const DMListItem = ({
         </Grid>
         <Grid item container justifyContent="flex-start" alignItems="center" xs={4}>
           <Typo variant="body1">{makeContentString()}</Typo>
+          {unreads ? (
+            <Badge color="secondary" badgeContent={unreads} max={9} className={classes.badgeMargin} />
+          ) : null}
         </Grid>
         <Grid item container justifyContent="flex-end" alignItems="center" xs={2}>
           <Button variant="outlined" aria-label="go to DM" onClick={handleClickToDM}>
