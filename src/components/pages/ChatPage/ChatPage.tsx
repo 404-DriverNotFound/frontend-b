@@ -1,9 +1,8 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
 import Grid from '@material-ui/core/Grid';
 import { useAppDispatch, useAppState } from '../../../utils/hooks/useAppContext';
-import { asyncGetRequest, makeAPIPath } from '../../../utils/utils';
+import { asyncGetRequest, errorMessageHandler, makeAPIPath } from '../../../utils/utils';
 import ChatInput from '../../atoms/ChatInput/ChatInput';
 import List from '../../atoms/List/List';
 import Typo from '../../atoms/Typo/Typo';
@@ -58,11 +57,7 @@ const ChatPage = () => {
       .then(() => {
         setChat('');
       })
-      .catch((error) => {
-        if (error.response?.data?.message) {
-          toast.error(error.response.data.message[0]);
-        } else toast.error(error.message);
-      });
+      .catch((error) => { errorMessageHandler(error); });
   };
 
   const fetchItems = () => {
@@ -80,7 +75,7 @@ const ChatPage = () => {
       })
       .catch((error) => {
         source.cancel();
-        toast.error(error.message);
+        errorMessageHandler(error);
         setChatEnd(true);
       });
   };
@@ -95,11 +90,7 @@ const ChatPage = () => {
     if (chatting && chatting.type === 'channel') {
       asyncGetRequest(makeAPIPath(`/channels/${chatting.name}/members`))
         .then(({ data }) => { setMembers(data); })
-        .catch((error) => {
-          if (error.response?.data?.message) {
-            toast.error(error.response.data.message[0]);
-          } else toast.error(error.message);
-        });
+        .catch((error) => { errorMessageHandler(error); });
     } else setMembers([]);
   }, [chatting]);
 

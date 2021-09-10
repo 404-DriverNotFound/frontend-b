@@ -8,7 +8,7 @@ import Dialog from '../../molecules/Dialog/Dialog';
 import LoginTemplate from '../../templates/LoginTemplate/LoginTemplate';
 import { useUserState } from '../../../utils/hooks/useUserContext';
 import { useAppDispatch } from '../../../utils/hooks/useAppContext';
-import { makeAPIPath } from '../../../utils/utils';
+import { errorMessageHandler, makeAPIPath } from '../../../utils/utils';
 import Typo from '../../atoms/Typo/Typo';
 import useDialog from '../../../utils/hooks/useDialog';
 
@@ -41,9 +41,7 @@ const MFARegisterPage = () => {
       .finally(() => { appDispatch({ type: 'endLoading' }); })
       .then((response) => response.blob())
       .then((blob) => setQRSrc(URL.createObjectURL(blob)))
-      .catch((error) => {
-        toast.error(error.message);
-      });
+      .catch((error) => { errorMessageHandler(error); });
   }, []);
 
   const buttons = (

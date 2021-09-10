@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { makeAPIPath } from '../utils';
+import { errorMessageHandler, makeAPIPath } from '../utils';
 import { useAppDispatch, useAppState } from './useAppContext';
 import { useUserDispatch } from './useUserContext';
 
@@ -23,9 +22,7 @@ const useLogout = () => {
         userDispatch({ type: 'logout' });
         history.push('/');
       })
-      .catch((error) => {
-        toast.error(error.message);
-      });
+      .catch((error) => { errorMessageHandler(error); });
   };
   return handleLogout;
 };

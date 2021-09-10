@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Redirect, Route, Switch } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
-import { asyncGetRequest, makeAPIPath } from '../../../utils/utils';
+import { asyncGetRequest, errorMessageHandler, makeAPIPath } from '../../../utils/utils';
 import List from '../../atoms/List/List';
 import SubMenu from '../../molecules/SubMenu/SubMenu';
 import Button from '../../atoms/Button/Button';
@@ -64,7 +63,7 @@ const ChannelList = ({ type }: ListProps) => {
       })
       .catch((error) => {
         source.cancel();
-        toast.error(error.message);
+        errorMessageHandler(error);
         setListEnd(true);
       });
   };

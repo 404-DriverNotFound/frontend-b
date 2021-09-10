@@ -11,7 +11,7 @@ import Button from '../../atoms/Button/Button';
 import UserProfile from '../../molecules/UserProfile/UserProfile';
 import { SetDialogType, SetOpenType } from '../../../utils/hooks/useDialog';
 import UserInfoForm from '../UserInfoForm/UserInfoForm';
-import { makeAPIPath } from '../../../utils/utils';
+import { errorMessageHandler, makeAPIPath } from '../../../utils/utils';
 import { makeRelationship } from '../../../utils/friendships';
 
 const useStyles = makeStyles({
@@ -148,11 +148,7 @@ const ProfileCard = ({
         });
         toast(comment);
       })
-      .catch((error) => {
-        if (error.response?.data?.message) {
-          toast.error(error.response.data.message[0]);
-        } else toast.error(error.message);
-      });
+      .catch((error) => { errorMessageHandler(error); });
     setOpen(false);
   };
 
@@ -175,11 +171,7 @@ const ProfileCard = ({
         });
         toast(comment);
       })
-      .catch((error) => {
-        if (error.response?.data?.message) {
-          toast.error(error.response.data.message[0]);
-        } else toast.error(error.message);
-      });
+      .catch((error) => { errorMessageHandler(error); });
     setOpen(false);
   };
 
@@ -199,11 +191,7 @@ const ProfileCard = ({
         });
         toast(comment);
       })
-      .catch((error) => {
-        if (error.response?.data?.message) {
-          toast.error(error.response.data.message[0]);
-        } else toast.error(error.message);
-      });
+      .catch((error) => { errorMessageHandler(error); });
     setOpen(false);
   };
 
