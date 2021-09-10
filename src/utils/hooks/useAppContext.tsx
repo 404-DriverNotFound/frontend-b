@@ -41,6 +41,35 @@ type AppActionType =
 const AppStateContext = createContext<AppStateType | undefined>(undefined);
 const AppDispatchContext = createContext<Dispatch<AppActionType> | undefined>(undefined);
 
+const newMessageReducer = (state: AppStateType, message: MessageType): AppStateType => {
+  const ret = { ...state };
+
+  if (state.chatting?.type === message.type && message.name === state.chatting.name) {
+    ret.newMessage = message;
+  } else ret.newMessage = null;
+
+  if (message.type === 'channel') {
+    ret.channels = state.channels.map((channel: ChannelType) => {
+      if (channel.name === message.name && channel.name !== state.chatting?.name) {
+        return { ...channel, unreads: channel.unreads + 1 };
+      } return { ...channel };
+    });
+  } else if (state.DMs.some((dmRoom) => dmRoom.name === message.name)) { // 기존 DM
+    ret.DMs = state.DMs.map((dmRoom: DMRoomType) => {
+      if (dmRoom.name === message.name && dmRoom.name !== state.chatting?.name) {
+        return { ...dmRoom, unreads: dmRoom.unreads + 1, latestMessage: message };
+      } return { ...dmRoom };
+    });
+  } else { // 처음 받거나 보낸 DM
+    ret.DMs = state.DMs.concat({
+      ...message.user, // FIXME 나인지 상대인지 판별해서 적절한 유저 정보 입력
+      latestMessage: message,
+      unreads: message.user.name === message.name ? 1 : 0,
+    });
+  }
+  return ret;
+};
+
 function AppReducer(state: AppStateType, action: AppActionType): AppStateType {
   switch (action.type) {
     case 'loading':
@@ -81,30 +110,7 @@ function AppReducer(state: AppStateType, action: AppActionType): AppStateType {
         channels: state.channels.filter((one) => one.name !== action.name) || state.channels,
       };
     case 'newMessage':
-      return {
-        ...state,
-        newMessage: (state.chatting?.type === action.message.type
-          && action.message.name === state.chatting.name) ? action.message : null,
-        channels: (action.message.type === 'channel'
-          ? (state.channels.map((channel: ChannelType) => {
-            if (channel.name === action.message.name && channel.name !== state.chatting?.name) {
-              return { ...channel, unreads: channel.unreads + 1 };
-            } return { ...channel };
-          }))
-          : state.channels),
-        // eslint-disable-next-line no-nested-ternary
-        DMs: (action.message.type === 'DM'
-          ? (state.DMs.some((dmRoom) => dmRoom.name === action.message.name)
-            ? state.DMs.map((dmRoom: DMRoomType) => {
-              if (dmRoom.name === action.message.name && dmRoom.name !== state.chatting?.name) {
-                return { ...dmRoom, unreads: dmRoom.unreads + 1, latestMessage: action.message };
-              } return { ...dmRoom };
-            }) : state.DMs.concat({
-              name: action.message.name,
-              latestMessage: action.message,
-              unreads: action.message.user.name === action.message.name ? 1 : 0,
-            })) : state.DMs), // FIXME 삼항연산자 떡칠인데 가독성 좋게 수정
-      };
+      return newMessageReducer(state, action.message);
     default:
       return { ...state };
   }

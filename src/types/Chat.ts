@@ -52,8 +52,4 @@ export type ChannelType = {
   updatedAt: Date,
 };
 
-export type DMRoomType = {
-  name: string,
-  latestMessage?: MessageType,
-  unreads: number,
-};
+export type DMRoomType = UserInfoType & { latestMessage: MessageType, unreads: number };
