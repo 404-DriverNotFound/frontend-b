@@ -12,7 +12,7 @@ import ListItem from '../../atoms/ListItem/ListItem';
 import { ChannelType } from '../../../types/Chat';
 import Button from '../../atoms/Button/Button';
 import { useAppDispatch, useAppState } from '../../../utils/hooks/useAppContext';
-import { makeAPIPath } from '../../../utils/utils';
+import { errorMessageHandler, makeAPIPath } from '../../../utils/utils';
 import { useUserState } from '../../../utils/hooks/useUserContext';
 import Input from '../../atoms/Input/Input';
 
@@ -128,9 +128,7 @@ const ChannelJoinForm = ({ info, setOpen }: ChannelJoinFormProps) => {
         history.push('/channel');
       })
       .catch((error) => {
-        if (error.response?.data?.message) {
-          toast.error(error.response.data.message[0]);
-        } else toast.error(error.message);
+        errorMessageHandler(error);
       });
   };
 
@@ -184,9 +182,7 @@ const ChannelListItem = ({
         history.push('/channel');
       })
       .catch((error) => {
-        if (error.response?.data?.message) {
-          toast.error(error.response.data.message[0]);
-        } else toast.error(error.message);
+        errorMessageHandler(error);
       });
   };
 
@@ -215,9 +211,8 @@ const ChannelListItem = ({
     setOpen(true);
   };
 
-  // FIXME: 채널 관리 구현
   const JoinButton = () => (<Button variant="outlined" onClick={openJoinDialog}>채널 가입</Button>);
-  const ManageButton = () => (<Button variant="outlined" onClick={() => {}}>채널 관리</Button>);
+  const ManageButton = () => (<Button variant="outlined" onClick={() => history.push(`/channel/manage/${name}`)}>채널 관리</Button>);
   const GoChatButton = () => (<Button variant="outlined" onClick={() => appDispatch({ type: 'enterChat', chatting: { type: 'channel', name } })}>채팅 참가</Button>);
   const LeaveButton = () => (<Button variant="outlined" onClick={openLeaveDialog}>채널 탈퇴</Button>);
 

@@ -13,3 +13,9 @@ export const Default = () => (
     <ChannelInfoForm setOpen={() => {}} />
   </ContextProvider>
 );
+
+export const EditForm = () => (
+  <ContextProvider>
+    <ChannelInfoForm setOpen={() => {}} channel="sample" />
+  </ContextProvider>
+);
