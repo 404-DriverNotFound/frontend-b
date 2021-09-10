@@ -39,55 +39,19 @@ const ShortMessageDMRoomInfo: DMRoomType = {
 };
 
 const MediumMessageDMRoomInfo: DMRoomType = {
-  id: '550e8400-e29b-41d4-a716-446655440000', // 의미없는 uuid입니다
-  name: 'USERNAME',
-  avatar: '',
-  status: 'OFFLINE',
+  ...ShortMessageDMRoomInfo,
   latestMessage: {
-    content: 'Lorem ipsum dolor sit ',
-    user: {
-      id: '550e8400-e29b-41d4-a716-446655440000',
-      name: 'USERNAME',
-      avatar: '',
-      status: 'OFFLINE',
-    },
-    channel: {
-      id: '550e8400-e29b-41d4-a716-446655440000',
-      name: 'DEFAULT CHANNEL NAME',
-      password: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-    id: '550e8400-e29b-41d4-a716-446655440000',
-    createdAt: new Date(),
+    ...ShortMessageDMRoomInfo.latestMessage,
+    content: 'Lorem ipsum dolor sit amet,',
   },
-  unreads: 0,
 };
 
 const LongMessageDMRoomInfo: DMRoomType = {
-  id: '550e8400-e29b-41d4-a716-446655440000', // 의미없는 uuid입니다
-  name: 'USERNAME',
-  avatar: '',
-  status: 'OFFLINE',
+  ...ShortMessageDMRoomInfo,
   latestMessage: {
+    ...ShortMessageDMRoomInfo.latestMessage,
     content: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-    user: {
-      id: '550e8400-e29b-41d4-a716-446655440000',
-      name: 'USERNAME',
-      avatar: '',
-      status: 'OFFLINE',
-    },
-    channel: {
-      id: '550e8400-e29b-41d4-a716-446655440000',
-      name: 'DEFAULT CHANNEL NAME',
-      password: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-    id: '550e8400-e29b-41d4-a716-446655440000',
-    createdAt: new Date(),
   },
-  unreads: 0,
 };
 
 export const Default = () => <DMListItem roomInfo={ShortMessageDMRoomInfo} />;
