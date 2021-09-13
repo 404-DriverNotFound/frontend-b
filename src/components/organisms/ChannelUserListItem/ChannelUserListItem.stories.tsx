@@ -1,9 +1,11 @@
 import React from 'react';
 import { Meta } from '@storybook/react';
-import ChannelUserListItem from './ChannelUserListItem';
+import { BrowserRouter } from 'react-router-dom';
+import ChannelUserListItem, { ChannelUserListItemSkeleton } from './ChannelUserListItem';
 import List from '../../atoms/List/List';
 import { MemberType } from '../../../types/Chat';
 import { ContextProvider } from '../../../utils/hooks/useContext';
+import MainTemplate from '../../templates/MainTemplate/MainTemplate';
 
 export default {
   title: 'organisms/ChannelUserListItem',
@@ -24,7 +26,9 @@ export const Default = () => (
   </ContextProvider>
 );
 
-export const IamOwnerWithList = () => (
+export const SkeletonChannel = () => <ChannelUserListItemSkeleton />;
+
+const IamOwnerWithList = () => (
   <ContextProvider>
     <List scroll height="70vh">
       <ChannelUserListItem
@@ -61,11 +65,37 @@ export const IamOwnerWithList = () => (
         }}
         myRole="OWNER"
       />
+      <ChannelUserListItem
+        info={{
+          ...dummyUserListItem,
+          name: 'generalMember1',
+          memberships: [{ role: 'MEMBER', createdAt: new Date(), mutedAt: new Date() }],
+        }}
+        myRole="OWNER"
+      />
+      <ChannelUserListItem
+        info={{
+          ...dummyUserListItem,
+          name: 'generalMember2',
+          status: 'IN_GAME',
+          memberships: [{ role: 'MEMBER', createdAt: new Date(), mutedAt: new Date() }],
+        }}
+        myRole="OWNER"
+      />
+      <ChannelUserListItem
+        info={{
+          ...dummyUserListItem,
+          name: 'generalMember3',
+          status: 'OFFLINE',
+          memberships: [{ role: 'MEMBER', createdAt: new Date(), mutedAt: new Date() }],
+        }}
+        myRole="OWNER"
+      />
     </List>
   </ContextProvider>
 );
 
-export const IamAdminWithList = () => (
+const IamAdminWithList = () => (
   <ContextProvider>
     <List scroll height="70vh">
       <ChannelUserListItem
@@ -88,7 +118,7 @@ export const IamAdminWithList = () => (
       <ChannelUserListItem
         info={{
           ...dummyUserListItem,
-          name: 'generalMember',
+          name: 'generalMember0',
           status: 'OFFLINE',
           memberships: [{ role: 'MEMBER', createdAt: new Date(), mutedAt: new Date() }],
         }}
@@ -102,6 +132,54 @@ export const IamAdminWithList = () => (
         }}
         myRole="ADMIN"
       />
+      <ChannelUserListItem
+        info={{
+          ...dummyUserListItem,
+          name: 'generalMember1',
+          memberships: [{ role: 'MEMBER', createdAt: new Date(), mutedAt: new Date() }],
+        }}
+        myRole="ADMIN"
+      />
+      <ChannelUserListItem
+        info={{
+          ...dummyUserListItem,
+          name: 'generalMember2',
+          status: 'IN_GAME',
+          memberships: [{ role: 'MEMBER', createdAt: new Date(), mutedAt: new Date() }],
+        }}
+        myRole="ADMIN"
+      />
+      <ChannelUserListItem
+        info={{
+          ...dummyUserListItem,
+          name: 'generalMember3',
+          status: 'OFFLINE',
+          memberships: [{ role: 'MEMBER', createdAt: new Date(), mutedAt: new Date() }],
+        }}
+        myRole="ADMIN"
+      />
     </List>
   </ContextProvider>
+);
+
+export const IamOwnerWithTemplate = () => (
+  <BrowserRouter>
+    <ContextProvider>
+      <MainTemplate
+        main={<IamOwnerWithList />}
+        chat={<h1>Chat</h1>}
+      />
+    </ContextProvider>
+  </BrowserRouter>
+);
+
+export const IamAdminWithTemplate = () => (
+  <BrowserRouter>
+    <ContextProvider>
+      <MainTemplate
+        main={<IamAdminWithList />}
+        chat={<h1>Chat</h1>}
+      />
+    </ContextProvider>
+  </BrowserRouter>
 );

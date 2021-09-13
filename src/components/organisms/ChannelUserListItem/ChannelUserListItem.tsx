@@ -54,6 +54,80 @@ const useStyles = makeStyles({
   },
 });
 
+const useSkeletonStyles = makeStyles({
+  root: {
+    padding: '0.2em',
+    width: '100%',
+    height: '60px',
+  },
+  '@keyframes loading': {
+    '0%': {
+      backgroundColor: 'rgba(165, 165, 165, 0.1)',
+    },
+    '50%': {
+      backgroundColor: 'rgba(165, 165, 165, 0.3)',
+    },
+    '100%': {
+      backgroundColor: 'rgba(165, 165, 165, 0.1)',
+    },
+  },
+  skeleton: {
+    animation: '$loading 1.8s infinite ease-in-out',
+  },
+  skeletonIcon: {
+    width: '36px',
+    height: '36px',
+    borderRadius: '18px',
+  },
+  skeletonName: {
+    margin: '5px',
+    width: '80%',
+    height: '25px',
+  },
+  skeletonStatus: {
+    margin: '5px',
+    width: '35%',
+    height: '18px',
+  },
+  skeletonRole: {
+    margin: '5px',
+    width: '100%',
+    height: '20px',
+  },
+  skeletonButton: {
+    margin: '0.25em',
+    padding: '5px 15px',
+    borderRadius: '4px',
+    width: '55px',
+    height: '25px',
+  },
+});
+
+export const ChannelUserListItemSkeleton = () => {
+  const classes = useSkeletonStyles();
+  return (
+    <ListItem>
+      <Grid className={classes.root} item container justifyContent="space-around" alignItems="center">
+        <Grid item container justifyContent="center" alignItems="center" xs={1}>
+          <div className={`${classes.skeletonIcon} ${classes.skeleton}`}> </div>
+        </Grid>
+        <Grid item container justifyContent="center" alignItems="center" xs={2} direction="column">
+          <div className={`${classes.skeletonName} ${classes.skeleton}`}> </div>
+          <div className={`${classes.skeletonStatus} ${classes.skeleton}`}> </div>
+        </Grid>
+        <Grid item container justifyContent="center" alignItems="center" xs={2}>
+          <div className={`${classes.skeletonRole} ${classes.skeleton}`}> </div>
+        </Grid>
+        <Grid item container justifyContent="flex-end" alignItems="center" xs={4}>
+          <div className={`${classes.skeletonButton} ${classes.skeleton}`}> </div>
+          <div className={`${classes.skeletonButton} ${classes.skeleton}`}> </div>
+          <div className={`${classes.skeletonButton} ${classes.skeleton}`}> </div>
+        </Grid>
+      </Grid>
+    </ListItem>
+  );
+};
+
 const StyledBadge = withStyles(() => createStyles({
   badge: {
     right: 18,
@@ -161,7 +235,6 @@ const ChannelUserListItem = ({ info, myRole }: ChannelUserListItemProps) => {
 
   const buttonArray = () => {
     const array: ButtonObjType[] = [];
-
     array.push(banButton);
     array.push(muteButton);
     if (myRole === 'OWNER') array.push(adminButton);
@@ -201,11 +274,11 @@ const ChannelUserListItem = ({ info, myRole }: ChannelUserListItemProps) => {
             <Avatar src={avatar} alt={name} />
           </StyledBadge>
         </Grid>
-        <Grid item container justifyContent="center" alignItems="center" xs={2} direction="column">
+        <Grid item container justifyContent="center" alignItems="center" xs={3} direction="column">
           <Typo variant="h6">{name}</Typo>
           <Typo className={classes.status} variant="subtitle1">{makeStatusString()}</Typo>
         </Grid>
-        <Grid item container justifyContent="center" alignItems="center" xs={1}>
+        <Grid item container justifyContent="center" alignItems="center" xs={2}>
           <Typo variant="subtitle1" className={classes.role}>{makeRoleString()}</Typo>
         </Grid>
         <Grid item container justifyContent="flex-end" alignItems="center" xs={4}>
