@@ -1,11 +1,12 @@
 import { RawUserInfoType } from './Response';
 import { UserInfoType } from './User';
 
-export type MembershipRole = 'ADMIN' | 'OWNER' | 'MEMBER' | 'NONE';
+export type MembershipRole = 'ADMIN' | 'OWNER' | 'MEMBER' | 'NONE' | 'BANNED';
 
 type MembershipType = {
   role: MembershipRole,
   createdAt: Date,
+  unmutedAt: Date | null,
 };
 
 export type MemberType = UserInfoType & { memberships: MembershipType[] };
