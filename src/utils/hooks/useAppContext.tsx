@@ -18,6 +18,7 @@ type AppStateType = {
   newMessage: MessageType | null,
   channels: ChannelType[],
   DMs: DMRoomType[],
+  blockList: string[],
 };
 
 const initialAppState: AppStateType = {
@@ -27,12 +28,14 @@ const initialAppState: AppStateType = {
   newMessage: null,
   channels: [],
   DMs: [],
+  blockList: [],
 };
 
 type AppActionType =
   { type: 'loading' } |
   { type: 'endLoading' } |
   { type: 'connect', socket: Socket } |
+  { type: 'renewBlockList', list: string[] } |
   { type: 'join', channels?: ChannelType[], DMs?: DMRoomType[] } |
   { type: 'exit', name: string } |
   { type: 'enterChat', chatting: ChattingType } |
@@ -90,6 +93,8 @@ function AppReducer(state: AppStateType, action: AppActionType): AppStateType {
     case 'disconnect':
       state?.socket?.disconnect();
       return { ...state, socket: null };
+    case 'renewBlockList':
+      return { ...state, blockList: action.list };
     case 'enterChat':
       return {
         ...state,

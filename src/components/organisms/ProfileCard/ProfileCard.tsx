@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 import { useUserState } from '../../../utils/hooks/useUserContext';
-import { useAppDispatch } from '../../../utils/hooks/useAppContext';
+import { useAppDispatch, useAppState } from '../../../utils/hooks/useAppContext';
 import { FriendshipType, RelatedInfoType } from '../../../types/User';
 import Button from '../../atoms/Button/Button';
 import UserProfile from '../../molecules/UserProfile/UserProfile';
@@ -106,6 +106,7 @@ const ProfileCard = ({
   } = userInfo;
   const me = useUserState();
   const appDispatch = useAppDispatch();
+  const appState = useAppState();
   const history = useHistory();
   const classes = useStyles();
 
@@ -324,7 +325,10 @@ const ProfileCard = ({
                   <Button
                     type="button"
                     onClick={
-                      () => handleDeleteRequest('차단 해제했습니다.', '/blocks')
+                      () => {
+                        handleDeleteRequest('차단 해제했습니다.', '/blocks');
+                        appDispatch({ type: 'renewBlockList', list: appState.blockList.filter((user) => user !== name) });
+                      }
                     }
                   >
                     confirm
@@ -347,7 +351,10 @@ const ProfileCard = ({
                   <Button variant="text" onClick={() => { setOpen(false); }}>cancel</Button>
                   <Button
                     type="button"
-                    onClick={() => handlePostRequest('해당 유저를 차단했습니다.', 'BLOCKED')}
+                    onClick={() => {
+                      handlePostRequest('해당 유저를 차단했습니다.', 'BLOCKED');
+                      appDispatch({ type: 'renewBlockList', list: appState.blockList.concat(name) });
+                    }}
                   >
                     confirm
                   </Button>

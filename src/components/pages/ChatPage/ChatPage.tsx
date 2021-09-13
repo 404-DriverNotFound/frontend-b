@@ -40,7 +40,9 @@ const ChatPage = () => {
   const [page, setPage] = useState<number>(0);
   const [isSending, setSending] = useState<boolean>(false);
   const [members, setMembers] = useState<MemberType[]>([]);
-  const { chatting, channels, newMessage } = useAppState();
+  const {
+    chatting, channels, newMessage, blockList,
+  } = useAppState();
   const appDispatch = useAppDispatch();
   const [channel, setChannel] = useState<ChannelType | null>(null);
   const {
@@ -146,15 +148,17 @@ const ChatPage = () => {
       {chatting ? (
         <>
           <List height="70vh" reverse scroll>
-            {chats.map((one) => (
-              <ChatMessage
-                key={one.id}
-                info={one}
-                userRole={channel ? getMembership(one.user, members) : 'MEMBER'}
-                me={one.user.name === userState.name}
-                setOpen={setOpen}
-                setDialog={setDialog}
-              />
+            {chats.map((one) => (chatting.type === 'channel' && blockList.includes(one.user.name) ? <></>
+              : (
+                <ChatMessage
+                  key={one.id}
+                  info={one}
+                  userRole={channel ? getMembership(one.user, members) : 'MEMBER'}
+                  me={one.user.name === userState.name}
+                  setOpen={setOpen}
+                  setDialog={setDialog}
+                />
+              )
             ))}
             {!isChatEnd && (
             <div

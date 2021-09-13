@@ -86,17 +86,19 @@ const App = () => {
         appDispatch({ type: 'endLoading' });
 
         socket.on('message', (data: RawMessageType) => {
-          // eslint-disable-next-line no-console
-          console.log('message', data);
           const message = messageToMessage(data);
           appDispatch({ type: 'newMessage', message });
         });
 
         socket.on('dm', (data: RawDMType) => {
-          // eslint-disable-next-line no-console
-          console.log('dm', data);
           const message = DMToMessage(data, userState.name);
           appDispatch({ type: 'newMessage', message });
+        });
+
+        socket.on('banned', (data) => {
+          const { name } = data.channel;
+          appDispatch({ type: 'exit', name });
+          toast.info(`${name} 채널에서 추방되었습니다.`); // NOTE 혼자 테스트하니 toast 확인이 안 돼서 팀 함께 테스트할 때 확인
         });
       });
     }
@@ -127,6 +129,11 @@ const App = () => {
         if (enable2FA && !authenticatorSecret) history.push('/register/2fa');
         else if (enable2FA && !isSecondFactorAuthenticated) history.push('/2fa');
         appDispatch({ type: 'loading' });
+        return (asyncGetRequest(makeAPIPath('/blocks')));
+      })
+      .then(({ data }: { data: RawUserInfoType[] }) => {
+        const list = data.map((user) => user.name);
+        appDispatch({ type: 'renewBlockList', list });
         return (asyncGetRequest(makeAPIPath('/channels/me')));
       })
       .then(({ data }) => {
