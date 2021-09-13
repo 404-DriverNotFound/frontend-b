@@ -42,6 +42,7 @@ type ChannelUserListItemProps = {
 
 type ButtonObjType = {
   text: string,
+  variant: 'contained' | 'outlined' | 'text' | undefined,
   onClick: React.MouseEventHandler,
 };
 
@@ -67,16 +68,31 @@ const ChannelUserListItem = ({ info, myRole }: ChannelUserListItemProps) => {
     }
   };
 
+  const makeRoleString = (): string => {
+    switch (role) {
+      case 'OWNER':
+        return '채널 주인';
+      case 'ADMIN':
+        return '관리자';
+      case 'BANNED':
+        return '강퇴된 유저';
+      default:
+        return '채팅 참여자';
+    }
+  };
+
   const banButton: ButtonObjType = (() => {
     switch (role) {
       case 'BANNED':
         return {
           text: '퇴장 해제',
+          variant: 'contained',
           onClick: () => {}, // FIXME: onClick 구현
         };
       default:
         return {
           text: '강제 퇴장',
+          variant: 'outlined',
           onClick: () => {}, // FIXME: onClick 구현
         };
     }
@@ -87,11 +103,13 @@ const ChannelUserListItem = ({ info, myRole }: ChannelUserListItemProps) => {
       case null:
         return {
           text: '임시 차단',
+          variant: 'outlined',
           onClick: () => {}, // FIXME: onClick 구현
         };
       default:
         return {
           text: '차단 해제',
+          variant: 'contained',
           onClick: () => {}, // FIXME: onClick 구현
         };
     }
@@ -103,11 +121,13 @@ const ChannelUserListItem = ({ info, myRole }: ChannelUserListItemProps) => {
       case 'ADMIN':
         return {
           text: '관리 파직',
+          variant: 'contained',
           onClick: () => {}, // FIXME: onClick 구현
         };
       default:
         return {
           text: '관리 임명',
+          variant: 'outlined',
           onClick: () => {}, // FIXME: onClick 구현
         };
     }
@@ -115,6 +135,7 @@ const ChannelUserListItem = ({ info, myRole }: ChannelUserListItemProps) => {
 
   const buttonArray = () => {
     const array: ButtonObjType[] = [];
+
     array.push(banButton);
     array.push(muteButton);
     if (myRole === 'OWNER') array.push(adminButton);
@@ -126,6 +147,7 @@ const ChannelUserListItem = ({ info, myRole }: ChannelUserListItemProps) => {
       <Button
         onClick={button.onClick}
         key={button.text}
+        variant={button.variant}
       >
         {button.text}
       </Button>
@@ -158,10 +180,10 @@ const ChannelUserListItem = ({ info, myRole }: ChannelUserListItemProps) => {
           <Typo className={classes.status} variant="subtitle1">{makeStatusString()}</Typo>
         </Grid>
         <Grid item container justifyContent="center" alignItems="center" xs={1}>
-          <Typo variant="subtitle1">{role}</Typo>
+          <Typo variant="subtitle1">{makeRoleString()}</Typo>
         </Grid>
         <Grid item container justifyContent="flex-end" alignItems="center" xs={4}>
-          {Buttons}
+          {role === 'OWNER' ? null : Buttons}
         </Grid>
       </Grid>
     </ListItem>
