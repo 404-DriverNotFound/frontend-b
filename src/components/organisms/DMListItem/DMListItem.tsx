@@ -121,20 +121,19 @@ type DMListItemProps = {
 };
 
 const makeDateString = (date: Date) => {
-  const anYear: number = 31536000000;
   const aMonth: number = 2628000000;
   const aDay: number = 86400000;
   const anHour: number = 3600000;
   const aMinute: number = 60000;
   const aSecond: number = 1000;
   const now: number = Date.now();
-  if (now - date.getTime() > anYear * 10) return ('옛날 옛적에');
-  if (now - date.getTime() > anYear) return (`${Math.floor((now - date.getTime()) / anYear)}년 전`);
-  if (now - date.getTime() > aMonth) return (`${Math.floor((now - date.getTime()) / aMonth)}개월 전`);
+
+  if (now - date.getTime() > aMonth) return (`${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`);
   if (now - date.getTime() > aDay) return (`${Math.floor((now - date.getTime()) / aDay)}일 전`);
   if (now - date.getTime() > anHour) return (`${Math.floor((now - date.getTime()) / anHour)}시간 전`);
   if (now - date.getTime() > aMinute) return (`${Math.floor((now - date.getTime()) / aMinute)}분 전`);
-  if (now - date.getTime() > aSecond) return (`${Math.floor((now - date.getTime()) / aSecond)}초 전`);
+  if (now - date.getTime() > aSecond) return ('방금 전');
+
   return '방금 전';
 };
 
@@ -152,8 +151,15 @@ const DMListItem = ({ roomInfo }: DMListItemProps) => {
     name, avatar, status, latestMessage, unreads,
   } = roomInfo;
   const { content, createdAt } = latestMessage;
-  const dateStr = makeDateString(createdAt);
   const classes = useStyles({ status });
+
+  const dateStr = () => {
+    const dateString = makeDateString(createdAt);
+    if (dateString.length > 7) {
+      return (<Typo variant="caption">{dateString}</Typo>);
+    }
+    return (<Typo variant="subtitle2">{dateString}</Typo>);
+  };
 
   const makeContentString = () => {
     if (content.length > 23) return `${content.substring(0, 20)}...`;
@@ -187,7 +193,7 @@ const DMListItem = ({ roomInfo }: DMListItemProps) => {
           <Typo className={classes.status} variant="subtitle1">{makeStatusString()}</Typo>
         </Grid>
         <Grid item container justifyContent="center" alignItems="center" xs={1}>
-          <Typo variant="subtitle2">{dateStr}</Typo>
+          {dateStr()}
         </Grid>
         <Grid item container justifyContent="flex-start" alignItems="center" xs={4}>
           <Typo variant="body1">{makeContentString()}</Typo>

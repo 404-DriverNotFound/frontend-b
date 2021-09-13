@@ -59,12 +59,20 @@ export const Default = () => <DMListItem roomInfo={ShortMessageDMRoomInfo} />;
 export const SkeletonChannel = () => <DMListItemSkeleton />;
 
 export const WithList = () => {
-  const now = new Date();
-  const minutesAgo = new Date(now.setMinutes(now.getMinutes() - 1));
-  const hoursAgo = new Date(now.setHours(now.getHours() - 1));
-  const daysAgo = new Date(now.setDate(now.getDate() - 1));
-  const monthsAgo = new Date(now.setMonth(now.getMonth() - 1));
-  const yearsAgo = new Date(now.setFullYear(now.getFullYear() - 1));
+  const aDay: number = 86400000;
+  const anHour: number = 3600000;
+  const aMinute: number = 60000;
+
+  const now: number = Date.now();
+  const aMinuteAgo = new Date(now - aMinute);
+  const anHourAgo = new Date(now - anHour);
+  const aDayAgo = new Date(now - aDay);
+
+  const nowString = new Date();
+  // eslint-disable-next-line max-len
+  const aMonthAgo = new Date(Number(nowString.getFullYear()), Number(nowString.getMonth()) - 1, Number(nowString.getDate()));
+  // eslint-disable-next-line max-len
+  const anYearAgo = new Date(nowString.getFullYear() - 1, nowString.getMonth(), nowString.getDate());
 
   return (
     <List scroll height="70vh">
@@ -86,7 +94,7 @@ export const WithList = () => {
           ...MediumMessageDMRoomInfo,
           latestMessage: {
             ...ShortMessageDMRoomInfo.latestMessage,
-            createdAt: minutesAgo,
+            createdAt: aMinuteAgo,
             content: '안녕? 1분 전 보낸 메시지',
           },
           name: 'Ykoh',
@@ -99,7 +107,7 @@ export const WithList = () => {
           ...LongMessageDMRoomInfo,
           latestMessage: {
             ...ShortMessageDMRoomInfo.latestMessage,
-            createdAt: hoursAgo,
+            createdAt: anHourAgo,
             content: '안녕? 1시간 전 보낸 메시지',
           },
           name: 'Hyochoi',
@@ -112,7 +120,7 @@ export const WithList = () => {
           ...ShortMessageDMRoomInfo,
           latestMessage: {
             ...ShortMessageDMRoomInfo.latestMessage,
-            createdAt: daysAgo,
+            createdAt: aDayAgo,
             content: '안녕? 1일 전 보낸 메시지',
           },
           name: 'Sujung',
@@ -125,7 +133,7 @@ export const WithList = () => {
           ...MediumMessageDMRoomInfo,
           latestMessage: {
             ...ShortMessageDMRoomInfo.latestMessage,
-            createdAt: monthsAgo,
+            createdAt: aMonthAgo,
             content: '안녕? 1달 전 보낸 메시지',
           },
           name: 'PopeKim',
@@ -138,7 +146,7 @@ export const WithList = () => {
           ...LongMessageDMRoomInfo,
           latestMessage: {
             ...ShortMessageDMRoomInfo.latestMessage,
-            createdAt: yearsAgo,
+            createdAt: anYearAgo,
             content: '안녕? 1년 전 보낸 메시지 한글 글자수가 길어지면 문제가 생깁니다',
           },
           name: 'Velopert',
@@ -175,7 +183,7 @@ export const WithList = () => {
           ...LongMessageDMRoomInfo,
           latestMessage: {
             ...LongMessageDMRoomInfo.latestMessage,
-            createdAt: new Date(2001, 9, 8),
+            createdAt: new Date(2001, 0, 8),
           },
           name: 'IronMan',
           status: 'OFFLINE',
