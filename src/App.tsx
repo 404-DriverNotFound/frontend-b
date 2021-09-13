@@ -98,7 +98,7 @@ const App = () => {
         socket.on('banned', (data) => {
           const { name } = data.channel;
           appDispatch({ type: 'exit', name });
-          toast.info(`${name} 채널에서 추방되었습니다.`); // NOTE 혼자 테스트하니 toast 확인이 안 돼서 팀 함께 테스트할 때 확인
+          toast.warn(`${name} 채널에서 추방되었습니다.`);
         });
       });
     }

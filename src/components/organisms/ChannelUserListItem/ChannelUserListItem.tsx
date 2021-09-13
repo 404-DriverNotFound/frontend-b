@@ -1,4 +1,6 @@
 import React from 'react';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 import Grid from '@material-ui/core/Grid';
 import Badge from '@material-ui/core/Badge';
 import SecurityRoundedIcon from '@material-ui/icons/SecurityRounded';
@@ -10,6 +12,9 @@ import Avatar from '../../atoms/Avatar/Avatar';
 import { MembershipRole, MemberType } from '../../../types/Chat';
 import { UserStatusType } from '../../../types/User';
 import Button from '../../atoms/Button/Button';
+import { SetDialogType, SetOpenType } from '../../../utils/hooks/useDialog';
+import { errorMessageHandler, makeAPIPath } from '../../../utils/utils';
+import { useAppDispatch } from '../../../utils/hooks/useAppContext';
 
 type StyleProps = {
   status: UserStatusType,
@@ -130,14 +135,19 @@ export const ChannelUserListItemSkeleton = () => {
 
 const StyledBadge = withStyles(() => createStyles({
   badge: {
-    right: 18,
-    top: 18,
+    left: 13,
+    top: 13,
   },
 }))(Badge);
 
 type ChannelUserListItemProps = {
   info: MemberType,
   myRole: 'OWNER' | 'ADMIN',
+  // eslint-disable-next-line no-unused-vars
+  setUser: (value: MemberType) => void,
+  setOpen: SetOpenType,
+  setDialog: SetDialogType,
+  channelName: string,
 };
 
 type ButtonObjType = {
@@ -146,15 +156,42 @@ type ButtonObjType = {
   onClick: React.MouseEventHandler,
 };
 
-const ChannelUserListItem = ({ info, myRole }: ChannelUserListItemProps) => {
+const ChannelUserListItem = ({
+  info, myRole, setUser, setOpen, setDialog, channelName,
+}: ChannelUserListItemProps) => {
   const {
     id, name, avatar, status, memberships,
   } = info;
   const { role, unmutedAt } = memberships[0];
+  const appDispatch = useAppDispatch();
   const me = useUserState();
   const classes = useStyles({ status, role });
 
   if (me.id === id) return null;
+
+  const handlePatchRequest = (
+    comment: string,
+    type: 'ADMIN' | 'MEMBER' | 'BANNED' | 'mute' | 'unmute',
+  ) => {
+    const path = ['ADMIN', 'MEMBER', 'BANNED'].includes(type) ? 'role' : type;
+    appDispatch({ type: 'loading' });
+    axios.patch(makeAPIPath(`/channels/${channelName}/members/${name}/${path}`),
+      path !== type ? { role: type } : null)
+      .finally(() => {
+        appDispatch({ type: 'endLoading' });
+      })
+      .then(({ data }) => {
+        setUser({
+          ...info,
+          memberships: [{
+            role: data.role, unmutedAt: data.unmutedAt, createdAt: data.createdAt,
+          }],
+        });
+        toast(comment);
+      })
+      .catch((error) => { errorMessageHandler(error); });
+    setOpen(false);
+  };
 
   const makeStatusString = (): string => {
     switch (status) {
@@ -187,13 +224,47 @@ const ChannelUserListItem = ({ info, myRole }: ChannelUserListItemProps) => {
         return {
           text: '차단 해제',
           variant: 'contained',
-          onClick: () => {}, // FIXME: onClick 구현
+          onClick: () => {
+            setDialog({
+              title: '차단 해제',
+              content: `${name}님을 차단 해제하시겠습니까?`,
+              buttons: (
+                <>
+                  <Button variant="text" onClick={() => { setOpen(false); }}>cancel</Button>
+                  <Button
+                    type="button"
+                    onClick={() => handlePatchRequest('유저에 대한 차단을 취소하였습니다.', 'MEMBER')}
+                  >
+                    confirm
+                  </Button>
+                </>),
+              onClose: () => setOpen(false),
+            });
+            setOpen(true);
+          },
         };
       default:
         return {
           text: '유저 차단',
           variant: 'outlined',
-          onClick: () => {}, // FIXME: onClick 구현
+          onClick: () => {
+            setDialog({
+              title: '유저 차단',
+              content: `${name}님을 채널에서 차단하시겠습니까?`,
+              buttons: (
+                <>
+                  <Button variant="text" onClick={() => { setOpen(false); }}>cancel</Button>
+                  <Button
+                    type="button"
+                    onClick={() => handlePatchRequest('유저를 채널에서 차단하였습니다.', 'BANNED')}
+                  >
+                    confirm
+                  </Button>
+                </>),
+              onClose: () => setOpen(false),
+            });
+            setOpen(true);
+          },
         };
     }
   })();
@@ -204,31 +275,98 @@ const ChannelUserListItem = ({ info, myRole }: ChannelUserListItemProps) => {
         return {
           text: '유저 뮤트',
           variant: 'outlined',
-          onClick: () => {}, // FIXME: onClick 구현
+          onClick: () => {
+            setDialog({
+              title: '유저 뮤트',
+              content: `${name}님을 1분간 뮤트하시겠습니까?`,
+              buttons: (
+                <>
+                  <Button variant="text" onClick={() => { setOpen(false); }}>cancel</Button>
+                  <Button
+                    type="button"
+                    onClick={() => handlePatchRequest('해당 유저가 1분간 뮤트되었습니다.', 'mute')}
+                  >
+                    confirm
+                  </Button>
+                </>),
+              onClose: () => setOpen(false),
+            });
+            setOpen(true);
+          },
         };
       default:
         return {
           text: '뮤트 해제',
           variant: 'contained',
-          onClick: () => {}, // FIXME: onClick 구현
+          onClick: () => {
+            setDialog({
+              title: '뮤트 해제',
+              content: `${name}님의 뮤트를 해제하시겠습니까?`,
+              buttons: (
+                <>
+                  <Button variant="text" onClick={() => { setOpen(false); }}>cancel</Button>
+                  <Button
+                    type="button"
+                    onClick={() => handlePatchRequest('해당 유저의 뮤트가 취소되었습니다.', 'unmute')}
+                  >
+                    confirm
+                  </Button>
+                </>),
+              onClose: () => setOpen(false),
+            });
+            setOpen(true);
+          },
         };
     }
   })();
 
-  // FIXME: 관리가 이미있는 데 요청되지 않도록하기
   const adminButton = ((): ButtonObjType => {
     switch (role) {
       case 'ADMIN':
         return {
           text: '관리 파직',
           variant: 'contained',
-          onClick: () => {}, // FIXME: onClick 구현
+          onClick: () => {
+            setDialog({
+              title: '관리자 권한 박탈',
+              content: `${name}님의 권한을 일반 멤버로 변경하시겠습니까?`,
+              buttons: (
+                <>
+                  <Button variant="text" onClick={() => { setOpen(false); }}>cancel</Button>
+                  <Button
+                    type="button"
+                    onClick={() => handlePatchRequest('해당 유저의 권한을 일반 멤버로 변경하였습니다.', 'MEMBER')}
+                  >
+                    confirm
+                  </Button>
+                </>),
+              onClose: () => setOpen(false),
+            });
+            setOpen(true);
+          },
         };
       default:
         return {
           text: '관리 임명',
           variant: 'outlined',
-          onClick: () => {}, // FIXME: onClick 구현
+          onClick: () => {
+            setDialog({
+              title: '관리자 권한 부여',
+              content: `${name}님에게 관리자 권한을 부여하시겠습니까? 관리자는 유저 추방(차단) 및 유저 뮤트를 할 수 있습니다.`,
+              buttons: (
+                <>
+                  <Button variant="text" onClick={() => { setOpen(false); }}>cancel</Button>
+                  <Button
+                    type="button"
+                    onClick={() => handlePatchRequest('해당 유저의 권한을 관리자로 변경하였습니다.', 'ADMIN')}
+                  >
+                    confirm
+                  </Button>
+                </>),
+              onClose: () => setOpen(false),
+            });
+            setOpen(true);
+          },
         };
     }
   })();

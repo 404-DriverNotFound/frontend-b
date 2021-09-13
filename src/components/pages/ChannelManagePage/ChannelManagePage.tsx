@@ -9,12 +9,12 @@ import Button from '../../atoms/Button/Button';
 import Dialog from '../../molecules/Dialog/Dialog';
 import useDialog from '../../../utils/hooks/useDialog';
 import useIntersect from '../../../utils/hooks/useIntersect';
-import { MemberType } from '../../../types/Chat';
-import ListItem from '../../atoms/ListItem/ListItem';
+import { MembershipRole, MemberType } from '../../../types/Chat';
 import Typo from '../../atoms/Typo/Typo';
 import { useAppDispatch } from '../../../utils/hooks/useAppContext';
 import { useUserState } from '../../../utils/hooks/useUserContext';
 import ChannelInfoForm from '../../organisms/ChannelInfoForm/ChannelInfoForm';
+import ChannelUserListItem, { ChannelUserListItemSkeleton } from '../../organisms/ChannelUserListItem/ChannelUserListItem';
 
 const COUNTS_PER_PAGE = 10;
 
@@ -25,14 +25,13 @@ type MatchParams = {
 const ChannelManagePage = ({ match }: RouteComponentProps<MatchParams>) => {
   const { CancelToken } = axios;
   const source = CancelToken.source();
-  const [canManage, setManage] = useState<boolean>(false);
+  const [role, setRole] = useState<MembershipRole>('NONE');
   const [users, setUsers] = useState<MemberType[]>([]);
   const [isListEnd, setListEnd] = useState(true);
   const [page, setPage] = useState<number>(0);
   const { channelName } = match.params;
   const path = makeAPIPath(`/channels/${channelName}/members`);
   const {
-    // eslint-disable-next-line no-unused-vars
     isOpen, setOpen, dialog, setDialog,
   } = useDialog();
   const history = useHistory();
@@ -53,7 +52,7 @@ const ChannelManagePage = ({ match }: RouteComponentProps<MatchParams>) => {
 
     asyncGetRequest(`${path}?perPage=${COUNTS_PER_PAGE}&page=${page}`, source)
       .then(({ data }) => {
-        setUsers((prev) => prev.concat(data));
+        setUsers((prev) => prev.concat(data.map((user: MemberType) => ({ ...user, avatar: makeAPIPath(`/${user.avatar}`) }))));
         if (data.length === 0 || data.length < COUNTS_PER_PAGE) setListEnd(true);
       })
       .catch((error) => {
@@ -80,9 +79,10 @@ const ChannelManagePage = ({ match }: RouteComponentProps<MatchParams>) => {
     asyncGetRequest(makeAPIPath(`/channels/${channelName}/members`))
       .finally(() => { appDispatch({ type: 'endLoading' }); })
       .then(({ data }) => {
-        if (data.some((member: MemberType) => (
-          member.name === userState.name && ['ADMIN', 'OWNER'].includes(member.memberships[0].role)))) {
-          setManage(true);
+        const found = data.find((member: MemberType) => (
+          member.name === userState.name && ['ADMIN', 'OWNER'].includes(member.memberships[0].role)));
+        if (found) {
+          setRole(found.memberships[0].role);
           setListEnd(false);
         } else {
           toast.error('접근 권한이 없습니다.');
@@ -101,7 +101,7 @@ const ChannelManagePage = ({ match }: RouteComponentProps<MatchParams>) => {
     };
   }, []);
 
-  return (canManage ? (
+  return (['ADMIN', 'OWNER'].includes(role) ? (
     <>
       <Dialog
         isOpen={isOpen}
@@ -116,8 +116,17 @@ const ChannelManagePage = ({ match }: RouteComponentProps<MatchParams>) => {
       </Grid>
       <List height="78vh" scroll>
         {users.map((user: MemberType) => (
-          // FIXME DMListItem으로 교체
-          <ListItem key={user.id}>{user.name}</ListItem>
+          <ChannelUserListItem
+            key={user.id}
+            info={user}
+            myRole={role as ('ADMIN' | 'OWNER')}
+            setUser={(userInfo) => {
+              setUsers(users.filter((one) => one.id !== userInfo.id).concat(userInfo));
+            }}
+            setOpen={setOpen}
+            setDialog={setDialog}
+            channelName={channelName}
+          />
         ))}
         {!isListEnd && (
         <div
@@ -133,11 +142,10 @@ const ChannelManagePage = ({ match }: RouteComponentProps<MatchParams>) => {
             wrap="nowrap"
             spacing={1}
             xs={12}
-            // FIXME 스켈레톤 넣기
           >
-            <ListItem>skeleton here</ListItem>
-            <ListItem>skeleton here</ListItem>
-            <ListItem>skeleton here</ListItem>
+            <ChannelUserListItemSkeleton />
+            <ChannelUserListItemSkeleton />
+            <ChannelUserListItemSkeleton />
           </Grid>
         </div>
         )}

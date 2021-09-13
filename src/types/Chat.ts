@@ -5,8 +5,8 @@ export type MembershipRole = 'ADMIN' | 'OWNER' | 'MEMBER' | 'NONE' | 'BANNED';
 
 type MembershipType = {
   role: MembershipRole,
-  createdAt: Date,
-  unmutedAt: Date | null,
+  createdAt: string,
+  unmutedAt: string | null,
 };
 
 export type MemberType = UserInfoType & { memberships: MembershipType[] };
