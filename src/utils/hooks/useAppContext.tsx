@@ -79,6 +79,7 @@ function AppReducer(state: AppStateType, action: AppActionType): AppStateType {
     case 'connect':
       return { ...state, socket: action.socket };
     case 'disconnect':
+      state?.socket?.disconnect();
       return { ...state, socket: null };
     case 'enterChat':
       return {
@@ -104,6 +105,7 @@ function AppReducer(state: AppStateType, action: AppActionType): AppStateType {
         DMs: action.DMs || state.DMs,
       };
     case 'exit':
+      state?.socket?.emit('leaveRoom', { id: state?.channels?.find((one) => one.name === action.name)?.id });
       return {
         ...state,
         chatting: state?.chatting?.name === action.name ? null : state.chatting,

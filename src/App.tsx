@@ -61,10 +61,12 @@ const App = () => {
 
   useEffect(() => {
     if (userState.id) {
-      const socket = io(String(process.env.REACT_APP_API_URL)!);
+      const socket = io(String(process.env.REACT_APP_API_URL)!, {
+        query: { userId: userState.id },
+      });
       socket.on('connect', () => {
         appDispatch({ type: 'connect', socket });
-        socket.emit('join', { id: userState.id });
+        channels.forEach((channel) => socket.emit('joinRoom', { id: channel.id }));
         appDispatch({ type: 'join', channels, DMs });
         appDispatch({ type: 'endLoading' });
 
@@ -131,7 +133,7 @@ const App = () => {
         }
       });
 
-    return () => { if (appState.socket) appState.socket.disconnect(); };
+    return () => appDispatch({ type: 'disconnect' });
   }, []);
 
   const children = userState.id ? (

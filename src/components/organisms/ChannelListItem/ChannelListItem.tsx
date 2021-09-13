@@ -117,6 +117,7 @@ const ChannelJoinForm = ({ info, setOpen }: ChannelJoinFormProps) => {
         appDispatch({
           type: 'join',
           channels: appState.channels.concat({
+            id: data.channel.id,
             name: data.channel.name,
             role: data.role,
             unreads: 0,
@@ -124,7 +125,7 @@ const ChannelJoinForm = ({ info, setOpen }: ChannelJoinFormProps) => {
             updatedAt: new Date(data.channel.updatedAt),
           }),
         });
-        if (appState?.socket) appState.socket.emit('join', { id: userState.id });
+        if (appState?.socket) appState.socket.emit('joinRoom', { id: data.channel.id });
         history.push('/channel');
       })
       .catch((error) => {
@@ -168,7 +169,7 @@ const ChannelListItem = ({
   const history = useHistory();
   const classes = useStyles();
 
-  const handleLeaveChannel = () => {
+  const handleExitChannel = () => {
     appDispatch({ type: 'loading' });
     axios.delete(makeAPIPath(`/channels/${name}/members/me`))
       .finally(() => {
@@ -176,7 +177,6 @@ const ChannelListItem = ({
       })
       .then(() => {
         toast(`${name} 채널에서 탈퇴하였습니다.`);
-        appDispatch({ type: 'join', channels: appState.channels.filter((channel) => channel.name !== appState.chatting?.name) });
         if (appState.chatting?.name === name) appDispatch({ type: 'leaveChat' });
         appDispatch({ type: 'exit', name });
         history.push('/channel');
@@ -204,7 +204,7 @@ const ChannelListItem = ({
       buttons: (
         <>
           <Button variant="text" onClick={() => { setOpen(false); }}>cancel</Button>
-          <Button type="button" onClick={handleLeaveChannel}>leave</Button>
+          <Button type="button" onClick={handleExitChannel}>leave</Button>
         </>),
       onClose: () => { setOpen(false); },
     });

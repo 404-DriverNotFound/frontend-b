@@ -10,7 +10,6 @@ import Input from '../../atoms/Input/Input';
 import Switch from '../../atoms/Switch/Switch';
 import Typo from '../../atoms/Typo/Typo';
 import Button from '../../atoms/Button/Button';
-import { useUserState } from '../../../utils/hooks/useUserContext';
 
 const useStyles = makeStyles({
   edit: {
@@ -54,7 +53,6 @@ const ChannelInfoForm = ({ setOpen, channel }: ChannelInfoFormProps) => {
   const [isDuplicateChecked, setDuplicateChecked] = useState<boolean>(false);
   const appDispatch = useAppDispatch();
   const appState = useAppState();
-  const userState = useUserState();
   const classes = useStyles();
   const history = useHistory();
 
@@ -120,6 +118,7 @@ const ChannelInfoForm = ({ setOpen, channel }: ChannelInfoFormProps) => {
         appDispatch({
           type: 'join',
           channels: appState.channels.concat({
+            id: data.id,
             name: data.name,
             role: 'OWNER',
             unreads: 0,
@@ -127,7 +126,7 @@ const ChannelInfoForm = ({ setOpen, channel }: ChannelInfoFormProps) => {
             updatedAt: new Date(data.updatedAt),
           }),
         });
-        if (appState?.socket) appState.socket.emit('join', { id: userState.id });
+        if (appState?.socket) appState.socket.emit('joinRoom', { id: data.id });
         history.push('/channel');
       })
       .catch((error) => {

@@ -45,6 +45,7 @@ export type MessageType = {
 };
 
 export type ChannelType = {
+  id: string,
   name: string,
   role: MembershipRole,
   unreads: number,

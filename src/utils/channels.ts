@@ -12,9 +12,10 @@ const getMembership = (user: UserInfoType, members: MemberType[]): MembershipRol
 
 const makeChannelInfo = (rawData: RawChannelType): ChannelType => {
   const {
-    name, password, updatedAt, memberships,
+    id, name, password, updatedAt, memberships,
   } = rawData;
   return {
+    id,
     name,
     updatedAt: new Date(updatedAt),
     unreads: 0,
