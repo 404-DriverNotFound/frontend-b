@@ -41,7 +41,7 @@ const DMPage = () => {
                 ...opposite,
                 avatar: makeAPIPath(`/${opposite.avatar}`),
                 latestMessage,
-                unreads: 0,
+                unreads: appState.DMs.find((DM) => DM.name === opposite.name)!.unreads,
               };
             });
             setDMs((prev) => prev.concat(fetchedRooms));
@@ -64,7 +64,7 @@ const DMPage = () => {
     setDMs((prev) => prev.map((DM) => {
       const found = appState?.DMs?.find((one) => one.name === DM.name);
       if (!found) return DM;
-      return { ...DM, latestMessage: found.latestMessage };
+      return { ...DM, latestMessage: found.latestMessage, unreads: found.unreads };
     }));
   }, [appState.DMs]);
 
