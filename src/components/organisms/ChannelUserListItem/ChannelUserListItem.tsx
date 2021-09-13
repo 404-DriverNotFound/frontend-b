@@ -2,16 +2,19 @@ import React from 'react';
 import Grid from '@material-ui/core/Grid';
 import Badge from '@material-ui/core/Badge';
 import SecurityRoundedIcon from '@material-ui/icons/SecurityRounded';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, withStyles, createStyles } from '@material-ui/core/styles';
 import { useUserState } from '../../../utils/hooks/useContext';
 import ListItem from '../../atoms/ListItem/ListItem';
 import Typo from '../../atoms/Typo/Typo';
 import Avatar from '../../atoms/Avatar/Avatar';
-import { MemberType } from '../../../types/Chat';
+import { MembershipRole, MemberType } from '../../../types/Chat';
 import { UserStatusType } from '../../../types/User';
 import Button from '../../atoms/Button/Button';
 
-type StyleProps = { status: UserStatusType };
+type StyleProps = {
+  status: UserStatusType,
+  role: MembershipRole,
+};
 
 const useStyles = makeStyles({
   root: {
@@ -33,7 +36,30 @@ const useStyles = makeStyles({
       }
     },
   },
+  role: {
+    color: (props: StyleProps) => {
+      switch (props.role) {
+        case 'OWNER':
+          return 'red';
+        case 'ADMIN':
+          return 'blue';
+        case 'BANNED':
+          return 'gray';
+        case 'MEMBER':
+        case 'NONE':
+        default:
+          return 'black';
+      }
+    },
+  },
 });
+
+const StyledBadge = withStyles(() => createStyles({
+  badge: {
+    right: 18,
+    top: 18,
+  },
+}))(Badge);
 
 type ChannelUserListItemProps = {
   info: MemberType,
@@ -42,7 +68,7 @@ type ChannelUserListItemProps = {
 
 type ButtonObjType = {
   text: string,
-  variant: 'contained' | 'outlined' | 'text' | undefined,
+  variant: 'contained' | 'outlined' | 'text',
   onClick: React.MouseEventHandler,
 };
 
@@ -52,7 +78,7 @@ const ChannelUserListItem = ({ info, myRole }: ChannelUserListItemProps) => {
   } = info;
   const { role, mutedAt } = memberships[0];
   const me = useUserState();
-  const classes = useStyles({ status });
+  const classes = useStyles({ status, role });
 
   if (me.id === id) return null;
 
@@ -75,40 +101,40 @@ const ChannelUserListItem = ({ info, myRole }: ChannelUserListItemProps) => {
       case 'ADMIN':
         return '관리자';
       case 'BANNED':
-        return '강퇴된 유저';
+        return '차단된 유저';
       default:
         return '채팅 참여자';
     }
   };
 
-  const banButton: ButtonObjType = (() => {
+  const banButton = ((): ButtonObjType => {
     switch (role) {
       case 'BANNED':
         return {
-          text: '퇴장 해제',
+          text: '차단 해제',
           variant: 'contained',
           onClick: () => {}, // FIXME: onClick 구현
         };
       default:
         return {
-          text: '강제 퇴장',
+          text: '유저 차단',
           variant: 'outlined',
           onClick: () => {}, // FIXME: onClick 구현
         };
     }
   })();
 
-  const muteButton: ButtonObjType = (() => {
+  const muteButton = ((): ButtonObjType => {
     switch (mutedAt) {
       case null:
         return {
-          text: '임시 차단',
+          text: '유저 뮤트',
           variant: 'outlined',
           onClick: () => {}, // FIXME: onClick 구현
         };
       default:
         return {
-          text: '차단 해제',
+          text: '뮤트 해제',
           variant: 'contained',
           onClick: () => {}, // FIXME: onClick 구현
         };
@@ -116,7 +142,7 @@ const ChannelUserListItem = ({ info, myRole }: ChannelUserListItemProps) => {
   })();
 
   // FIXME: 관리가 이미있는 데 요청되지 않도록하기
-  const adminButton: ButtonObjType = (() => {
+  const adminButton = ((): ButtonObjType => {
     switch (role) {
       case 'ADMIN':
         return {
@@ -158,7 +184,7 @@ const ChannelUserListItem = ({ info, myRole }: ChannelUserListItemProps) => {
     <ListItem>
       <Grid className={classes.root} item container justifyContent="space-around" alignItems="center">
         <Grid item container justifyContent="center" alignItems="center" xs={1}>
-          <Badge
+          <StyledBadge
             style={{ marginBottom: '0' }}
             anchorOrigin={{
               vertical: 'top',
@@ -173,14 +199,14 @@ const ChannelUserListItem = ({ info, myRole }: ChannelUserListItemProps) => {
             ) : <></>}
           >
             <Avatar src={avatar} alt={name} />
-          </Badge>
+          </StyledBadge>
         </Grid>
         <Grid item container justifyContent="center" alignItems="center" xs={2} direction="column">
           <Typo variant="h6">{name}</Typo>
           <Typo className={classes.status} variant="subtitle1">{makeStatusString()}</Typo>
         </Grid>
         <Grid item container justifyContent="center" alignItems="center" xs={1}>
-          <Typo variant="subtitle1">{makeRoleString()}</Typo>
+          <Typo variant="subtitle1" className={classes.role}>{makeRoleString()}</Typo>
         </Grid>
         <Grid item container justifyContent="flex-end" alignItems="center" xs={4}>
           {role === 'OWNER' ? null : Buttons}
