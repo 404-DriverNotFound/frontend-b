@@ -1,5 +1,7 @@
 import React from 'react';
 import Grid from '@material-ui/core/Grid';
+import Badge from '@material-ui/core/Badge';
+import SecurityRoundedIcon from '@material-ui/icons/SecurityRounded';
 import { makeStyles } from '@material-ui/core/styles';
 import { useUserState } from '../../../utils/hooks/useContext';
 import ListItem from '../../atoms/ListItem/ListItem';
@@ -47,8 +49,7 @@ const ChannelUserListItem = ({ info, myRole }: ChannelUserListItemProps) => {
   const {
     id, name, avatar, status, memberships,
   } = info;
-  const role = memberships[0];
-  const mutedAt = memberships[2];
+  const { role, mutedAt } = memberships[0];
   const me = useUserState();
   const classes = useStyles({ status });
 
@@ -70,12 +71,12 @@ const ChannelUserListItem = ({ info, myRole }: ChannelUserListItemProps) => {
     switch (role) {
       case 'BANNED':
         return {
-          text: '강제 퇴장',
+          text: '퇴장 해제',
           onClick: () => {}, // FIXME: onClick 구현
         };
       default:
         return {
-          text: '퇴장 해제',
+          text: '강제 퇴장',
           onClick: () => {}, // FIXME: onClick 구현
         };
     }
@@ -135,14 +136,30 @@ const ChannelUserListItem = ({ info, myRole }: ChannelUserListItemProps) => {
     <ListItem>
       <Grid className={classes.root} item container justifyContent="space-around" alignItems="center">
         <Grid item container justifyContent="center" alignItems="center" xs={1}>
-          <Avatar src={avatar} alt={name} />
+          <Badge
+            style={{ marginBottom: '0' }}
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'left',
+            }}
+            overlap="circular"
+            badgeContent={['ADMIN', 'OWNER'].includes(role) ? (
+              <SecurityRoundedIcon
+                color={role === 'OWNER' ? 'secondary' : 'primary'}
+                fontSize="small"
+              />
+            ) : <></>}
+          >
+            <Avatar src={avatar} alt={name} />
+          </Badge>
         </Grid>
         <Grid item container justifyContent="center" alignItems="center" xs={2} direction="column">
           <Typo variant="h6">{name}</Typo>
           <Typo className={classes.status} variant="subtitle1">{makeStatusString()}</Typo>
         </Grid>
-        <Typo variant="subtitle1">{role}</Typo>
-        <Typo variant="subtitle1">{mutedAt}</Typo>
+        <Grid item container justifyContent="center" alignItems="center" xs={1}>
+          <Typo variant="subtitle1">{role}</Typo>
+        </Grid>
         <Grid item container justifyContent="flex-end" alignItems="center" xs={4}>
           {Buttons}
         </Grid>

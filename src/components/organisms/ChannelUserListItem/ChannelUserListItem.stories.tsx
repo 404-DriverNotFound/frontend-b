@@ -1,7 +1,9 @@
 import React from 'react';
 import { Meta } from '@storybook/react';
 import ChannelUserListItem from './ChannelUserListItem';
+import List from '../../atoms/List/List';
 import { MemberType } from '../../../types/Chat';
+import { ContextProvider } from '../../../utils/hooks/useContext';
 
 export default {
   title: 'organisms/ChannelUserListItem',
@@ -13,7 +15,93 @@ const dummyUserListItem: MemberType = {
   name: 'USERNAME',
   avatar: '',
   status: 'ONLINE',
-  memberships: ['MEMBER', new Date(), null],
+  memberships: [{ role: 'MEMBER', createdAt: new Date(), mutedAt: null }],
 };
 
-export const Default = () => <ChannelUserListItem info={dummyUserListItem} myRole="OWNER" />;
+export const Default = () => (
+  <ContextProvider>
+    <ChannelUserListItem info={dummyUserListItem} myRole="OWNER" />
+  </ContextProvider>
+);
+
+export const IamOwnerWithList = () => (
+  <ContextProvider>
+    <List scroll height="70vh">
+      <ChannelUserListItem
+        info={{
+          ...dummyUserListItem,
+          name: 'MutedMember',
+          memberships: [{ role: 'MEMBER', createdAt: new Date(), mutedAt: new Date() }],
+        }}
+        myRole="OWNER"
+      />
+      <ChannelUserListItem
+        info={{
+          ...dummyUserListItem,
+          name: 'BannedMember',
+          status: 'IN_GAME',
+          memberships: [{ role: 'BANNED', createdAt: new Date(), mutedAt: new Date() }],
+        }}
+        myRole="OWNER"
+      />
+      <ChannelUserListItem
+        info={{
+          ...dummyUserListItem,
+          name: 'generalMember',
+          status: 'OFFLINE',
+          memberships: [{ role: 'MEMBER', createdAt: new Date(), mutedAt: new Date() }],
+        }}
+        myRole="OWNER"
+      />
+      <ChannelUserListItem
+        info={{
+          ...dummyUserListItem,
+          name: 'I am Admin',
+          memberships: [{ role: 'ADMIN', createdAt: new Date(), mutedAt: new Date() }],
+        }}
+        myRole="OWNER"
+      />
+    </List>
+  </ContextProvider>
+);
+
+export const IamAdminWithList = () => (
+  <ContextProvider>
+    <List scroll height="70vh">
+      <ChannelUserListItem
+        info={{
+          ...dummyUserListItem,
+          name: 'MutedMember',
+          memberships: [{ role: 'MEMBER', createdAt: new Date(), mutedAt: new Date() }],
+        }}
+        myRole="ADMIN"
+      />
+      <ChannelUserListItem
+        info={{
+          ...dummyUserListItem,
+          name: 'BannedMember',
+          status: 'IN_GAME',
+          memberships: [{ role: 'BANNED', createdAt: new Date(), mutedAt: new Date() }],
+        }}
+        myRole="ADMIN"
+      />
+      <ChannelUserListItem
+        info={{
+          ...dummyUserListItem,
+          name: 'generalMember',
+          status: 'OFFLINE',
+          memberships: [{ role: 'MEMBER', createdAt: new Date(), mutedAt: new Date() }],
+        }}
+        myRole="ADMIN"
+      />
+      <ChannelUserListItem
+        info={{
+          ...dummyUserListItem,
+          name: 'I am OWNER',
+          memberships: [{ role: 'OWNER', createdAt: new Date(), mutedAt: new Date() }],
+        }}
+        myRole="ADMIN"
+      />
+    </List>
+  </ContextProvider>
+);
