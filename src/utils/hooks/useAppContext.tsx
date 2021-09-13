@@ -3,6 +3,8 @@ import React, {
 } from 'react';
 import { Socket } from 'socket.io-client';
 import { ChannelType, DMRoomType, MessageType } from '../../types/Chat';
+import { UserInfoType } from '../../types/User';
+import { asyncGetRequest, errorMessageHandler, makeAPIPath } from '../utils';
 
 type ChattingType = {
   type: 'channel' | 'DM',
@@ -58,11 +60,18 @@ const newMessageReducer = (state: AppStateType, message: MessageType): AppStateT
     ret.DMs = state.DMs.map((dmRoom: DMRoomType) => {
       if (dmRoom.name === message.name && dmRoom.name !== state.chatting?.name) {
         return { ...dmRoom, unreads: dmRoom.unreads + 1, latestMessage: message };
-      } return { ...dmRoom };
+      } return { ...dmRoom, unreads: 0, latestMessage: message };
     });
   } else { // 처음 받거나 보낸 DM
+    let userInfo : UserInfoType | null = null;
+    if (message.user.name === message.name) userInfo = message.user;
+    else {
+      asyncGetRequest(makeAPIPath('/users/me'))
+        .then(({ data }) => { userInfo = data; })
+        .catch((error) => { errorMessageHandler(error); });
+    }
     ret.DMs = state.DMs.concat({
-      ...message.user, // FIXME 나인지 상대인지 판별해서 적절한 유저 정보 입력
+      ...userInfo!,
       latestMessage: message,
       unreads: message.user.name === message.name ? 1 : 0,
     });

@@ -21,7 +21,7 @@ import MFAPage from './components/pages/MFAPage/MFAPage';
 import CommunityPage from './components/pages/CommunityPage/CommunityPage';
 import ProfilePage from './components/pages/ProfilePage/ProfilePage';
 import {
-  ChannelType, DMRoomType, RawChannelType, RawDMType, RawMessageType,
+  ChannelType, DMRoomType, MessageType, RawChannelType, RawDMType, RawMessageType,
 } from './types/Chat';
 import ChannelPage from './components/pages/ChannelPage/ChannelPage';
 import { makeChannelInfo } from './utils/channels';
@@ -29,6 +29,7 @@ import ChatPage from './components/pages/ChatPage/ChatPage';
 import { DMToMessage, messageToMessage } from './utils/chats';
 import ChannelManagePage from './components/pages/ChannelManagePage/ChannelManagePage';
 import DMPage from './components/pages/DMPage/DMPage';
+import { RawUserInfoType } from './types/Response';
 
 const useStyles = makeStyles({
   progress: {
@@ -47,6 +48,20 @@ const useStyles = makeStyles({
     backgroundColor: 'rgba(255, 255, 255, 0.5)',
   },
 });
+
+const DM_INIT : MessageType = {
+  type: 'DM',
+  content: 'init',
+  user: {
+    id: '',
+    name: '',
+    avatar: '',
+    status: 'OFFLINE',
+  },
+  name: 'init',
+  id: '',
+  createdAt: new Date(),
+};
 
 const App = () => {
   const theme = unstable_createMuiStrictModeTheme();
@@ -119,9 +134,12 @@ const App = () => {
         return (asyncGetRequest(makeAPIPath('/dmers')));
       })
       .then(({ data }) => {
-        setDMs(data.map((dm: any) => ({
+        setDMs(data.map((dm: RawUserInfoType): DMRoomType => ({
           id: dm.id,
           name: dm.name,
+          avatar: makeAPIPath(`/${dm.avatar}`),
+          status: dm.status,
+          latestMessage: DM_INIT,
           unreads: 0,
         })));
       })

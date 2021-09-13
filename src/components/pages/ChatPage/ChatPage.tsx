@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import Grid from '@material-ui/core/Grid';
+import LinearProgress from '@material-ui/core/LinearProgress';
 import { useAppDispatch, useAppState } from '../../../utils/hooks/useAppContext';
 import { asyncGetRequest, errorMessageHandler, makeAPIPath } from '../../../utils/utils';
 import ChatInput from '../../atoms/ChatInput/ChatInput';
@@ -37,6 +38,7 @@ const ChatPage = () => {
   const [chat, setChat] = useState<string>('');
   const [isChatEnd, setChatEnd] = useState(false);
   const [page, setPage] = useState<number>(0);
+  const [isSending, setSending] = useState<boolean>(false);
   const [members, setMembers] = useState<MemberType[]>([]);
   const { chatting, channels, newMessage } = useAppState();
   const appDispatch = useAppDispatch();
@@ -51,12 +53,10 @@ const ChatPage = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (chat.length === 0) return;
+    if (chat.length === 0 || isSending) return;
 
     (channel ? postChannelChat(chatting!.name, chat) : postDM(chatting!.name, chat))
-      .then(() => {
-        setChat('');
-      })
+      .then(() => { setSending(true); })
       .catch((error) => { errorMessageHandler(error); });
   };
 
@@ -82,6 +82,7 @@ const ChatPage = () => {
 
   useEffect(() => {
     setChats([]);
+    setSending(false);
     setChat('');
     setPage(chatting ? 1 : 0);
     setChannel((chatting && chatting.type === 'channel')
@@ -99,6 +100,15 @@ const ChatPage = () => {
   }, [page]);
 
   useEffect(() => {
+    if (isSending && newMessage) {
+      if (newMessage.user.id === userState.id) {
+        setSending(false);
+        setChat('');
+      }
+    }
+  }, [isSending]);
+
+  useEffect(() => {
     if (newMessage) {
       setChats((prev) => addNewChat(prev, newMessage));
     }
@@ -109,6 +119,7 @@ const ChatPage = () => {
     setChats([]);
     setMembers([]);
     setChatEnd(true);
+    setSending(false);
   }, []);
 
   // eslint-disable-next-line no-unused-vars
@@ -165,6 +176,7 @@ const ChatPage = () => {
             )}
           </List>
           <ChatInput value={chat} onChange={handleChange} onSubmit={handleSubmit} />
+          <LinearProgress style={{ visibility: isSending ? 'visible' : 'hidden' }} />
         </>
       )
         : (

@@ -3,36 +3,55 @@ import axios from 'axios';
 import Grid from '@material-ui/core/Grid';
 import { asyncGetRequest, errorMessageHandler, makeAPIPath } from '../../../utils/utils';
 import List from '../../atoms/List/List';
-import Dialog from '../../molecules/Dialog/Dialog';
-import useDialog from '../../../utils/hooks/useDialog';
 import useIntersect from '../../../utils/hooks/useIntersect';
-import { MemberType as DMRoomType } from '../../../types/Chat';
-import ListItem from '../../atoms/ListItem/ListItem';
-import { useAppDispatch } from '../../../utils/hooks/useAppContext';
+import { DMRoomType } from '../../../types/Chat';
+import { DMToMessage } from '../../../utils/chats';
+import { useUserState } from '../../../utils/hooks/useUserContext';
+import { RawUserInfoType } from '../../../types/Response';
+import DMListItem, { DMListItemSkeleton } from '../../organisms/DMListItem/DMListItem';
+import { UserInfoType } from '../../../types/User';
+import { useAppState } from '../../../utils/hooks/useAppContext';
 
 const COUNTS_PER_PAGE = 10;
 
 const DMPage = () => {
   const { CancelToken } = axios;
   const source = CancelToken.source();
-  const [dms, setDMs] = useState<DMRoomType[]>([]);
+  const [DMs, setDMs] = useState<DMRoomType[]>([]);
   const [isListEnd, setListEnd] = useState(false);
   const [page, setPage] = useState<number>(1);
-  const {
-    // eslint-disable-next-line no-unused-vars
-    isOpen, setOpen, dialog, setDialog,
-  } = useDialog();
+  const userState = useUserState();
+  const appState = useAppState();
   const path = makeAPIPath('/dmers');
-  // eslint-disable-next-line no-unused-vars
-  const appDispatch = useAppDispatch();
 
   const fetchItems = () => {
     if (isListEnd) return;
 
     asyncGetRequest(`${path}?perPage=${COUNTS_PER_PAGE}&page=${page}`, source)
-      .then(({ data }) => {
-        setDMs((prev) => prev.concat(data));
-        if (data.length === 0 || data.length < COUNTS_PER_PAGE) setListEnd(true);
+      .then(({ data }: { data: RawUserInfoType[] }) => {
+        const promises = data.map((one) => axios.get(makeAPIPath(`/dms/opposite/${one.name}?perPage=1&page=1`), {
+          cancelToken: source.token,
+        }));
+        Promise.all(promises)
+          .then((responses) => {
+            const fetchedRooms: DMRoomType[] = responses.map((response): DMRoomType => {
+              const latestMessage = DMToMessage(response.data[0], userState.name);
+              const opposite: UserInfoType = data.find((one) => one.name === latestMessage.name)!;
+              return {
+                ...opposite,
+                avatar: makeAPIPath(`/${opposite.avatar}`),
+                latestMessage,
+                unreads: 0,
+              };
+            });
+            setDMs((prev) => prev.concat(fetchedRooms));
+            if (data.length === 0 || data.length < COUNTS_PER_PAGE) setListEnd(true);
+          })
+          .catch((error) => {
+            source.cancel();
+            errorMessageHandler(error);
+            setListEnd(true);
+          });
       })
       .catch((error) => {
         source.cancel();
@@ -40,6 +59,14 @@ const DMPage = () => {
         setListEnd(true);
       });
   };
+
+  useEffect(() => {
+    setDMs((prev) => prev.map((DM) => {
+      const found = appState?.DMs?.find((one) => one.name === DM.name);
+      if (!found) return DM;
+      return { ...DM, latestMessage: found.latestMessage };
+    }));
+  }, [appState.DMs]);
 
   useEffect(() => {
     fetchItems();
@@ -61,17 +88,9 @@ const DMPage = () => {
 
   return (
     <>
-      <Dialog
-        isOpen={isOpen}
-        title={dialog.title}
-        content={dialog.content}
-        buttons={dialog.buttons}
-        onClose={dialog.onClose}
-      />
       <List height="84vh" scroll>
-        {dms.map((room: DMRoomType) => (
-          // FIXME DMListItem으로 교체
-          <ListItem key={room.id}>{room.name}</ListItem>
+        {DMs.map((room: DMRoomType) => (
+          <DMListItem roomInfo={room} key={room.id} />
         ))}
         {!isListEnd && (
         <div
@@ -87,11 +106,10 @@ const DMPage = () => {
             wrap="nowrap"
             spacing={1}
             xs={12}
-            // FIXME 스켈레톤 넣기
           >
-            <ListItem>skeleton here</ListItem>
-            <ListItem>skeleton here</ListItem>
-            <ListItem>skeleton here</ListItem>
+            <DMListItemSkeleton />
+            <DMListItemSkeleton />
+            <DMListItemSkeleton />
           </Grid>
         </div>
         )}
