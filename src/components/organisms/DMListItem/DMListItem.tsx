@@ -155,9 +155,6 @@ const DMListItem = ({ roomInfo }: DMListItemProps) => {
 
   const dateStr = () => {
     const dateString = makeDateString(createdAt);
-    if (dateString.length > 7) {
-      return (<Typo variant="caption">{dateString}</Typo>);
-    }
     return (<Typo variant="subtitle2">{dateString}</Typo>);
   };
 
