@@ -10,7 +10,7 @@ import { useUserState } from '../../../utils/hooks/useUserContext';
 import { RawUserInfoType } from '../../../types/Response';
 import DMListItem, { DMListItemSkeleton } from '../../organisms/DMListItem/DMListItem';
 import { UserInfoType } from '../../../types/User';
-import { useAppDispatch, useAppState } from '../../../utils/hooks/useAppContext';
+import { useAppState } from '../../../utils/hooks/useAppContext';
 
 const COUNTS_PER_PAGE = 10;
 
@@ -22,7 +22,6 @@ const DMPage = () => {
   const [page, setPage] = useState<number>(0);
   const userState = useUserState();
   const appState = useAppState();
-  const appDispatch = useAppDispatch();
   const path = makeAPIPath('/dmers');
 
   const fetchItems = () => {
@@ -88,8 +87,7 @@ const DMPage = () => {
   });
 
   useEffect(() => {
-    if (appState.DMs.length === 0) appDispatch({ type: 'loading' });
-    else {
+    if (appState.DMs.length !== 0) {
       setPage(1);
       setListEnd(false);
     }
