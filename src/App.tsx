@@ -100,6 +100,19 @@ const App = () => {
           appDispatch({ type: 'exit', name });
           toast.warn(`${name} 채널에서 추방되었습니다.`);
         });
+
+        socket.on('adminToMember', (data) => {
+          const { name } = data.channel;
+          appDispatch({
+            type: 'join',
+            channels: appState.channels.map((channel) => (
+              channel.name === name ? { ...channel, role: 'MEMBER' } : { ...channel })),
+          });
+          if (window.location.pathname === `/channel/manage/${name}`) {
+            history.push('/channel');
+            toast.warn(`${name} 채널의 권한이 관리자에서 멤버로 변경되었습니다.`);
+          }
+        });
       });
     }
   }, [DMs]);
