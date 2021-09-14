@@ -8,7 +8,7 @@ import ChatInput from '../../atoms/ChatInput/ChatInput';
 import List from '../../atoms/List/List';
 import Typo from '../../atoms/Typo/Typo';
 import {
-  ChannelType, MemberType, MessageType, RawDMType, RawMessageType,
+  MemberType, MessageType, RawDMType, RawMessageType,
 } from '../../../types/Chat';
 import { useUserState } from '../../../utils/hooks/useUserContext';
 import Dialog from '../../molecules/Dialog/Dialog';
@@ -41,10 +41,9 @@ const ChatPage = () => {
   const [isSending, setSending] = useState<boolean>(false);
   const [members, setMembers] = useState<MemberType[]>([]);
   const {
-    chatting, channels, newMessage, blockList,
+    chatting, newMessage, blockList,
   } = useAppState();
   const appDispatch = useAppDispatch();
-  const [channel, setChannel] = useState<ChannelType | null>(null);
   const {
     isOpen, setOpen, dialog, setDialog,
   } = useDialog();
@@ -57,7 +56,7 @@ const ChatPage = () => {
     e.preventDefault();
     if (chat.length === 0 || isSending) return;
 
-    (channel ? postChannelChat(chatting!.name, chat) : postDM(chatting!.name, chat))
+    (chatting?.type === 'channel' ? postChannelChat(chatting!.name, chat) : postDM(chatting!.name, chat))
       .then(() => { setSending(true); })
       .catch((error) => { errorMessageHandler(error); });
   };
@@ -87,8 +86,6 @@ const ChatPage = () => {
     setSending(false);
     setChat('');
     setPage(chatting ? 1 : 0);
-    setChannel((chatting && chatting.type === 'channel')
-      ? (channels.filter((one) => one.name === chatting.name)[0] || null) : null);
     setChatEnd(!chatting);
     if (chatting && chatting.type === 'channel') {
       asyncGetRequest(makeAPIPath(`/channels/${chatting.name}/members`))
@@ -153,7 +150,7 @@ const ChatPage = () => {
                 <ChatMessage
                   key={one.id}
                   info={one}
-                  userRole={channel ? getMembership(one.user, members) : 'MEMBER'}
+                  userRole={chatting.type === 'channel' ? getMembership(one.user, members) : 'MEMBER'}
                   me={one.user.name === userState.name}
                   setOpen={setOpen}
                   setDialog={setDialog}
