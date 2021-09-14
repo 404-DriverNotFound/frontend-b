@@ -10,7 +10,7 @@ import { useUserState } from '../../../utils/hooks/useUserContext';
 import { RawUserInfoType } from '../../../types/Response';
 import DMListItem, { DMListItemSkeleton } from '../../organisms/DMListItem/DMListItem';
 import { UserInfoType } from '../../../types/User';
-import { useAppState } from '../../../utils/hooks/useAppContext';
+import { useAppDispatch, useAppState } from '../../../utils/hooks/useAppContext';
 
 const COUNTS_PER_PAGE = 10;
 
@@ -18,10 +18,11 @@ const DMPage = () => {
   const { CancelToken } = axios;
   const source = CancelToken.source();
   const [DMs, setDMs] = useState<DMRoomType[]>([]);
-  const [isListEnd, setListEnd] = useState(false);
-  const [page, setPage] = useState<number>(1);
+  const [isListEnd, setListEnd] = useState(true);
+  const [page, setPage] = useState<number>(0);
   const userState = useUserState();
   const appState = useAppState();
+  const appDispatch = useAppDispatch();
   const path = makeAPIPath('/dmers');
 
   const fetchItems = () => {
@@ -37,11 +38,12 @@ const DMPage = () => {
             const fetchedRooms: DMRoomType[] = responses.map((response): DMRoomType => {
               const latestMessage = DMToMessage(response.data[0], userState.name);
               const opposite: UserInfoType = data.find((one) => one.name === latestMessage.name)!;
+              const DM = appState.DMs.find((one) => one.name === opposite.name);
               return {
                 ...opposite,
                 avatar: makeAPIPath(`/${opposite.avatar}`),
                 latestMessage,
-                unreads: appState.DMs.find((DM) => DM.name === opposite.name)!.unreads,
+                unreads: DM ? DM.unreads : 0,
               };
             });
             setDMs((prev) => prev.concat(fetchedRooms));
@@ -61,15 +63,20 @@ const DMPage = () => {
   };
 
   useEffect(() => {
-    setDMs((prev) => prev.map((DM) => {
-      const found = appState?.DMs?.find((one) => one.name === DM.name);
-      if (!found) return DM;
-      return { ...DM, latestMessage: found.latestMessage, unreads: found.unreads };
-    }));
+    if (DMs.length === 0 && appState.DMs.length !== 0) {
+      setListEnd(false);
+      setPage(1);
+    } else if (DMs.length !== 0 && appState.DMs.length !== 0) {
+      setDMs((prev) => prev.map((DM) => {
+        const found = appState?.DMs?.find((one) => one.name === DM.name);
+        if (!found || found.latestMessage.user.id === '') return DM;
+        return { ...DM, latestMessage: found.latestMessage, unreads: found.unreads };
+      }));
+    }
   }, [appState.DMs]);
 
   useEffect(() => {
-    fetchItems();
+    if (page !== 0) fetchItems();
   }, [page]);
 
   // eslint-disable-next-line no-unused-vars
@@ -80,10 +87,17 @@ const DMPage = () => {
     observer.observe(entry.target);
   });
 
-  useEffect(() => () => {
-    source.cancel();
-    setDMs([]);
-    setListEnd(true);
+  useEffect(() => {
+    if (appState.DMs.length === 0) appDispatch({ type: 'loading' });
+    else {
+      setPage(1);
+      setListEnd(false);
+    }
+    return () => {
+      source.cancel();
+      setDMs([]);
+      setListEnd(true);
+    };
   }, []);
 
   return (
