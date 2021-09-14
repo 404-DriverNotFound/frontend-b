@@ -25,7 +25,7 @@ const useStyles = makeStyles({
 });
 
 const CHANNEL_NAME_AVAILABLE = '채널명 중복검사를 실행하세요';
-const CHANNEL_NAME_HELPER_TEXT = '맨 앞, 뒤 공백 없는 모든 문자 3-18자';
+const CHANNEL_NAME_HELPER_TEXT = '앞뒤 공백 없는 한글/영문/숫자/공백 3-18자';
 const CHANNEL_PASSWORD_AVAILABLE = '사용할 수 있는 비밀번호';
 const CHANNEL_PASSWORD_HELPER_TEXT = '공백 제외 모든 문자+숫자 4-32자';
 const PASSWORD_CHECK_YES = '비밀번호 일치';
@@ -59,7 +59,7 @@ const ChannelInfoForm = ({ setOpen, channel }: ChannelInfoFormProps) => {
   const handleChannelNameChange = (event: React.ChangeEvent<Element>) => {
     const { value } = (event as React.ChangeEvent<HTMLInputElement>).target;
     if (value.length > 18) return;
-    if (/^[^\s]+(\s+[^\s]+)*$/.test(value) && /^.{3,18}$/.test(value)) {
+    if (/^[^\s]+(\s+[^\s]+)*$/.test(value) && /^[0-9a-zA-z\uAC00-\uD7A3\s]{3,18}$/.test(value)) {
       setValidChannelName(true);
       setHelperTextChannelName(CHANNEL_NAME_AVAILABLE);
     } else {
