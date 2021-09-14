@@ -121,7 +121,9 @@ const ChannelManagePage = ({ match }: RouteComponentProps<MatchParams>) => {
             info={user}
             myRole={role as ('ADMIN' | 'OWNER')}
             setUser={(userInfo) => {
-              setUsers(users.filter((one) => one.id !== userInfo.id).concat(userInfo));
+              if (userInfo.memberships[0].role === 'NONE') {
+                setUsers(users.filter((one) => one.id !== userInfo.id));
+              } else setUsers(users.filter((one) => one.id !== userInfo.id).concat(userInfo));
             }}
             setOpen={setOpen}
             setDialog={setDialog}

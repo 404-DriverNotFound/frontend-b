@@ -193,6 +193,25 @@ const ChannelUserListItem = ({
     setOpen(false);
   };
 
+  const handleUnBanUser = () => {
+    appDispatch({ type: 'loading' });
+    axios.delete(makeAPIPath(`/channels/${channelName}/members/${name}`))
+      .finally(() => {
+        appDispatch({ type: 'endLoading' });
+      })
+      .then(({ data }) => {
+        setUser({
+          ...info,
+          memberships: [{
+            role: 'NONE', unmutedAt: data.unmutedAt, createdAt: data.createdAt,
+          }],
+        });
+        toast('유저에 대한 차단을 취소하였습니다.');
+      })
+      .catch((error) => { errorMessageHandler(error); });
+    setOpen(false);
+  };
+
   const makeStatusString = (): string => {
     switch (status) {
       case 'ONLINE':
@@ -233,7 +252,7 @@ const ChannelUserListItem = ({
                   <Button variant="text" onClick={() => { setOpen(false); }}>cancel</Button>
                   <Button
                     type="button"
-                    onClick={() => handlePatchRequest('유저에 대한 차단을 취소하였습니다.', 'MEMBER')}
+                    onClick={() => handleUnBanUser()}
                   >
                     confirm
                   </Button>

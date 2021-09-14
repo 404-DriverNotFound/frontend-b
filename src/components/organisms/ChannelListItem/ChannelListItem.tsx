@@ -166,12 +166,13 @@ const ChannelListItem = ({
   const dateStr = makeDateString(updatedAt);
   const appDispatch = useAppDispatch();
   const appState = useAppState();
+  const userState = useUserState();
   const history = useHistory();
   const classes = useStyles();
 
   const handleExitChannel = () => {
     appDispatch({ type: 'loading' });
-    axios.delete(makeAPIPath(`/channels/${name}/members/me`))
+    axios.delete(makeAPIPath(`/channels/${name}/members/${userState.name}`))
       .finally(() => {
         appDispatch({ type: 'endLoading' });
       })
