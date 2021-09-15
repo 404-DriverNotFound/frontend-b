@@ -18,7 +18,8 @@ const useStyles = makeStyles({
     margin: '0.5em auto',
     backgroundColor: '#eee',
     borderRadius: '10px',
-    padding: '5px 5px 1em 5px',
+    padding: '5px',
+    // padding: '0px 5px 1em 5px',
   },
 });
 
@@ -27,7 +28,7 @@ const GameMainPage = () => {
   const classes = useStyles();
 
   return (
-    <Grid className={classes.root} container justifyContent="center" alignItems="center" spacing={1}>
+    <Grid className={classes.root} container justifyContent="space-evenly" alignItems="center" spacing={3}>
       <Grid item xs={6}>
         <GameOptionCard option="classic" onClick={() => { history.push(CLASSIC_PLAY_PATH); }} />
       </Grid>
