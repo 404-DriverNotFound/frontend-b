@@ -14,13 +14,6 @@ const useStyles = makeStyles({
     height: '60px',
     '&:hover': { color: '#208fea' },
   },
-  hover: {
-    '&:hover': {
-      color: '#208fea',
-      cursor: 'pointer',
-      backgroundColor: '#f5f5f5',
-    },
-  },
   image: {
     width: '30px',
     height: '30px',
