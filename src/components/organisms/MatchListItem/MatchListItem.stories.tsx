@@ -4,7 +4,8 @@ import { BrowserRouter } from 'react-router-dom';
 import MatchListItem from './MatchListItem';
 import List from '../../atoms/List/List';
 import MainTemplate from '../../templates/MainTemplate/MainTemplate';
-import { ContextProvider } from '../../../utils/hooks/useContext';
+import ContextProvider from '../../../utils/hooks/useContext';
+import { MatchType } from '../../../types/Game';
 import { UserInfoType } from '../../../types/User';
 
 export default {
@@ -12,37 +13,59 @@ export default {
   component: MatchListItem,
 } as Meta;
 
-type matchType = UserInfoType & { date: Date, winner: string }; // FIXME 임시 type
-
-const dummyWinner: matchType = {
+const me: UserInfoType = {
   id: '550e8400-e29b-41d4-a716-446655440000', // 의미없는 uuid입니다
-  name: 'WINNER',
+  name: 'ME',
   avatar: '',
   status: 'OFFLINE',
-  date: new Date(),
-  winner: 'WINNER',
 };
 
-const dummyLoser: matchType = {
-  id: '550e8400-e29b-41d4-a716-446655440000', // 의미없는 uuid입니다
-  name: 'LOSER',
+const opposite: UserInfoType = {
+  id: '661e8400-e29b-41d4-a716-446655440000', // 의미없는 uuid입니다
+  name: 'OPPOSITE',
   avatar: '',
   status: 'OFFLINE',
-  date: new Date(),
-  winner: 'WINNER',
 };
 
-const fakeList: matchType[] = [
-  dummyWinner, dummyLoser, dummyWinner, dummyLoser, dummyWinner,
+const winCase: MatchType = {
+  id: '550e8400-e29b-41d4-a716-446655440000', // 의미없는 uuid입니다
+  createdAt: new Date(),
+  status: 'DONE',
+  type: 'LADDER',
+  user1: me,
+  user2: opposite,
+  winner: me.id,
+  loser: opposite.id,
+};
+
+const loseCase: MatchType = {
+  id: '550e8400-e29b-41d4-a716-446655440000', // 의미없는 uuid입니다
+  createdAt: new Date(),
+  status: 'DONE',
+  type: 'LADDER',
+  user1: me,
+  user2: opposite,
+  winner: opposite.id,
+  loser: me.id,
+};
+
+const fakeList: MatchType[] = [
+  winCase, loseCase, winCase, loseCase, winCase,
 ];
 
 export const Default = () => (
-  <MatchListItem matchInfo={dummyLoser} />
+  <MatchListItem opposite={opposite} isMeWinner createdAt={new Date()} />
 );
 
 export const WithList = () => (
   <List scroll height="15em">
-    {fakeList.map((info) => <MatchListItem matchInfo={info} />)}
+    {fakeList.map((info) => (
+      <MatchListItem
+        opposite={info.user1.id === me.id ? info.user2 : info.user1}
+        isMeWinner={info.winner !== opposite.id}
+        createdAt={new Date()}
+      />
+    ))}
   </List>
 );
 

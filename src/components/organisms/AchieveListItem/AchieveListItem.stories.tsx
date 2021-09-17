@@ -4,7 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import AchieveListItem from './AchieveListItem';
 import List from '../../atoms/List/List';
 import MainTemplate from '../../templates/MainTemplate/MainTemplate';
-import { ContextProvider } from '../../../utils/hooks/useContext';
+import ContextProvider from '../../../utils/hooks/useContext';
 import { achievementList, AchievementType } from '../../../utils/achievements';
 
 export default {

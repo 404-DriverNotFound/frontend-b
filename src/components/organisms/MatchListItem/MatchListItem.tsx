@@ -15,18 +15,17 @@ const useStyles = makeStyles({
   },
 });
 
-type MatchListItemProps = {
-  matchInfo: UserInfoType & { date: Date, winner: string }, // FIXME 임시 type
+export type MatchListItemProps = {
+  opposite: UserInfoType,
+  isMeWinner: boolean,
+  createdAt: Date,
 }
 
 const makeDateString = (date: Date) => `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()} ${date.getHours()}:${date.getMinutes()}`;
 
-const MatchListItem = ({ matchInfo }: MatchListItemProps) => {
-  const {
-    name, avatar, date, winner,
-  } = matchInfo;
-  const isMeWinner = winner !== name;
-  const dateStr = makeDateString(date);
+const MatchListItem = ({ opposite, isMeWinner, createdAt }: MatchListItemProps) => {
+  const { avatar, name } = opposite;
+  const dateStr = makeDateString(createdAt);
   const classes = useStyles();
 
   return (
