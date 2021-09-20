@@ -10,7 +10,7 @@ const MAIN_GAME_PAGE = '/game';
 const CLASSIC_PLAY_PATH = '/game/playclassic';
 const SPEED_PLAY_PATH = '/game/playspeed';
 const REVERSE_PLAY_PATH = '/game/playreverse';
-const WATCH_PLAY_PATH = '/game/watch';
+export const WATCH_PLAY_PATH = '/game/watch';
 
 const useStyles = makeStyles({
   root: {

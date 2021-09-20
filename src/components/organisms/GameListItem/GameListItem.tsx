@@ -4,6 +4,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typo from '../../atoms/Typo/Typo';
 import { UserInfoType } from '../../../types/User';
+import { GameModeType } from '../../../types/Match';
 import Avatar from '../../atoms/Avatar/Avatar';
 import ListClickItem from '../../atoms/ListClickItem/ListClickItem';
 
@@ -32,8 +33,6 @@ const useStyles = makeStyles({
   },
 });
 
-type GameModeType = 'classic' | 'speed' | 'reverse';
-
 type GameListItemProps = {
   leftUser: UserInfoType,
   rightUser: UserInfoType,
@@ -47,19 +46,19 @@ const GameListItem = ({
   const classes = useStyles();
   const makeIcon = () => {
     switch (mode) {
-      case 'speed':
+      case 'SPEED':
         return (
           <Tooltip arrow title="Speed Mode">
             <img src="/images/fast.png" alt="Speed Mode" className={`${classes.image} ${classes.speed}`} />
           </Tooltip>
         );
-      case 'reverse':
+      case 'REVERSE':
         return (
           <Tooltip arrow title="Reverse Mode">
             <img src="/images/reverse.png" alt="Reverse Mode" className={`${classes.image} ${classes.reverse}`} />
           </Tooltip>
         );
-      case 'classic':
+      case 'CLASSIC':
       default:
         return (
           <Tooltip arrow title="Classic Mode">
