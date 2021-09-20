@@ -5,12 +5,13 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import GameOptionCard from '../../molecules/GameOptionCard/GameOptionCard';
+import GameWatchPage from '../GameWatchPage/GameWatchPage';
 
 const MAIN_GAME_PAGE = '/game';
 const CLASSIC_PLAY_PATH = '/game/playclassic';
 const SPEED_PLAY_PATH = '/game/playspeed';
 const REVERSE_PLAY_PATH = '/game/playreverse';
-export const WATCH_PLAY_PATH = '/game/watch';
+const WATCH_PLAY_PATH = '/game/watch';
 
 const useStyles = makeStyles({
   root: {
@@ -51,7 +52,7 @@ const GamePage = () => (
       <Route exact path={CLASSIC_PLAY_PATH} render={() => <h1>Classic play</h1>} />
       <Route exact path={SPEED_PLAY_PATH} render={() => <h1>Speedy play</h1>} />
       <Route exact path={REVERSE_PLAY_PATH} render={() => <h1>Reverse play</h1>} />
-      <Route exact path={WATCH_PLAY_PATH} render={() => <h1>Watch play</h1>} />
+      <Route exact path={WATCH_PLAY_PATH} component={GameWatchPage} />
       <Route path="/">
         <Redirect to={MAIN_GAME_PAGE} />
       </Route>

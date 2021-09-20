@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Grid from '@material-ui/core/Grid';
 import { Redirect, Route, Switch } from 'react-router-dom';
-import { WATCH_PLAY_PATH } from '../GamePage/GamePage';
 import { asyncGetRequest, errorMessageHandler, makeAPIPath } from '../../../utils/utils';
 import { RawMatchType, MatchType } from '../../../types/Match';
 import List from '../../atoms/List/List';
@@ -11,35 +10,15 @@ import SubMenu from '../../molecules/SubMenu/SubMenu';
 import useIntersect from '../../../utils/hooks/useIntersect';
 import GameListItem from '../../organisms/GameListItem/GameListItem';
 
-const ALL_MATCH_PATH = `${WATCH_PLAY_PATH}/all`;
-const LADDER_MATCH_PATH = `${WATCH_PLAY_PATH}/ladder`;
-const EXHIBITION_MATCH_PATH = `${WATCH_PLAY_PATH}/exhibition`;
+const ALL_MATCH_PATH = '/game/watch/';
+const LADDER_MATCH_PATH = '/game/watch/ladder';
+const EXHIBITION_MATCH_PATH = '/game/watch/exhibition';
 
 const COUNTS_PER_PAGE = 10;
 
 type ListProps = {
   type: 'ALL' | 'LADDER' | 'EXHIBITION',
 }
-
-// type MatchListProps = {
-//   [index: string]: MatchGameType,
-// };
-
-// const matchTypes: MatchGameType = {
-//   all: '',
-//   ladder: 'LADDER',
-//   exhibition: 'EXHIBITION',
-// };
-
-// const useStyles = makeStyles({
-//   root: {
-//     height: '78vh',
-//     margin: '0.5em auto',
-//     backgroundColor: '#eee',
-//     borderRadius: '10px',
-//     padding: '5px',
-//   },
-// });
 
 const MatchList = ({ type }: ListProps) => {
   const { CancelToken } = axios;
@@ -95,7 +74,7 @@ const MatchList = ({ type }: ListProps) => {
           <GameListItem
             leftUser={match.user1}
             rightUser={match.user2}
-            mode={match.gameMode}
+            mode="CLASSIC" // FIXME: 임시로 Classic으로 설정 API 수정 후 고치기
             onClick={() => {}}
           />
         </ListItem>

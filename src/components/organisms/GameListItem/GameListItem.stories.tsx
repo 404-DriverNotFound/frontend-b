@@ -30,7 +30,7 @@ const Normal = () => (
   <GameListItem
     leftUser={userFirst}
     rightUser={userSecond}
-    mode="classic"
+    mode="CLASSIC"
     onClick={() => {}}
   />
 );
@@ -39,7 +39,7 @@ const Reverse = () => (
   <GameListItem
     leftUser={userSecond}
     rightUser={userFirst}
-    mode="reverse"
+    mode="REVERSE"
     onClick={() => {}}
   />
 );
@@ -48,7 +48,7 @@ const Speed = () => (
   <GameListItem
     leftUser={userFirst}
     rightUser={userSecond}
-    mode="speed"
+    mode="SPEED"
     onClick={() => {}}
   />
 );
