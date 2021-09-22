@@ -10,7 +10,7 @@ import SubMenu from '../../molecules/SubMenu/SubMenu';
 import useIntersect from '../../../utils/hooks/useIntersect';
 import GameListItem from '../../organisms/GameListItem/GameListItem';
 
-const ALL_MATCH_PATH = '/game/watch/';
+const ALL_MATCH_PATH = '/game/watch/all';
 const LADDER_MATCH_PATH = '/game/watch/ladder';
 const EXHIBITION_MATCH_PATH = '/game/watch/exhibition';
 
@@ -23,8 +23,8 @@ type ListProps = {
 const MatchList = ({ type }: ListProps) => {
   const { CancelToken } = axios;
   const source = CancelToken.source();
-  const path = type === 'ALL' ? makeAPIPath('/matches/spectating') : makeAPIPath(`/matches/spectating?type=${type}`);
-  // const matchType = matchTypes[type];
+  const path = makeAPIPath('/matches/spectating');
+  const typePath = type === 'ALL' ? '' : `&type=${type}`;
   const [matches, setMatches] = useState<MatchType[]>([]);
   const [isListEnd, setListEnd] = useState(true);
   const [page, setPage] = useState<number>(0);
@@ -32,10 +32,14 @@ const MatchList = ({ type }: ListProps) => {
   const fetchItems = () => {
     if (isListEnd) return;
 
-    asyncGetRequest(`${path}?perPage=${COUNTS_PER_PAGE}&page=${page}`, source)
+    asyncGetRequest(`${path}?perPage=${COUNTS_PER_PAGE}&page=${page}${typePath}`, source)
       .then(({ data }: { data: RawMatchType[] }) => {
         const typed: MatchType[] = data;
-        setMatches((prev) => prev.concat(typed.map((match) => ({ ...match, user1: { ...match.user1, avatar: makeAPIPath(`/${match.user1.avatar}`) }, user2: { ...match.user2, avatar: makeAPIPath(`/${match.user2.avatar}`) } }))));
+        setMatches((prev) => prev.concat(typed.map((match) => ({
+          ...match,
+          user1: { ...match.user1, avatar: makeAPIPath(`/${match.user1.avatar}`) },
+          user2: { ...match.user2, avatar: makeAPIPath(`/${match.user2.avatar}`) },
+        }))));
         if (data.length === 0 || data.length < COUNTS_PER_PAGE) setListEnd(true);
       })
       .catch((error) => {
@@ -70,14 +74,13 @@ const MatchList = ({ type }: ListProps) => {
   return (
     <>
       {matches.map((match) => (
-        <ListItem key={match.id}>
-          <GameListItem
-            leftUser={match.user1}
-            rightUser={match.user2}
-            mode="CLASSIC" // FIXME: 임시로 Classic으로 설정 API 수정 후 고치기
-            onClick={() => {}}
-          />
-        </ListItem>
+        <GameListItem
+          key={match.id}
+          leftUser={match.user1}
+          rightUser={match.user2}
+          mode="CLASSIC" // FIXME: 임시로 Classic으로 설정 API 수정 후 고치기
+          onClick={() => {}}
+        />
       ))}
       {!isListEnd && (
         <div

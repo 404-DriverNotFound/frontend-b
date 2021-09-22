@@ -52,8 +52,8 @@ const GamePage = () => (
       <Route exact path={CLASSIC_PLAY_PATH} render={() => <h1>Classic play</h1>} />
       <Route exact path={SPEED_PLAY_PATH} render={() => <h1>Speedy play</h1>} />
       <Route exact path={REVERSE_PLAY_PATH} render={() => <h1>Reverse play</h1>} />
-      <Route exact path={WATCH_PLAY_PATH} component={GameWatchPage} />
-      <Route path="/">
+      <Route path={WATCH_PLAY_PATH} component={GameWatchPage} />
+      <Route exact path="/">
         <Redirect to={MAIN_GAME_PAGE} />
       </Route>
     </Switch>
