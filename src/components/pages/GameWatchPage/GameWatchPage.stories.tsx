@@ -4,7 +4,6 @@ import { BrowserRouter, Route } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import GameWatchPage from './GameWatchPage';
 import MainTemplate from '../../templates/MainTemplate/MainTemplate';
-// import { RawMatchType } from '../../../types/Match';
 import ContextProvider from '../../../utils/hooks/useContext';
 
 export default {
@@ -19,34 +18,6 @@ const useStyles = makeStyles({
     height: '100%',
   },
 });
-
-// const SampleRawMatchType: RawMatchType = {
-//   id: '550e8400-e29b-41d4-a716-446655440000', // 의미없는 uuid입니다
-//   createdAt: String(new Date()),
-//   status: 'IN_PROGRESS',
-//   type: 'EXHIBITON',
-//   gameMode: 'CLASSIC',
-//   user1: {
-//     id: '550e8400-e29b-41d4-a716-446655440000', // 의미없는 uuid입니다
-//     name: 'LeftUsername',
-//     avatar: '',
-//     status: 'IN_GAME',
-//     enable2FA: false,
-//     authenticatorSecret: false,
-//     isSecondFactorAuthenticated: false,
-//     score: 4,
-//   },
-//   user2: {
-//     id: '550e8400-e29b-41d4-a716-446655440000', // 의미없는 uuid입니다
-//     name: 'RightUsername',
-//     avatar: '',
-//     status: 'IN_GAME',
-//     enable2FA: false,
-//     authenticatorSecret: false,
-//     isSecondFactorAuthenticated: false,
-//     score: 2,
-//   },
-// };
 
 export const WithMainTemplate = () => {
   const classes = useStyles();

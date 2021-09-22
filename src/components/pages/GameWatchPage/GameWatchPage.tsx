@@ -5,10 +5,9 @@ import { Redirect, Route, Switch } from 'react-router-dom';
 import { asyncGetRequest, errorMessageHandler, makeAPIPath } from '../../../utils/utils';
 import { RawMatchType, MatchType } from '../../../types/Match';
 import List from '../../atoms/List/List';
-import ListItem from '../../atoms/ListItem/ListItem';
 import SubMenu from '../../molecules/SubMenu/SubMenu';
 import useIntersect from '../../../utils/hooks/useIntersect';
-import GameListItem from '../../organisms/GameListItem/GameListItem';
+import GameListItem, { GameListItemSkeleton } from '../../organisms/GameListItem/GameListItem';
 
 const ALL_MATCH_PATH = '/game/watch/all';
 const LADDER_MATCH_PATH = '/game/watch/ladder';
@@ -97,9 +96,9 @@ const MatchList = ({ type }: ListProps) => {
             spacing={1}
             xs={12}
           >
-            <ListItem>a</ListItem>
-            <ListItem>b</ListItem>
-            <ListItem>c</ListItem>
+            <GameListItemSkeleton />
+            <GameListItemSkeleton />
+            <GameListItemSkeleton />
           </Grid>
         </div>
       )}

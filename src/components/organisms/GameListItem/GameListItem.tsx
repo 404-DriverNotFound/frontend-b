@@ -62,7 +62,7 @@ const useStyles = makeStyles({
   },
   skeletonVersus: {
     margin: '5px',
-    width: '20%',
+    width: '13%',
     height: '25px',
   },
 });
