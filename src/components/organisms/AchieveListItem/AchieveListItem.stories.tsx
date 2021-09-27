@@ -5,8 +5,7 @@ import AchieveListItem, { AchieveListItemSkeleton } from './AchieveListItem';
 import List from '../../atoms/List/List';
 import MainTemplate from '../../templates/MainTemplate/MainTemplate';
 import ContextProvider from '../../../utils/hooks/useContext';
-import { AchievementType } from '../../../types/Game';
-import { AchievementDescription, AchievementName } from '../../../utils/achievements';
+import { AchievementDescription, AchievementName, AchievementType } from '../../../types/Game';
 
 export default {
   title: 'organisms/AchieveListItem',

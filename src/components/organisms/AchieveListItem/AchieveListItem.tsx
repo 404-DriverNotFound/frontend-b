@@ -4,8 +4,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import Typo from '../../atoms/Typo/Typo';
 import ListItem from '../../atoms/ListItem/ListItem';
 import { AchievementType } from '../../../types/Game';
-import { ACHIEVEMENT_LIST } from '../../../utils/achievements';
 import { makeDateString } from '../../../utils/utils';
+import ACHIEVEMENT_LIST from '../../../utils/achievements';
 
 const useStyles = makeStyles({
   root: {
