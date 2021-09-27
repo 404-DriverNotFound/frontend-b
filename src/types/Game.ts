@@ -1,3 +1,4 @@
+import { AchievementDescription, AchievementName } from '../utils/achievements';
 import { UserInfoType } from './User';
 
 export type MatchType = {
@@ -9,4 +10,10 @@ export type MatchType = {
   user2: UserInfoType,
   winner: string | null,
   loser: string | null,
+};
+
+export type AchievementType = {
+  name: AchievementName,
+  description: AchievementDescription,
+  createdAt: Date,
 };

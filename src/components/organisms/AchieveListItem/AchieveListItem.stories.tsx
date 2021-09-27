@@ -1,27 +1,57 @@
 import React from 'react';
 import { Meta } from '@storybook/react';
 import { BrowserRouter } from 'react-router-dom';
-import AchieveListItem from './AchieveListItem';
+import AchieveListItem, { AchieveListItemSkeleton } from './AchieveListItem';
 import List from '../../atoms/List/List';
 import MainTemplate from '../../templates/MainTemplate/MainTemplate';
 import ContextProvider from '../../../utils/hooks/useContext';
-import { achievementList, AchievementType } from '../../../utils/achievements';
+import { AchievementType } from '../../../types/Game';
+import { AchievementDescription, AchievementName } from '../../../utils/achievements';
 
 export default {
   title: 'organisms/AchieveListItem',
   component: AchieveListItem,
 } as Meta;
 
-const dummyAchieveList: AchievementType[] = achievementList
-  .map((achievement) => ({ ...achievement, date: new Date() }));
+const dummyAchieveList: AchievementType[] = [
+  {
+    name: AchievementName.FIRST_GAME,
+    description: AchievementDescription.FIRST_GAME,
+    createdAt: new Date(),
+  },
+  {
+    name: AchievementName.FIRST_WIN,
+    description: AchievementDescription.FIRST_WIN,
+    createdAt: new Date(),
+  },
+  {
+    name: AchievementName.FIRST_LOSE,
+    description: AchievementDescription.FIRST_LOSE,
+    createdAt: new Date(),
+  },
+  {
+    name: AchievementName.FIRST_FRIEND,
+    description: AchievementDescription.FIRST_FRIEND,
+    createdAt: new Date(),
+  },
+  {
+    name: AchievementName.FIRST_BLOCK,
+    description: AchievementDescription.FIRST_BLOCK,
+    createdAt: new Date(),
+  },
+];
 
 export const Default = () => (
-  <AchieveListItem type={dummyAchieveList[0]} />
+  <AchieveListItem info={dummyAchieveList[0]} />
+);
+
+export const Skeleton = () => (
+  <AchieveListItemSkeleton />
 );
 
 export const WithList = () => (
   <List scroll height="15em">
-    {dummyAchieveList.map((achievement) => <AchieveListItem type={achievement} />)}
+    {dummyAchieveList.map((achievement) => <AchieveListItem info={achievement} />)}
   </List>
 );
 
