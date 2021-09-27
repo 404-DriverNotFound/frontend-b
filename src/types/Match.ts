@@ -18,7 +18,6 @@ export type RawMatchType = {
 
 export type MatchType = {
   id: string,
-  status: MatchStatusType,
   type: MatchGameType,
   mode: GameModeType,
   user1: RawUserInfoType & { score: number },
