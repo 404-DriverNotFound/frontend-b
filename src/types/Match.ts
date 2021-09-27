@@ -1,4 +1,5 @@
 import { RawUserInfoType } from './Response';
+import { UserInfoType } from './User';
 
 export type MatchStatusType = 'IN_PROGRESS' | 'DONE';
 
@@ -14,12 +15,17 @@ export type RawMatchType = {
   mode: GameModeType,
   user1: RawUserInfoType & { score: number },
   user2: RawUserInfoType & { score: number },
+  winner: (RawUserInfoType & { score: number }) | null,
+  loser: (RawUserInfoType & { score: number }) | null,
 };
 
 export type MatchType = {
   id: string,
+  createdAt: Date,
   type: MatchGameType,
   mode: GameModeType,
-  user1: RawUserInfoType & { score: number },
-  user2: RawUserInfoType & { score: number },
+  user1: UserInfoType & { score: number },
+  user2: UserInfoType & { score: number },
+  winner: UserInfoType | null,
+  loser: UserInfoType | null,
 }
