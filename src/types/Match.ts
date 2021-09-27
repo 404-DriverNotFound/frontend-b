@@ -3,7 +3,7 @@ import { UserInfoType } from './User';
 
 export type MatchStatusType = 'IN_PROGRESS' | 'DONE';
 
-export type MatchGameType = 'LADDER' | 'EXHIBITON';
+export type MatchGameType = 'LADDER' | 'EXHIBITION';
 
 export type GameModeType = 'CLASSIC' | 'SPEED' | 'REVERSE';
 
