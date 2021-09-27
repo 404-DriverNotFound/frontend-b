@@ -14,6 +14,35 @@ const useStyles = makeStyles({
     width: '100%',
     height: '60px',
   },
+  '@keyframes loading': {
+    '0%': {
+      backgroundColor: 'rgba(165, 165, 165, 0.1)',
+    },
+    '50%': {
+      backgroundColor: 'rgba(165, 165, 165, 0.3)',
+    },
+    '100%': {
+      backgroundColor: 'rgba(165, 165, 165, 0.1)',
+    },
+  },
+  skeleton: {
+    animation: '$loading 1.8s infinite ease-in-out',
+  },
+  skeletonCard: {
+    padding: '0.5em',
+    width: '100%',
+    height: '100px',
+  },
+  skeletonAvatar: {
+    width: '40px',
+    height: '40px',
+    borderRadius: '20px',
+  },
+  skeletonTypo: {
+    margin: '5px',
+    width: '90%',
+    height: '20px',
+  },
 });
 
 export type MatchListItemProps = {
@@ -21,6 +50,34 @@ export type MatchListItemProps = {
   isMeWinner: boolean,
   createdAt: Date,
 }
+
+export const MatchListItemSkeleton = () => {
+  const classes = useStyles();
+  return (
+    <ListItem>
+      <Grid className={classes.root} item container justifyContent="space-around" alignItems="center">
+        <Grid item container justifyContent="center" alignItems="center" xs={2}>
+          <div className={`${classes.skeletonAvatar} ${classes.skeleton}`}>{}</div>
+        </Grid>
+        <Grid item container justifyContent="center" alignItems="center" xs={1}>
+          <div className={`${classes.skeletonTypo} ${classes.skeleton}`}> </div>
+        </Grid>
+        <Grid item container justifyContent="center" alignItems="center" xs={2}>
+          <div className={`${classes.skeletonTypo} ${classes.skeleton}`}> </div>
+        </Grid>
+        <Grid item container justifyContent="center" alignItems="center" xs={1}>
+          <div className={`${classes.skeletonAvatar} ${classes.skeleton}`}>{}</div>
+        </Grid>
+        <Grid item container justifyContent="center" alignItems="center" xs={3}>
+          <div className={`${classes.skeletonTypo} ${classes.skeleton}`}> </div>
+        </Grid>
+        <Grid item container justifyContent="center" alignItems="center" xs={2}>
+          <div className={`${classes.skeletonTypo} ${classes.skeleton}`}> </div>
+        </Grid>
+      </Grid>
+    </ListItem>
+  );
+};
 
 const MatchListItem = ({ opposite, isMeWinner, createdAt }: MatchListItemProps) => {
   const { avatar, name } = opposite;

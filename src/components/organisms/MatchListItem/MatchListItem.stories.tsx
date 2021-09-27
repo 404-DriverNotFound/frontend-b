@@ -1,7 +1,7 @@
 import React from 'react';
 import { Meta } from '@storybook/react';
 import { BrowserRouter } from 'react-router-dom';
-import MatchListItem from './MatchListItem';
+import MatchListItem, { MatchListItemSkeleton } from './MatchListItem';
 import List from '../../atoms/List/List';
 import MainTemplate from '../../templates/MainTemplate/MainTemplate';
 import ContextProvider from '../../../utils/hooks/useContext';
@@ -56,6 +56,8 @@ const fakeList: MatchType[] = [
 export const Default = () => (
   <MatchListItem opposite={opposite} isMeWinner createdAt={new Date()} />
 );
+
+export const Skeleton = () => <MatchListItemSkeleton />;
 
 export const WithList = () => (
   <List scroll height="15em">
