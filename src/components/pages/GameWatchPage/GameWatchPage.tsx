@@ -77,7 +77,7 @@ const MatchList = ({ type }: ListProps) => {
           key={match.id}
           leftUser={match.user1}
           rightUser={match.user2}
-          mode={match.mode} // FIXME: 임시로 Classic으로 설정 API 수정 후 고치기
+          mode={match.mode}
           onClick={() => {}}
         />
       ))}
