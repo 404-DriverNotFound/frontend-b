@@ -33,21 +33,14 @@ const useStyles = makeStyles({
     height: '100px',
   },
   skeletonAvatar: {
-    width: '50px',
-    height: '50px',
-    borderRadius: '25px',
+    width: '40px',
+    height: '40px',
+    borderRadius: '20px',
   },
   skeletonTypo: {
     margin: '5px',
     width: '90%',
     height: '20px',
-  },
-  skeletonButton: {
-    margin: '0.25em',
-    padding: '5px 15px',
-    borderRadius: '4px',
-    width: '61px',
-    height: '26px',
   },
 });
 
@@ -60,13 +53,13 @@ export const AchieveListItemSkeleton = () => {
   return (
     <ListItem>
       <Grid className={classes.root} item container justifyContent="space-around" alignItems="center">
-        <Grid item container justifyContent="center" alignItems="center" xs={2}>
+        <Grid item container justifyContent="center" alignItems="center" xs={3}>
           <div className={`${classes.skeletonAvatar} ${classes.skeleton}`}>{}</div>
         </Grid>
-        <Grid item container justifyContent="center" alignItems="center" xs={4}>
+        <Grid item container justifyContent="center" alignItems="center" xs={6}>
           <div className={`${classes.skeletonTypo} ${classes.skeleton}`}> </div>
         </Grid>
-        <Grid item container justifyContent="center" alignItems="center" xs={2}>
+        <Grid item container justifyContent="center" alignItems="center" xs={3}>
           <div className={`${classes.skeletonTypo} ${classes.skeleton}`}> </div>
         </Grid>
       </Grid>
