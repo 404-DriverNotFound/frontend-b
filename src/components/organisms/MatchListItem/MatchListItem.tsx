@@ -6,6 +6,7 @@ import Typo from '../../atoms/Typo/Typo';
 import ListItem from '../../atoms/ListItem/ListItem';
 import Avatar from '../../atoms/Avatar/Avatar';
 import { UserInfoType } from '../../../types/User';
+import { makeDateString } from '../../../utils/utils';
 
 const useStyles = makeStyles({
   root: {
@@ -20,8 +21,6 @@ export type MatchListItemProps = {
   isMeWinner: boolean,
   createdAt: Date,
 }
-
-const makeDateString = (date: Date) => `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()} ${date.getHours()}:${date.getMinutes()}`;
 
 const MatchListItem = ({ opposite, isMeWinner, createdAt }: MatchListItemProps) => {
   const { avatar, name } = opposite;
