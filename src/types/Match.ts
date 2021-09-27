@@ -15,8 +15,8 @@ export type RawMatchType = {
   mode: GameModeType,
   user1: RawUserInfoType & { score: number },
   user2: RawUserInfoType & { score: number },
-  winner: (RawUserInfoType & { score: number }) | null,
-  loser: (RawUserInfoType & { score: number }) | null,
+  winner: RawUserInfoType | null,
+  loser: RawUserInfoType | null,
 };
 
 export type MatchType = {
