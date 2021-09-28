@@ -13,12 +13,11 @@ import Button from '../../atoms/Button/Button';
 import Dialog from '../../molecules/Dialog/Dialog';
 import { GameModeType } from '../../../types/Match';
 import Typo from '../../atoms/Typo/Typo';
+import GamePlayPage from '../GamePlayPage/GamePlayPage';
 
 const MAIN_GAME_PAGE = '/game';
-const CLASSIC_PLAY_PATH = '/game/playclassic';
-const SPEED_PLAY_PATH = '/game/playspeed';
-const REVERSE_PLAY_PATH = '/game/playreverse';
-const WATCH_PLAY_PATH = '/game/watch';
+const PLAY_PATH = '/game/play';
+const WATCH_PATH = '/game/watch';
 
 const useStyles = makeStyles({
   root: {
@@ -33,35 +32,46 @@ const useStyles = makeStyles({
   },
 });
 
-const GameMainPage = () => {
+type MainPageProps = {
+  mode: GameModeType | null,
+  // eslint-disable-next-line no-unused-vars
+  setMode: (mode: GameModeType | null) => void,
+  // eslint-disable-next-line no-unused-vars
+  setSetting: (setting: any) => void,
+  // eslint-disable-next-line no-unused-vars
+  setPosition: (position: 'LEFT' | 'RIGHT' | null) => void,
+};
+
+const GameMainPage = ({
+  mode, setMode, setSetting, setPosition,
+}: MainPageProps) => {
   const history = useHistory();
   const classes = useStyles();
   const { socket } = useAppState();
-  const [mode, setMode] = useState<GameModeType | null>(null);
   const {
     isOpen, setOpen, dialog, setDialog,
-  } = useDialog();
+  } = useDialog(); // TODO: 이 모든 것들 GameContext로 따로 빼기
 
   const handleReady = (position: 'LEFT' | 'RIGHT', setting: any) => {
-    setTimeout(() => {
-      // eslint-disable-next-line no-console
-      console.log(position, setting);
-      socket?.off('ready');
-      setOpen(false);
-    }, 3000);
+    // eslint-disable-next-line no-console
+    console.log(position, setting);
+    setPosition(position);
+    setSetting(setting);
+    socket?.off('ready');
+    setOpen(false);
+    history.push(PLAY_PATH);
   };
 
   useEffect(() => {
     if (!mode) {
       socket?.off('ready');
       setOpen(false);
-    } else if (mode === 'CLASSIC') {
-      setDialog({ ...dialog, title: 'Classic Game Matching...' });
-      socket?.on('ready', handleReady);
-      setOpen(true);
-      socket?.emit('waiting');
-    } // FIXME: 다른 모드도 추가하고 공통부분 밖으로 빼기
-    // TODO emit할 때 roomId 같이 보내달라고 요청하기
+      return;
+    }
+    setDialog({ ...dialog, title: `${mode} MODE matching...` });
+    socket?.on('ready', handleReady);
+    setOpen(true);
+    socket?.emit('waiting');
   }, [mode]);
 
   useEffect(() => {
@@ -97,7 +107,7 @@ const GameMainPage = () => {
         <GameOptionCard option="REVERSE" onClick={() => setMode('REVERSE')} />
       </Grid>
       <Grid item xs={6}>
-        <GameOptionCard option="WATCH" onClick={() => { history.push(WATCH_PLAY_PATH); }} />
+        <GameOptionCard option="WATCH" onClick={() => { history.push(WATCH_PATH); }} />
       </Grid>
     </Grid>
   );
@@ -105,16 +115,12 @@ const GameMainPage = () => {
 
 const GamePage = () => {
   const { socket } = useAppState();
+  const [mode, setMode] = useState<GameModeType | null>(null);
+  const [setting, setSetting] = useState(null);
+  const [position, setPosition] = useState<'LEFT' | 'RIGHT' | null>(null);
   return (
     <>
       {/* FIXME: button들 삭제해야 함 */}
-      <Button onClick={() => {
-        // eslint-disable-next-line no-console
-        if (socket?.emit('waiting')) console.log('emit waiting');
-      }}
-      >
-        waiting
-      </Button>
       <Button onClick={() => {
         // eslint-disable-next-line no-console
         if (socket?.emit('ready')) console.log('emit ready');
@@ -130,11 +136,24 @@ const GamePage = () => {
         leaveGame
       </Button>
       <Switch>
-        <Route exact path={MAIN_GAME_PAGE} component={GameMainPage} />
-        <Route exact path={CLASSIC_PLAY_PATH} render={() => <h1>Classic play</h1>} />
-        <Route exact path={SPEED_PLAY_PATH} render={() => <h1>Speedy play</h1>} />
-        <Route exact path={REVERSE_PLAY_PATH} render={() => <h1>Reverse play</h1>} />
-        <Route path={WATCH_PLAY_PATH} component={GameWatchPage} />
+        <Route
+          exact
+          path={MAIN_GAME_PAGE}
+          render={() => (
+            <GameMainPage
+              mode={mode}
+              setMode={setMode}
+              setSetting={setSetting}
+              setPosition={setPosition}
+            />
+          )}
+        />
+        <Route
+          exact
+          path={PLAY_PATH}
+          render={() => <GamePlayPage setting={setting} mode={mode} position={position} />}
+        />
+        <Route path={WATCH_PATH} component={GameWatchPage} />
         <Route exact path="/">
           <Redirect to={MAIN_GAME_PAGE} />
         </Route>
