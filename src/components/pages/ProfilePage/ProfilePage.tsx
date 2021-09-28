@@ -1,18 +1,26 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { RouteComponentProps, useHistory } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import Grid from '@material-ui/core/Grid';
-import { RelatedInfoType } from '../../../types/User';
-import { useUserState } from '../../../utils/hooks/useUserContext';
-import { useAppDispatch } from '../../../utils/hooks/useAppContext';
-import { asyncGetRequest, makeAPIPath } from '../../../utils/utils';
 import List from '../../atoms/List/List';
 import Typo from '../../atoms/Typo/Typo';
 import ProfileCard from '../../organisms/ProfileCard/ProfileCard';
 import Dialog from '../../molecules/Dialog/Dialog';
 import useDialog from '../../../utils/hooks/useDialog';
+import MatchListItem, { MatchListItemSkeleton } from '../../organisms/MatchListItem/MatchListItem';
+import AchieveListItem, { AchieveListItemSkeleton } from '../../organisms/AchieveListItem/AchieveListItem';
+import { RelatedInfoType } from '../../../types/User';
+import { useUserState } from '../../../utils/hooks/useUserContext';
+import { useAppDispatch } from '../../../utils/hooks/useAppContext';
+import { asyncGetRequest, errorMessageHandler, makeAPIPath } from '../../../utils/utils';
 import { makeRelatedInfo } from '../../../utils/friendships';
 import { initialRawFriendInfo, initialRawUserInfo, RawRelatedInfoType } from '../../../types/Response';
+import { RawAchievementType, AchievementType } from '../../../types/Game';
+import { RawMatchType, MatchType } from '../../../types/Match';
+import useIntersect from '../../../utils/hooks/useIntersect';
+
+const COUNTS_PER_PAGE = 10;
 
 type MatchParams = {
   username: string,
@@ -24,6 +32,132 @@ const initialUserInfo: RelatedInfoType = {
   avatar: '',
   status: 'OFFLINE',
   relationship: 'NONE',
+};
+
+const MatchHistory = () => {
+  const { CancelToken } = axios;
+  const source = CancelToken.source();
+  const path = makeAPIPath('/matches/me');
+  const me = useUserState();
+  const [matchHistories, setMatchHistories] = useState<MatchType[]>([]);
+  const [isListEnd, setListEnd] = useState(true);
+  const [page, setPage] = useState<number>(0);
+
+  const fetchItems = () => {
+    if (isListEnd) return;
+
+    asyncGetRequest(`${path}?status=DONE&perPage=${COUNTS_PER_PAGE}&page=${page}`, source)
+      .then(({ data }: { data: RawMatchType[] }) => {
+        const match: MatchType[] = data.map((info) => ({
+          ...info,
+          createdAt: new Date(info.createdAt),
+          user1: { ...info.user1, avatar: makeAPIPath(`/${info.user1.avatar}`) },
+          user2: { ...info.user2, avatar: makeAPIPath(`/${info.user2.avatar}`) },
+        }));
+        setMatchHistories((prev) => prev.concat(match));
+        if (data.length === 0 || data.length < COUNTS_PER_PAGE) setListEnd(true);
+      })
+      .catch((error) => {
+        source.cancel();
+        errorMessageHandler(error);
+        setListEnd(true);
+      });
+  };
+
+  useEffect(() => {
+    fetchItems();
+  }, [page]);
+
+  // eslint-disable-next-line no-unused-vars
+  const [_, setRef] = useIntersect(async (entry: any, observer: any) => {
+    observer.unobserve(entry.target);
+    await new Promise((resolve) => setTimeout(resolve, 250));
+    setPage((prev) => prev + 1);
+    observer.observe(entry.target);
+  });
+
+  useEffect(() => {
+    setListEnd(false);
+
+    return () => {
+      source.cancel();
+      setMatchHistories([]);
+      setListEnd(true);
+    };
+  }, []);
+
+  return (
+    <>
+      {matchHistories.map((matchHistory) => (
+        <MatchListItem
+          opposite={matchHistory.user1.id === me.id ? matchHistory.user2 : matchHistory.user1}
+          mode={matchHistory.mode}
+          isMeWinner={matchHistory.winner?.id === me.id}
+          createdAt={matchHistory.createdAt}
+          key={matchHistory.id}
+        />
+      ))}
+      {!isListEnd && (
+        <div
+          style={{ display: 'flex', justifyContent: 'center', marginTop: '4px' }}
+          ref={isListEnd ? null : setRef as React.LegacyRef<HTMLDivElement>}
+        >
+          <Grid
+            item
+            container
+            direction="column"
+            justifyContent="flex-start"
+            alignItems="stretch"
+            wrap="nowrap"
+            spacing={1}
+            xs={12}
+          >
+            <MatchListItemSkeleton />
+            <MatchListItemSkeleton />
+            <MatchListItemSkeleton />
+          </Grid>
+        </div>
+      )}
+    </>
+  );
+};
+
+const AchievementList = () => {
+  const [Achieves, setAchieves] = useState<AchievementType[]>([]);
+  const [isLoaded, setLoaded] = useState<boolean>(false);
+  const path = makeAPIPath('/achievements');
+
+  useEffect(() => {
+    axios.get(path)
+      .then((responses) => {
+        const { data }: { data: RawAchievementType[] } = responses;
+        const Achievements: AchievementType[] = data.map((achieve) => ({
+          ...achieve,
+          createdAt: new Date(achieve.createdAt),
+        }));
+        setLoaded(true);
+        setAchieves(Achievements);
+      })
+      .catch((error) => { errorMessageHandler(error); });
+  }, []);
+
+  return (
+    <>
+      {Achieves.map((achievement) => (
+        <AchieveListItem
+          info={achievement}
+          key={achievement.name}
+        />
+      ))}
+      {!isLoaded && (
+        <>
+          <AchieveListItemSkeleton />
+          <AchieveListItemSkeleton />
+          <AchieveListItemSkeleton />
+        </>
+      )}
+    </>
+  );
 };
 
 const ProfilePage = ({ match }: RouteComponentProps<MatchParams>) => {
@@ -56,8 +190,7 @@ const ProfilePage = ({ match }: RouteComponentProps<MatchParams>) => {
                 userInfo.friendship = null;
                 setUser(makeRelatedInfo(me, userInfo));
               } else toast.error(error.message);
-            })
-        );
+            }));
       })
       .catch((error) => {
         if (error.response && error.response.status >= 400 && error.response.status < 500) {
@@ -92,11 +225,15 @@ const ProfilePage = ({ match }: RouteComponentProps<MatchParams>) => {
         </Grid>
         <Grid item>
           <Typo variant="h5">Match History</Typo>
-          <List height="15em" />
+          <List height="15em" scroll>
+            <MatchHistory />
+          </List>
         </Grid>
         <Grid item>
           <Typo variant="h5">Achievements</Typo>
-          <List height="15em" />
+          <List height="15em" scroll>
+            <AchievementList />
+          </List>
         </Grid>
       </Grid>
     </>
