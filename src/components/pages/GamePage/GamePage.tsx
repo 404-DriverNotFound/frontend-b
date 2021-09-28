@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import {
   Route, Switch, useHistory, Redirect,
 } from 'react-router-dom';
@@ -11,9 +11,9 @@ import { useAppState } from '../../../utils/hooks/useAppContext';
 import useDialog from '../../../utils/hooks/useDialog';
 import Button from '../../atoms/Button/Button';
 import Dialog from '../../molecules/Dialog/Dialog';
-import { GameModeType } from '../../../types/Match';
 import Typo from '../../atoms/Typo/Typo';
 import GamePlayPage from '../GamePlayPage/GamePlayPage';
+import { GameContextProvider, useGameDispatch, useGameState } from '../../../utils/hooks/useGameContext';
 
 const MAIN_GAME_PAGE = '/game';
 const PLAY_PATH = '/game/play';
@@ -32,31 +32,18 @@ const useStyles = makeStyles({
   },
 });
 
-type MainPageProps = {
-  mode: GameModeType | null,
-  // eslint-disable-next-line no-unused-vars
-  setMode: (mode: GameModeType | null) => void,
-  // eslint-disable-next-line no-unused-vars
-  setSetting: (setting: any) => void,
-  // eslint-disable-next-line no-unused-vars
-  setPosition: (position: 'LEFT' | 'RIGHT' | null) => void,
-};
-
-const GameMainPage = ({
-  mode, setMode, setSetting, setPosition,
-}: MainPageProps) => {
+const GameMainPage = () => {
   const history = useHistory();
   const classes = useStyles();
+  const { mode } = useGameState();
+  const gameDispatch = useGameDispatch();
   const { socket } = useAppState();
   const {
     isOpen, setOpen, dialog, setDialog,
-  } = useDialog(); // TODO: 이 모든 것들 GameContext로 따로 빼기
+  } = useDialog();
 
   const handleReady = (position: 'LEFT' | 'RIGHT', setting: any) => {
-    // eslint-disable-next-line no-console
-    console.log(position, setting);
-    setPosition(position);
-    setSetting(setting);
+    gameDispatch({ type: 'ready', setting, position });
     socket?.off('ready');
     setOpen(false);
     history.push(PLAY_PATH);
@@ -66,12 +53,12 @@ const GameMainPage = ({
     if (!mode) {
       socket?.off('ready');
       setOpen(false);
-      return;
+    } else {
+      setDialog({ ...dialog, title: `${mode} MODE matching...` });
+      socket?.on('ready', handleReady);
+      setOpen(true);
+      socket?.emit('waiting');
     }
-    setDialog({ ...dialog, title: `${mode} MODE matching...` });
-    socket?.on('ready', handleReady);
-    setOpen(true);
-    socket?.emit('waiting');
   }, [mode]);
 
   useEffect(() => {
@@ -83,8 +70,8 @@ const GameMainPage = ({
           <Typo variant="subtitle1" align="center">매칭 가능한 유저를 찾는 중입니다</Typo>
         </Grid>
       ),
-      buttons: <Button onClick={() => setMode(null)}>매칭 취소</Button>,
-      onClose: () => setMode(null),
+      buttons: <Button onClick={() => gameDispatch({ type: 'setMode', mode: null })}>매칭 취소</Button>,
+      onClose: () => gameDispatch({ type: 'setMode', mode: null }),
     });
   }, []);
 
@@ -98,13 +85,13 @@ const GameMainPage = ({
         onClose={dialog.onClose}
       />
       <Grid item xs={6}>
-        <GameOptionCard option="CLASSIC" onClick={() => setMode('CLASSIC')} />
+        <GameOptionCard option="CLASSIC" onClick={() => gameDispatch({ type: 'setMode', mode: 'CLASSIC' })} />
       </Grid>
       <Grid item xs={6}>
-        <GameOptionCard option="SPEED" onClick={() => setMode('SPEED')} />
+        <GameOptionCard option="SPEED" onClick={() => gameDispatch({ type: 'setMode', mode: 'SPEED' })} />
       </Grid>
       <Grid item xs={6}>
-        <GameOptionCard option="REVERSE" onClick={() => setMode('REVERSE')} />
+        <GameOptionCard option="REVERSE" onClick={() => gameDispatch({ type: 'setMode', mode: 'REVERSE' })} />
       </Grid>
       <Grid item xs={6}>
         <GameOptionCard option="WATCH" onClick={() => { history.push(WATCH_PATH); }} />
@@ -113,53 +100,17 @@ const GameMainPage = ({
   );
 };
 
-const GamePage = () => {
-  const { socket } = useAppState();
-  const [mode, setMode] = useState<GameModeType | null>(null);
-  const [setting, setSetting] = useState(null);
-  const [position, setPosition] = useState<'LEFT' | 'RIGHT' | null>(null);
-  return (
-    <>
-      {/* FIXME: button들 삭제해야 함 */}
-      <Button onClick={() => {
-        // eslint-disable-next-line no-console
-        if (socket?.emit('ready')) console.log('emit ready');
-      }}
-      >
-        ready
-      </Button>
-      <Button onClick={() => {
-        // eslint-disable-next-line no-console
-        if (socket?.emit('leaveGame')) console.log('emit leave game');
-      }}
-      >
-        leaveGame
-      </Button>
-      <Switch>
-        <Route
-          exact
-          path={MAIN_GAME_PAGE}
-          render={() => (
-            <GameMainPage
-              mode={mode}
-              setMode={setMode}
-              setSetting={setSetting}
-              setPosition={setPosition}
-            />
-          )}
-        />
-        <Route
-          exact
-          path={PLAY_PATH}
-          render={() => <GamePlayPage setting={setting} mode={mode} position={position} />}
-        />
-        <Route path={WATCH_PATH} component={GameWatchPage} />
-        <Route exact path="/">
-          <Redirect to={MAIN_GAME_PAGE} />
-        </Route>
-      </Switch>
-    </>
-  );
-};
+const GamePage = () => (
+  <GameContextProvider>
+    <Switch>
+      <Route exact path={MAIN_GAME_PAGE} component={GameMainPage} />
+      <Route exact path={PLAY_PATH} component={GamePlayPage} />
+      <Route path={WATCH_PATH} component={GameWatchPage} />
+      <Route exact path="/">
+        <Redirect to={MAIN_GAME_PAGE} />
+      </Route>
+    </Switch>
+  </GameContextProvider>
+);
 
 export default GamePage;

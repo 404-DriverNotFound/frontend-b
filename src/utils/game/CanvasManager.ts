@@ -1,5 +1,3 @@
-export type GameStatusType = 'none' | 'ready' | 'countdown' | 'playing' | 'gameOver';
-
 export type RectangleType = {
   x: number,
   y: number,
@@ -13,7 +11,7 @@ export default class CanvasManager {
 
   settings;
 
-  constructor(ctx: CanvasRenderingContext2D, settings: any) { // FIXME: setting type
+  constructor(ctx: CanvasRenderingContext2D, settings: any) {
     this.ctx = ctx;
     this.settings = settings;
   }
