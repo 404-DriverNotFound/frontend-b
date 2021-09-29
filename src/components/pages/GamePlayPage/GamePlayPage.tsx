@@ -10,6 +10,7 @@ import { useGameDispatch, useGameState } from '../../../utils/hooks/useGameConte
 import Button from '../../atoms/Button/Button';
 import Typo from '../../atoms/Typo/Typo';
 import Dialog from '../../molecules/Dialog/Dialog';
+import PlayerProfile from '../../organisms/PlayerProfile/PlayerProfile';
 
 type StyleProps = { width: number };
 
@@ -40,7 +41,6 @@ const makeCountString = (count: number, state: PlayStateType): string => {
       return 'GAME START!';
     case 'end':
     default:
-      if (count > 0) return `게임 종료까지 ${count}초`;
       return 'GAME END';
   }
 };
@@ -48,7 +48,9 @@ const makeCountString = (count: number, state: PlayStateType): string => {
 const GamePlayPage = () => {
   const { socket } = useAppState();
   const history = useHistory();
-  const { mode, setting, position } = useGameState();
+  const {
+    mode, setting, player0, player1, position,
+  } = useGameState();
   const gameDispatch = useGameDispatch();
   const [state, setState] = useState<PlayStateType>('init');
   const [countdown, setCountDown] = useState<number | null>(null);
@@ -103,7 +105,6 @@ const GamePlayPage = () => {
     socket?.on('destroy', (message) => {
       const handleClose = () => {
         gameDispatch({ type: 'reset' });
-        socket?.emit('leaveGame');
         history.goBack();
       };
       document.removeEventListener('keydown', handleKeyDown);
@@ -138,20 +139,28 @@ const GamePlayPage = () => {
         onClose={dialog.onClose}
       />
       <Grid container className={classes.root} direction="column" justifyContent="center" alignItems="center">
+        <Typo variant="h6">{makeCountString(countdown || 0, [playerState[0].score, playerState[1].score].includes(5) ? 'end' : state)}</Typo>
         <Grid item container justifyContent="center" alignItems="center">
-          <Button onClick={() => { if (socket?.emit('ready')) setState('ready'); }} disabled={state !== 'init'}>ready</Button>
-          <Button onClick={() => { if (socket?.emit('leaveGame')) setState('end'); }}>exit</Button>
-        </Grid>
-        <Typo variant="h6">{mode}</Typo>
-        <Typo variant="h5">{makeCountString(countdown || 0, [playerState[0].score, playerState[1].score].includes(5) ? 'end' : state)}</Typo>
-        <Grid item container justifyContent="space-evenly" alignItems="center">
-          <Typo variant="h6">{playerState[0].score}</Typo>
-          <Typo variant="body1">SCORE</Typo>
-          <Typo variant="h6">{playerState[1].score}</Typo>
+          <Grid item xs={5}><Typo variant="h5" align="center">{playerState[0].score}</Typo></Grid>
+          <Grid item xs={2}><Typo variant="h6" align="center">SCORE</Typo></Grid>
+          <Grid item xs={5}><Typo variant="h5" align="center">{playerState[1].score}</Typo></Grid>
         </Grid>
         <canvas width={setting.WIDTH} height={setting.HEIGHT} ref={canvas} />
-        <Grid item container className={classes.root} justifyContent={position === 'LEFT' ? 'flex-start' : 'flex-end'} alignItems="center">
-          <Typo variant="h6">YOU</Typo>
+        <Grid item container direction="row" className={classes.root} justifyContent="space-around" alignItems="center">
+          <Grid item xs={4} container justifyContent="flex-end">
+            <PlayerProfile userGameInfo={{ ...player0!, win: 0, lose: 0 }} />
+          </Grid>
+          <Grid item container xs={4} direction="column" justifyContent="center" alignItems="center">
+            <Typo variant="h6">{mode}</Typo>
+            <Grid item container justifyContent="center" alignItems="center">
+              <Button onClick={() => { if (socket?.emit('ready')) setState('ready'); }} disabled={state !== 'init'}>ready</Button>
+              <Button onClick={() => { if (socket?.emit('leaveGame')) setState('end'); }}>exit</Button>
+            </Grid>
+          </Grid>
+          <Grid item xs={4} container justifyContent="flex-start">
+            <PlayerProfile userGameInfo={{ ...player1!, win: 0, lose: 0 }} />
+          </Grid>
+          {/* FIXME: win, lose 정보 수정 */}
         </Grid>
       </Grid>
     </>

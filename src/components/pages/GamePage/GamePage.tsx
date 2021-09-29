@@ -15,6 +15,8 @@ import Typo from '../../atoms/Typo/Typo';
 import GamePlayPage from '../GamePlayPage/GamePlayPage';
 import { GameContextProvider, useGameDispatch, useGameState } from '../../../utils/hooks/useGameContext';
 import { RawUserInfoType } from '../../../types/Response';
+import { MatchPositionType } from '../../../types/Match';
+import { makeAPIPath } from '../../../utils/utils';
 
 const MAIN_GAME_PAGE = '/game';
 const PLAY_PATH = '/game/play';
@@ -43,10 +45,16 @@ const GameMainPage = () => {
     isOpen, setOpen, dialog, setDialog,
   } = useDialog();
 
-  const handleReady = (position: 'LEFT' | 'RIGHT', player0: RawUserInfoType, player1: RawUserInfoType, setting: any) => {
-    // eslint-disable-next-line no-console
-    console.log(player0, player1);
-    gameDispatch({ type: 'ready', setting, position });
+  const handleReady = (
+    position: MatchPositionType, player0: RawUserInfoType, player1: RawUserInfoType, setting: any,
+  ) => {
+    gameDispatch({
+      type: 'ready',
+      position,
+      player0: { ...player0, avatar: makeAPIPath(`/${player0.avatar}`) },
+      player1: { ...player1, avatar: makeAPIPath(`/${player1.avatar}`) },
+      setting,
+    });
     socket?.off('ready');
     setOpen(false);
     history.push(PLAY_PATH);

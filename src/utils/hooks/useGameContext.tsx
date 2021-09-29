@@ -1,23 +1,29 @@
 import React, {
   createContext, Dispatch, useContext, useReducer,
 } from 'react';
-import { GameModeType } from '../../types/Match';
+import { GameModeType, MatchPositionType } from '../../types/Match';
+import { RawUserInfoType } from '../../types/Response';
+import { UserInfoType } from '../../types/User';
 
 type GameStateType = {
   mode: GameModeType | null,
   setting: any | null,
-  position: 'LEFT' | 'RIGHT' | null,
+  player0: UserInfoType | null,
+  player1: UserInfoType | null,
+  position: MatchPositionType | null,
 };
 
 const initialGameState: GameStateType = {
   mode: null,
   setting: null,
+  player0: null,
+  player1: null,
   position: null,
 };
 
 type GameActionType =
   { type: 'setMode', mode: GameModeType | null } |
-  { type: 'ready', setting: any, position: 'LEFT' | 'RIGHT' } |
+  { type: 'ready', position: MatchPositionType, player0: RawUserInfoType, player1: RawUserInfoType, setting: any } |
   { type: 'reset' };
 
 const GameStateContext = createContext<GameStateType | undefined>(undefined);
@@ -28,7 +34,13 @@ function GameReducer(state: GameStateType, action: GameActionType): GameStateTyp
     case 'setMode':
       return { ...state, mode: action.mode };
     case 'ready':
-      return { ...state, setting: action.setting, position: action.position };
+      // eslint-disable-next-line no-case-declarations
+      const {
+        position, player0, player1, setting,
+      } = action;
+      return {
+        ...state, position, player0, player1, setting,
+      };
     case 'reset':
       return { ...initialGameState };
     default:
