@@ -49,6 +49,11 @@ const GameMainPage = () => {
     history.push(PLAY_PATH);
   };
 
+  const handleExit = () => {
+    socket?.emit('leaveGame');
+    gameDispatch({ type: 'setMode', mode: null });
+  };
+
   useEffect(() => {
     if (!mode) {
       socket?.off('ready');
@@ -70,8 +75,8 @@ const GameMainPage = () => {
           <Typo variant="subtitle1" align="center">매칭 가능한 유저를 찾는 중입니다</Typo>
         </Grid>
       ),
-      buttons: <Button onClick={() => gameDispatch({ type: 'setMode', mode: null })}>매칭 취소</Button>,
-      onClose: () => gameDispatch({ type: 'setMode', mode: null }),
+      buttons: <Button onClick={handleExit}>매칭 취소</Button>,
+      onClose: handleExit,
     });
   }, []);
 

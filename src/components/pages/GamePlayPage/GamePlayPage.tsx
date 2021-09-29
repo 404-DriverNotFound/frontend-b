@@ -31,7 +31,7 @@ const initialPlayerState = { score: 0, ready: false };
 const makeCountString = (count: number, state: PlayStateType): string => {
   switch (state) {
     case 'init':
-      if (count) return `${count}초 안에 ready 버튼을 누르세요.`;
+      if (count > 0) return `${count}초 안에 ready 버튼을 누르세요.`;
       return '준비 가능 시간을 초과하였습니다.';
     case 'ready':
       return '상대 플레이어가 준비되기를 기다리고 있습니다.';
@@ -102,8 +102,12 @@ const GamePlayPage = () => {
 
     socket?.on('destroy', (message) => {
       const handleClose = () => {
+        gameDispatch({ type: 'reset' });
+        socket?.emit('leaveGame');
         history.goBack();
       };
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keyup', handleKeyUp);
       setState('end');
       setDialog({
         content: message || '게임이 종료되었습니다.',
@@ -114,7 +118,7 @@ const GamePlayPage = () => {
     });
 
     return () => {
-      if (![playerState[0].score, playerState[1].score].includes(5)) socket?.emit('leaveGame');
+      socket?.emit('leaveGame');
       setOpen(false);
       gameDispatch({ type: 'reset' });
       socket?.off('update');
