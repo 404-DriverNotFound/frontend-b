@@ -14,6 +14,7 @@ import Dialog from '../../molecules/Dialog/Dialog';
 import Typo from '../../atoms/Typo/Typo';
 import GamePlayPage from '../GamePlayPage/GamePlayPage';
 import { GameContextProvider, useGameDispatch, useGameState } from '../../../utils/hooks/useGameContext';
+import { RawUserInfoType } from '../../../types/Response';
 
 const MAIN_GAME_PAGE = '/game';
 const PLAY_PATH = '/game/play';
@@ -42,7 +43,9 @@ const GameMainPage = () => {
     isOpen, setOpen, dialog, setDialog,
   } = useDialog();
 
-  const handleReady = (position: 'LEFT' | 'RIGHT', setting: any) => {
+  const handleReady = (position: 'LEFT' | 'RIGHT', player0: RawUserInfoType, player1: RawUserInfoType, setting: any) => {
+    // eslint-disable-next-line no-console
+    console.log(player0, player1);
     gameDispatch({ type: 'ready', setting, position });
     socket?.off('ready');
     setOpen(false);
