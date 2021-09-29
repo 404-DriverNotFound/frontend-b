@@ -34,15 +34,7 @@ type MatchParams = {
   username: string,
 };
 
-type MatchHistoryProps = {
-  username: string
-};
-
-type AchievementProps = {
-  username: string
-};
-
-const MatchHistory = ({ username }: MatchHistoryProps) => {
+const MatchHistory = ({ username }: MatchParams) => {
   const { CancelToken } = axios;
   const source = CancelToken.source();
   const path = makeAPIPath(`/matches/${username}`);
@@ -129,7 +121,7 @@ const MatchHistory = ({ username }: MatchHistoryProps) => {
   );
 };
 
-const AchievementList = ({ username }: AchievementProps) => {
+const AchievementList = ({ username }: MatchParams) => {
   const [Achieves, setAchieves] = useState<AchievementType[]>([]);
   const [isLoaded, setLoaded] = useState<boolean>(false);
   const path = makeAPIPath(`/achievements/${username}`);
