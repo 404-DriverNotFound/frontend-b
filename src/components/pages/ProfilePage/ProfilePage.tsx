@@ -22,10 +22,6 @@ import useIntersect from '../../../utils/hooks/useIntersect';
 
 const COUNTS_PER_PAGE = 10;
 
-type MatchParams = {
-  username: string,
-};
-
 const initialUserInfo: RelatedInfoType = {
   id: '',
   name: '',
@@ -34,11 +30,22 @@ const initialUserInfo: RelatedInfoType = {
   relationship: 'NONE',
 };
 
-const MatchHistory = () => {
+type MatchParams = {
+  username: string,
+};
+
+type MatchHistoryProps = {
+  username: string
+};
+
+type AchievementProps = {
+  username: string
+};
+
+const MatchHistory = ({ username }: MatchHistoryProps) => {
   const { CancelToken } = axios;
   const source = CancelToken.source();
-  const path = makeAPIPath('/matches/me');
-  const me = useUserState();
+  const path = makeAPIPath(`/matches/${username}`);
   const [matchHistories, setMatchHistories] = useState<MatchType[]>([]);
   const [isListEnd, setListEnd] = useState(true);
   const [page, setPage] = useState<number>(0);
@@ -46,7 +53,7 @@ const MatchHistory = () => {
   const fetchItems = () => {
     if (isListEnd) return;
 
-    asyncGetRequest(`${path}?status=DONE&perPage=${COUNTS_PER_PAGE}&page=${page}`, source)
+    asyncGetRequest(`${path}?perPage=${COUNTS_PER_PAGE}&page=${page}&status=DONE`, source)
       .then(({ data }: { data: RawMatchType[] }) => {
         const match: MatchType[] = data.map((info) => ({
           ...info,
@@ -90,9 +97,9 @@ const MatchHistory = () => {
     <>
       {matchHistories.map((matchHistory) => (
         <MatchListItem
-          opposite={matchHistory.user1.id === me.id ? matchHistory.user2 : matchHistory.user1}
+          opposite={matchHistory.user1.name === username ? matchHistory.user2 : matchHistory.user1}
           mode={matchHistory.mode}
-          isMeWinner={matchHistory.winner?.id === me.id}
+          isMeWinner={matchHistory.winner?.name === username}
           createdAt={matchHistory.createdAt}
           key={matchHistory.id}
         />
@@ -122,10 +129,10 @@ const MatchHistory = () => {
   );
 };
 
-const AchievementList = () => {
+const AchievementList = ({ username }: AchievementProps) => {
   const [Achieves, setAchieves] = useState<AchievementType[]>([]);
   const [isLoaded, setLoaded] = useState<boolean>(false);
-  const path = makeAPIPath('/achievements');
+  const path = makeAPIPath(`/achievements/${username}`);
 
   useEffect(() => {
     axios.get(path)
@@ -226,13 +233,13 @@ const ProfilePage = ({ match }: RouteComponentProps<MatchParams>) => {
         <Grid item>
           <Typo variant="h5">Match History</Typo>
           <List height="15em" scroll>
-            <MatchHistory />
+            <MatchHistory username={username} />
           </List>
         </Grid>
         <Grid item>
           <Typo variant="h5">Achievements</Typo>
           <List height="15em" scroll>
-            <AchievementList />
+            <AchievementList username={username} />
           </List>
         </Grid>
       </Grid>
