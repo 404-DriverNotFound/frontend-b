@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Grid from '@material-ui/core/Grid';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import { useAppDispatch, useAppState } from '../../../utils/hooks/useAppContext';
@@ -34,6 +34,7 @@ const ChatPage = () => {
   const { CancelToken } = axios;
   const source = CancelToken.source();
   const userState = useUserState();
+  const container = useRef<HTMLDivElement>(null);
   const [chats, setChats] = useState<MessageType[]>([]);
   const [chat, setChat] = useState<string>('');
   const [isChatEnd, setChatEnd] = useState(false);
@@ -137,6 +138,7 @@ const ChatPage = () => {
         content={dialog.content}
         buttons={dialog.buttons}
         onClose={dialog.onClose}
+        container={() => container.current}
       />
       <Grid container justifyContent="space-between" alignItems="center">
         <Typo variant="h6">{chatting?.name || '참여중인 채팅이 없습니다'}</Typo>
@@ -144,7 +146,7 @@ const ChatPage = () => {
       </Grid>
       {chatting ? (
         <>
-          <List height="70vh" reverse scroll>
+          <List height="70vh" ref={container} reverse scroll>
             {chats.map((one) => (chatting.type === 'channel' && blockList.includes(one.user.name) ? <></>
               : (
                 <ChatMessage
