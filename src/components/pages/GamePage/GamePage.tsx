@@ -73,7 +73,7 @@ const GameMainPage = () => {
       setDialog({ ...dialog, title: `${mode} MODE matching...` });
       socket?.on('ready', handleReady);
       setOpen(true);
-      socket?.emit('waiting', 'LADDER', mode);
+      socket?.emit('waiting', { type: 'LADDER', mode });
     }
   }, [mode]);
 
