@@ -126,12 +126,14 @@ const MatchHistory = ({ username }: UserNameType) => {
 };
 
 const AchievementList = ({ username }: UserNameType) => {
+  const { CancelToken } = axios;
+  const source = CancelToken.source();
   const [achieves, setAchieves] = useState<AchievementType[]>([]);
   const [isLoaded, setLoaded] = useState<boolean>(false);
   const path = makeAPIPath(`/users/${username}/achievements`);
 
   useEffect(() => {
-    axios.get(path)
+    axios.get(path, { cancelToken: source.token })
       .then((responses) => {
         const { data }: { data: RawAchievementType[] } = responses;
         const Achievements: AchievementType[] = data.map((achieve) => ({
