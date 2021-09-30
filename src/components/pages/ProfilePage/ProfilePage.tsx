@@ -126,7 +126,7 @@ const MatchHistory = ({ username }: UserNameType) => {
 };
 
 const AchievementList = ({ username }: UserNameType) => {
-  const [Achieves, setAchieves] = useState<AchievementType[]>([]);
+  const [achieves, setAchieves] = useState<AchievementType[]>([]);
   const [isLoaded, setLoaded] = useState<boolean>(false);
   const path = makeAPIPath(`/users/${username}/achievements`);
 
@@ -146,7 +146,7 @@ const AchievementList = ({ username }: UserNameType) => {
 
   return (
     <>
-      {Achieves.map((achievement) => (
+      {achieves.map((achievement) => (
         <AchieveListItem
           info={achievement}
           key={achievement.name}
