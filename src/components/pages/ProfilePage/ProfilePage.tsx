@@ -30,11 +30,15 @@ const initialUserInfo: RelatedInfoType = {
   relationship: 'NONE',
 };
 
+type UserNameType = {
+  username: string,
+};
+
 type MatchParams = {
   username: string,
 };
 
-const MatchHistory = ({ username }: MatchParams) => {
+const MatchHistory = ({ username }: UserNameType) => {
   const { CancelToken } = axios;
   const source = CancelToken.source();
   const path = makeAPIPath(`/matches/${username}`);
@@ -121,7 +125,7 @@ const MatchHistory = ({ username }: MatchParams) => {
   );
 };
 
-const AchievementList = ({ username }: MatchParams) => {
+const AchievementList = ({ username }: UserNameType) => {
   const [Achieves, setAchieves] = useState<AchievementType[]>([]);
   const [isLoaded, setLoaded] = useState<boolean>(false);
   const path = makeAPIPath(`/users/${username}/achievements`);
@@ -212,7 +216,7 @@ const ProfilePage = ({ match }: RouteComponentProps<MatchParams>) => {
         buttons={dialog.buttons}
         onClose={dialog.onClose}
       />
-      <Grid container direction="column" spacing={6} justifyContent="space-evenly" alignItems="stretch">
+      <Grid container direction="column" spacing={4} justifyContent="space-evenly" alignItems="stretch">
         <Grid item>
           <ProfileCard
             userInfo={user}
@@ -224,13 +228,13 @@ const ProfilePage = ({ match }: RouteComponentProps<MatchParams>) => {
         </Grid>
         <Grid item>
           <Typo variant="h5">Match History</Typo>
-          <List height="15em" scroll>
+          <List height="23vh" scroll>
             <MatchHistory username={username} />
           </List>
         </Grid>
         <Grid item>
           <Typo variant="h5">Achievements</Typo>
-          <List height="15em" scroll>
+          <List height="23vh" scroll>
             <AchievementList username={username} />
           </List>
         </Grid>
