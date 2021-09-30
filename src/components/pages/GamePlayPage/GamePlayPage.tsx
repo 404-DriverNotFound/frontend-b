@@ -119,7 +119,7 @@ const GamePlayPage = () => {
     });
 
     return () => {
-      socket?.emit('leaveGame', { type: 'LADDER', mode }); // FIXME LADDER가 아닌 경우
+      if (mode) socket?.emit('leaveGame', { type: 'LADDER', mode }); // FIXME LADDER가 아닌 경우
       setOpen(false);
       gameDispatch({ type: 'reset' });
       socket?.off('update');
