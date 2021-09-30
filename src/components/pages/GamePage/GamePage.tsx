@@ -62,7 +62,7 @@ const GameMainPage = () => {
 
   const handleExit = () => {
     socket?.emit('leaveGame', { type: 'LADDER', mode });
-    gameDispatch({ type: 'setMode', mode: null });
+    gameDispatch({ type: 'reset' });
   };
 
   useEffect(() => {
@@ -70,7 +70,12 @@ const GameMainPage = () => {
       socket?.off('ready');
       setOpen(false);
     } else {
-      setDialog({ ...dialog, title: `${mode} MODE matching...` });
+      setDialog({
+        ...dialog,
+        title: `${mode} MODE matching...`,
+        buttons: <Button onClick={handleExit}>매칭 취소</Button>,
+        onClose: handleExit,
+      });
       socket?.on('ready', handleReady);
       setOpen(true);
       socket?.emit('waiting', { type: 'LADDER', mode });
