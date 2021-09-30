@@ -15,7 +15,7 @@ import Typo from '../../atoms/Typo/Typo';
 import GamePlayPage from '../GamePlayPage/GamePlayPage';
 import { useGameDispatch, useGameState } from '../../../utils/hooks/useGameContext';
 import { RawUserInfoType } from '../../../types/Response';
-import { MatchPositionType } from '../../../types/Match';
+import { MatchPositionType, GameModeType } from '../../../types/Match';
 import { makeAPIPath } from '../../../utils/utils';
 
 const MAIN_GAME_PAGE = '/game';
@@ -65,6 +65,15 @@ const GameMainPage = () => {
     gameDispatch({ type: 'reset' });
   };
 
+  const changeMode = (gameMode: GameModeType) => {
+    gameDispatch({
+      type: 'setGame',
+      gameType: 'LADDER',
+      mode: gameMode,
+      isPlayer: true,
+    });
+  };
+
   useEffect(() => {
     if (!mode) {
       socket?.off('ready');
@@ -106,13 +115,13 @@ const GameMainPage = () => {
         onClose={dialog.onClose}
       />
       <Grid item xs={6}>
-        <GameOptionCard option="CLASSIC" onClick={() => gameDispatch({ type: 'setMode', mode: 'CLASSIC' })} />
+        <GameOptionCard option="CLASSIC" onClick={() => changeMode('CLASSIC')} />
       </Grid>
       <Grid item xs={6}>
-        <GameOptionCard option="SPEED" onClick={() => gameDispatch({ type: 'setMode', mode: 'SPEED' })} />
+        <GameOptionCard option="SPEED" onClick={() => changeMode('SPEED')} />
       </Grid>
       <Grid item xs={6}>
-        <GameOptionCard option="REVERSE" onClick={() => gameDispatch({ type: 'setMode', mode: 'REVERSE' })} />
+        <GameOptionCard option="REVERSE" onClick={() => changeMode('REVERSE')} />
       </Grid>
       <Grid item xs={6}>
         <GameOptionCard option="WATCH" onClick={() => { history.push(WATCH_PATH); }} />

@@ -79,7 +79,7 @@ const MatchList = ({ type }: ListProps) => {
           leftUser={match.user1}
           rightUser={match.user2}
           mode={match.mode}
-          onClick={() => {}}
+          onClick={() => {}} // FIXME: 소켓 이벤트 확정시 관전 로직 추가
         />
       ))}
       {!isListEnd && (

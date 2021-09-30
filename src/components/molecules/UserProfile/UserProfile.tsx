@@ -83,7 +83,6 @@ const UserProfile = ({ userInfo, profile }: UserProfileProps) => {
             {makeMatchHistoryString(score!, win!, lose!)}
           </Typo>
         )}
-
       </Grid>
     </Grid>
   );

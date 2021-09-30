@@ -1,12 +1,14 @@
 import React, {
   createContext, Dispatch, useContext, useReducer,
 } from 'react';
-import { GameModeType, MatchPositionType } from '../../types/Match';
+import { GameModeType, MatchGameType, MatchPositionType } from '../../types/Match';
 import { RawUserInfoType } from '../../types/Response';
 import { UserInfoType } from '../../types/User';
 
 type GameStateType = {
   mode: GameModeType | null,
+  gameType: MatchGameType | null,
+  isPlayer: boolean,
   setting: any | null,
   player0: UserInfoType | null,
   player1: UserInfoType | null,
@@ -15,6 +17,8 @@ type GameStateType = {
 
 const initialGameState: GameStateType = {
   mode: null,
+  gameType: null,
+  isPlayer: false,
   setting: null,
   player0: null,
   player1: null,
@@ -22,7 +26,7 @@ const initialGameState: GameStateType = {
 };
 
 type GameActionType =
-  { type: 'setMode', mode: GameModeType | null } |
+  { type: 'setGame', mode: GameModeType, gameType: MatchGameType, isPlayer: boolean } |
   { type: 'ready', position: MatchPositionType, player0: RawUserInfoType, player1: RawUserInfoType, setting: any } |
   { type: 'reset' };
 
@@ -31,16 +35,20 @@ const GameDispatchContext = createContext<Dispatch<GameActionType> | undefined>(
 
 function GameReducer(state: GameStateType, action: GameActionType): GameStateType {
   switch (action.type) {
-    case 'setMode':
-      return { ...state, mode: action.mode };
-    case 'ready':
-      // eslint-disable-next-line no-case-declarations
+    case 'setGame': {
+      const { mode, gameType, isPlayer } = action;
+      return {
+        ...state, mode, gameType, isPlayer,
+      };
+    }
+    case 'ready': {
       const {
         position, player0, player1, setting,
       } = action;
       return {
         ...state, position, player0, player1, setting,
       };
+    }
     case 'reset':
       return { ...initialGameState };
     default:
