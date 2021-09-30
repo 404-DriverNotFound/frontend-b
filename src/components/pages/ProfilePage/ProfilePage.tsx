@@ -143,7 +143,10 @@ const AchievementList = ({ username }: UserNameType) => {
         setLoaded(true);
         setAchieves(Achievements);
       })
-      .catch((error) => { errorMessageHandler(error); });
+      .catch((error) => {
+        source.cancel();
+        errorMessageHandler(error);
+      });
   }, []);
 
   return (
