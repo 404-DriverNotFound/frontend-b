@@ -41,7 +41,7 @@ type MatchParams = {
 const MatchHistory = ({ username }: UserNameType) => {
   const { CancelToken } = axios;
   const source = CancelToken.source();
-  const path = makeAPIPath(`/matches/${username}`);
+  const path = makeAPIPath(`/users/${username}/matches`);
   const [matchHistories, setMatchHistories] = useState<MatchType[]>([]);
   const [isListEnd, setListEnd] = useState(true);
   const [page, setPage] = useState<number>(0);

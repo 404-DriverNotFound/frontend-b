@@ -4,12 +4,10 @@ import Grid from '@material-ui/core/Grid';
 import { UserInfoType } from '../../../types/User';
 import Avatar from '../../atoms/Avatar/Avatar';
 import Typo from '../../atoms/Typo/Typo';
-
-// FIXME: 임시 Type 작성
-export type UserGameInfoType = UserInfoType & { win: number, lose: number };
+import { makeMatchHistoryString } from '../../../utils/utils';
 
 type PlayerProfileProps = {
-  userGameInfo: UserGameInfoType,
+  userGameInfo: UserInfoType,
 };
 
 const useStyles = makeStyles({
@@ -22,18 +20,16 @@ const useStyles = makeStyles({
 
 const PlayerProfile = ({ userGameInfo }: PlayerProfileProps) => {
   const {
-    name, avatar, win, lose,
+    name, avatar, score, win, lose,
   } = userGameInfo;
   const classes = useStyles();
-
-  const makeMatchHistoryString = (): string => (`전적 ${win}승 ${lose}패`);
 
   return (
     <Grid className={classes.root} item container xs={12} direction="column" justifyContent="center" alignItems="center">
       <Avatar src={avatar} alt={name} />
       <Typo variant="body1">{name}</Typo>
       <Typo variant="body2">
-        {makeMatchHistoryString()}
+        {makeMatchHistoryString(score!, win!, lose!)}
       </Typo>
     </Grid>
   );

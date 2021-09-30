@@ -148,7 +148,7 @@ const GamePlayPage = () => {
         <canvas width={setting.WIDTH} height={setting.HEIGHT} ref={canvas} />
         <Grid item container direction="row" className={classes.root} justifyContent="space-around" alignItems="center">
           <Grid item xs={4} container justifyContent="flex-end">
-            <PlayerProfile userGameInfo={{ ...player0!, win: 0, lose: 0 }} />
+            <PlayerProfile userGameInfo={player0!} />
           </Grid>
           <Grid item container xs={4} direction="column" justifyContent="center" alignItems="center">
             <Typo variant="h6">{mode}</Typo>
@@ -159,9 +159,8 @@ const GamePlayPage = () => {
             </Grid>
           </Grid>
           <Grid item xs={4} container justifyContent="flex-start">
-            <PlayerProfile userGameInfo={{ ...player1!, win: 0, lose: 0 }} />
+            <PlayerProfile userGameInfo={player1!} />
           </Grid>
-          {/* FIXME: win, lose 정보 수정 */}
         </Grid>
       </Grid>
     </>

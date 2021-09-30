@@ -22,7 +22,7 @@ type ListProps = {
 const MatchList = ({ type }: ListProps) => {
   const { CancelToken } = axios;
   const source = CancelToken.source();
-  const path = makeAPIPath('/matches/spectating');
+  const path = makeAPIPath('/matches?status=IN_PROGRESS');
   const typePath = type === 'ALL' ? '' : `&type=${type}`;
   const [matches, setMatches] = useState<MatchType[]>([]);
   const [isListEnd, setListEnd] = useState(true);
@@ -31,7 +31,7 @@ const MatchList = ({ type }: ListProps) => {
   const fetchItems = () => {
     if (isListEnd) return;
 
-    asyncGetRequest(`${path}?perPage=${COUNTS_PER_PAGE}&page=${page}${typePath}`, source)
+    asyncGetRequest(`${path}&perPage=${COUNTS_PER_PAGE}&page=${page}${typePath}`, source)
       .then(({ data }: { data: RawMatchType[] }) => {
         const typed: MatchType[] = data.map((match) => ({
           ...match,
