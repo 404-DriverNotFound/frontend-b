@@ -124,7 +124,7 @@ const MatchHistory = ({ username }: MatchParams) => {
 const AchievementList = ({ username }: MatchParams) => {
   const [Achieves, setAchieves] = useState<AchievementType[]>([]);
   const [isLoaded, setLoaded] = useState<boolean>(false);
-  const path = makeAPIPath(`/achievements/${username}`);
+  const path = makeAPIPath(`/users/${username}/achievements`);
 
   useEffect(() => {
     axios.get(path)
