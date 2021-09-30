@@ -26,6 +26,7 @@ const Dialog = ({
       aria-describedby="alert-dialog-description"
       style={{ position: 'absolute' }}
       BackdropProps={{ style: { position: 'absolute' } }}
+      fullWidth
     >
       {title && <DialogTitle>{title}</DialogTitle>}
       <DialogContent>{content}</DialogContent>

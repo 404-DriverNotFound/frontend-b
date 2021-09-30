@@ -1,4 +1,5 @@
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 import Badge from '@material-ui/core/Badge';
 import Grid from '@material-ui/core/Grid';
 import SecurityRoundedIcon from '@material-ui/icons/SecurityRounded';
@@ -7,6 +8,8 @@ import { MembershipRole, MessageType } from '../../../types/Chat';
 import Avatar from '../../atoms/Avatar/Avatar';
 import Typo from '../../atoms/Typo/Typo';
 import { SetDialogType, SetOpenType } from '../../../utils/hooks/useDialog';
+import Button from '../../atoms/Button/Button';
+import { makeMatchHistoryString } from '../../../utils/utils';
 
 type StyleProps = { me: boolean };
 
@@ -54,13 +57,46 @@ const ChatMessage = ({
   info, userRole, me = false, setOpen, setDialog,
 }: ChatProps) => {
   const { user } = info;
+  const {
+    name, avatar, score, win, lose,
+  } = user;
   const classes = useStyles({ me });
+  const history = useHistory();
+
+  const handleMatchChoice = () => {
+    setDialog({
+      title: '매치 초대',
+      content: (
+        <Grid container direction="column" justifyContent="center" alignItems="center">
+          <Typo gutterBottom>초대할 게임 모드를 선택해주세요.</Typo>
+          <Grid item container justifyContent="center" alignItems="center">
+            <Button variant="outlined">CLASSIC</Button>
+            <Button variant="outlined">SPEED</Button>
+            <Button variant="outlined">REVERSE</Button>
+          </Grid>
+        </Grid>),
+      buttons: <Button variant="text" onClick={() => { setOpen(false); }}>close</Button>,
+      onClose: () => setOpen(false),
+    });
+    setOpen(true);
+  };
+
   const handleClick = () => {
     setDialog({
-      title: 'Menu',
-      content: 'temp chat menu',
+      content: (
+        <Grid container direction="column" justifyContent="center" alignItems="center">
+          <Avatar size="large" alt={name} src={avatar} />
+          <Typo variant="h5">{name}</Typo>
+          <Typo variant="body2" gutterBottom>
+            {makeMatchHistoryString(score!, win!, lose!)}
+          </Typo>
+          <Button variant="outlined" onClick={() => history.push(`/profile/${name}`)}>프로필 페이지</Button>
+          <Button variant="outlined" onClick={handleMatchChoice}>매치 초대하기</Button>
+        </Grid>
+      ),
+      buttons: <Button variant="text" onClick={() => { setOpen(false); }}>close</Button>,
       onClose: () => setOpen(false),
-    }); // FIXME 유저 메뉴 고쳐야 합니다
+    });
     setOpen(true);
   };
 
