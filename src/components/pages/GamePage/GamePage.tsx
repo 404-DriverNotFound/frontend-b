@@ -13,7 +13,7 @@ import Button from '../../atoms/Button/Button';
 import Dialog from '../../molecules/Dialog/Dialog';
 import Typo from '../../atoms/Typo/Typo';
 import GamePlayPage from '../GamePlayPage/GamePlayPage';
-import { GameContextProvider, useGameDispatch, useGameState } from '../../../utils/hooks/useGameContext';
+import { useGameDispatch, useGameState } from '../../../utils/hooks/useGameContext';
 import { RawUserInfoType } from '../../../types/Response';
 import { MatchPositionType } from '../../../types/Match';
 import { makeAPIPath } from '../../../utils/utils';
@@ -117,16 +117,14 @@ const GameMainPage = () => {
 };
 
 const GamePage = () => (
-  <GameContextProvider>
-    <Switch>
-      <Route exact path={MAIN_GAME_PAGE} component={GameMainPage} />
-      <Route exact path={PLAY_PATH} component={GamePlayPage} />
-      <Route path={WATCH_PATH} component={GameWatchPage} />
-      <Route exact path="/">
-        <Redirect to={MAIN_GAME_PAGE} />
-      </Route>
-    </Switch>
-  </GameContextProvider>
+  <Switch>
+    <Route exact path={MAIN_GAME_PAGE} component={GameMainPage} />
+    <Route exact path={PLAY_PATH} component={GamePlayPage} />
+    <Route path={WATCH_PATH} component={GameWatchPage} />
+    <Route exact path="/">
+      <Redirect to={MAIN_GAME_PAGE} />
+    </Route>
+  </Switch>
 );
 
 export default GamePage;
