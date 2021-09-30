@@ -146,7 +146,18 @@ const AchievementList = ({ username }: UserNameType) => {
       .catch((error) => {
         source.cancel();
         errorMessageHandler(error);
+        setLoaded(true);
       });
+  }, []);
+
+  useEffect(() => {
+    setLoaded(false);
+
+    return () => {
+      source.cancel();
+      setAchieves([]);
+      setLoaded(true);
+    };
   }, []);
 
   return (
