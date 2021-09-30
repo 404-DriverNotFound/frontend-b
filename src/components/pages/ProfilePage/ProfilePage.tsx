@@ -148,10 +148,6 @@ const AchievementList = ({ username }: UserNameType) => {
         errorMessageHandler(error);
         setLoaded(true);
       });
-  }, []);
-
-  useEffect(() => {
-    setLoaded(false);
 
     return () => {
       source.cancel();
