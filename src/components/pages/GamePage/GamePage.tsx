@@ -61,7 +61,7 @@ const GameMainPage = () => {
   };
 
   const handleExit = () => {
-    socket?.emit('leaveGame');
+    socket?.emit('leaveGame', { type: 'LADDER', mode });
     gameDispatch({ type: 'setMode', mode: null });
   };
 

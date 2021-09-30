@@ -119,7 +119,7 @@ const GamePlayPage = () => {
     });
 
     return () => {
-      socket?.emit('leaveGame');
+      socket?.emit('leaveGame', { type: 'LADDER', mode }); // FIXME LADDER가 아닌 경우
       setOpen(false);
       gameDispatch({ type: 'reset' });
       socket?.off('update');
@@ -154,7 +154,8 @@ const GamePlayPage = () => {
             <Typo variant="h6">{mode}</Typo>
             <Grid item container justifyContent="center" alignItems="center">
               <Button onClick={() => { if (socket?.emit('ready')) setState('ready'); }} disabled={state !== 'init'}>ready</Button>
-              <Button onClick={() => { if (socket?.emit('leaveGame')) setState('end'); }}>exit</Button>
+              <Button onClick={() => { if (socket?.emit('leaveGame', { type: 'LADDER', mode })) setState('end'); }}>exit</Button>
+              {/* FIXME LADDER가 아닌 경우 */}
             </Grid>
           </Grid>
           <Grid item xs={4} container justifyContent="flex-start">
