@@ -187,37 +187,39 @@ const App = () => {
   }, []);
 
   const children = userState.id ? (
+    <>
+      <Switch>
+        <Route path="/">
+          <MainTemplate
+            main={(
+              <Switch>
+                <Route exact path="/">
+                  <Redirect to="/game" />
+                </Route>
+                <Route path="/game" component={GamePage} />
+                <Route path="/community" component={CommunityPage} />
+                <Route path="/channel/manage/:channelName" component={ChannelManagePage} />
+                <Route path="/channel" component={ChannelPage} />
+                <Route path="/profile/:username" component={ProfilePage} />
+                <Route exact path="/dm" component={DMPage} />
+                <Route exact path="/profile">
+                  <Redirect to={`/profile/${userState.name}`} />
+                </Route>
+                <Route exact path="/404" render={() => <h1>404 Not found</h1>} />
+                <Route path="/">
+                  <Redirect to="/404" />
+                </Route>
+              </Switch>
+      )}
+            chat={<ChatPage />}
+          />
+        </Route>
+      </Switch>
+    </>
+  ) : (
     <Switch>
       <Route exact path="/register/2fa" component={MFARegisterPage} />
       <Route exact path="/2fa" component={MFAPage} />
-      <Route path="/">
-        <MainTemplate
-          main={(
-            <Switch>
-              <Route exact path="/">
-                <Redirect to="/game" />
-              </Route>
-              <Route path="/game" component={GamePage} />
-              <Route path="/community" component={CommunityPage} />
-              <Route path="/channel/manage/:channelName" component={ChannelManagePage} />
-              <Route path="/channel" component={ChannelPage} />
-              <Route path="/profile/:username" component={ProfilePage} />
-              <Route exact path="/dm" component={DMPage} />
-              <Route exact path="/profile">
-                <Redirect to={`/profile/${userState.name}`} />
-              </Route>
-              <Route exact path="/404" render={() => <h1>404 Not found</h1>} />
-              <Route path="/">
-                <Redirect to="/404" />
-              </Route>
-            </Switch>
-      )}
-          chat={<ChatPage />}
-        />
-      </Route>
-    </Switch>
-  ) : (
-    <Switch>
       <Route exact path="/register" component={RegisterPage} />
       <Route path="/" component={LoginPage} />
     </Switch>
