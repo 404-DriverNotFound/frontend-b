@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import {
   Route, Switch, useHistory, Redirect,
 } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -45,6 +46,11 @@ const GameMainPage = () => {
     isOpen, setOpen, dialog, setDialog,
   } = useDialog();
 
+  const handleDuplicated = () => {
+    toast.warn('자신과 매칭되어 대기를 취소합니다.');
+    gameDispatch({ type: 'reset' });
+  };
+
   const handleReady = (
     position: MatchPositionType, player0: RawUserInfoType, player1: RawUserInfoType, setting: any,
   ) => {
@@ -56,6 +62,7 @@ const GameMainPage = () => {
       setting,
     });
     socket?.off('ready');
+    socket?.off('duplicated');
     setOpen(false);
     history.push(PLAY_PATH);
   };
@@ -77,6 +84,7 @@ const GameMainPage = () => {
   useEffect(() => {
     if (!mode) {
       socket?.off('ready');
+      socket?.off('duplicated');
       setOpen(false);
     } else {
       setDialog({
@@ -86,6 +94,7 @@ const GameMainPage = () => {
         onClose: handleExit,
       });
       socket?.on('ready', handleReady);
+      socket?.on('duplicated', handleDuplicated);
       setOpen(true);
       socket?.emit('waiting', { type: 'LADDER', mode });
     }
@@ -103,6 +112,11 @@ const GameMainPage = () => {
       buttons: <Button onClick={handleExit}>매칭 취소</Button>,
       onClose: handleExit,
     });
+
+    return () => {
+      socket?.off('ready');
+      socket?.off('duplicated');
+    };
   }, []);
 
   return (
