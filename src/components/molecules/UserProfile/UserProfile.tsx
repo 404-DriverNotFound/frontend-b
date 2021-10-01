@@ -78,7 +78,7 @@ const UserProfile = ({ userInfo, profile }: UserProfileProps) => {
       <Grid item xs={6}>
         <Typo variant={profile ? 'h5' : 'h6'}>{name}</Typo>
         <Typo className={classes.status}>{makeStatusString()}</Typo>
-        {(profile && score) && (
+        {(profile && score !== undefined) && (
           <Typo variant="body2">
             {makeMatchHistoryString(score!, win!, lose!)}
           </Typo>
