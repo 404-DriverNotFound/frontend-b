@@ -40,6 +40,7 @@ const GameMainPage = () => {
   const history = useHistory();
   const classes = useStyles();
   const { mode } = useGameState();
+  // const { mode, setting } = useGameState();
   const gameDispatch = useGameDispatch();
   const { socket } = useAppState();
   const {
@@ -52,14 +53,17 @@ const GameMainPage = () => {
   };
 
   const handleReady = (
-    position: MatchPositionType, player0: RawUserInfoType, player1: RawUserInfoType, setting: any,
+    position: MatchPositionType,
+    player0: RawUserInfoType,
+    player1: RawUserInfoType,
+    gameSetting: any,
   ) => {
     gameDispatch({
       type: 'ready',
       position,
       player0: { ...player0, avatar: makeAPIPath(`/${player0.avatar}`) },
       player1: { ...player1, avatar: makeAPIPath(`/${player1.avatar}`) },
-      setting,
+      setting: gameSetting,
     });
     socket?.off('ready');
     socket?.off('duplicated');
@@ -70,6 +74,9 @@ const GameMainPage = () => {
   const handleExit = () => {
     socket?.emit('leaveGame', { type: 'LADDER', mode });
     gameDispatch({ type: 'reset' });
+    socket?.off('ready');
+    socket?.off('duplicated');
+    setOpen(false);
   };
 
   const changeMode = (gameMode: GameModeType) => {
@@ -79,28 +86,20 @@ const GameMainPage = () => {
       mode: gameMode,
       isPlayer: true,
     });
+    setDialog({
+      ...dialog,
+      title: `${gameMode} MODE matching...`,
+      buttons: <Button onClick={handleExit}>매칭 취소</Button>,
+      onClose: handleExit,
+    });
+    socket?.on('ready', handleReady);
+    socket?.on('duplicated', handleDuplicated);
+    setOpen(true);
+    socket?.emit('waiting', { type: 'LADDER', mode: gameMode });
   };
 
   useEffect(() => {
-    if (!mode) {
-      socket?.off('ready');
-      socket?.off('duplicated');
-      setOpen(false);
-    } else {
-      setDialog({
-        ...dialog,
-        title: `${mode} MODE matching...`,
-        buttons: <Button onClick={handleExit}>매칭 취소</Button>,
-        onClose: handleExit,
-      });
-      socket?.on('ready', handleReady);
-      socket?.on('duplicated', handleDuplicated);
-      setOpen(true);
-      socket?.emit('waiting', { type: 'LADDER', mode });
-    }
-  }, [mode]);
-
-  useEffect(() => {
+    if (mode) handleExit();
     setDialog({
       title: 'default',
       content: (
@@ -114,8 +113,10 @@ const GameMainPage = () => {
     });
 
     return () => {
+      // if (!setting) socket?.emit('leaveGame', { type: 'LADDER', mode });
       socket?.off('ready');
       socket?.off('duplicated');
+      setOpen(false);
     };
   }, []);
 
