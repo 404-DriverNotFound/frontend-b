@@ -31,6 +31,9 @@ import ChannelManagePage from './components/pages/ChannelManagePage/ChannelManag
 import DMPage from './components/pages/DMPage/DMPage';
 import { RawUserInfoType } from './types/Response';
 import GamePage from './components/pages/GamePage/GamePage';
+import Dialog from './components/molecules/Dialog/Dialog';
+import useDialog from './utils/hooks/useDialog';
+import useMatch from './utils/hooks/useMatch';
 
 const useStyles = makeStyles({
   progress: {
@@ -77,6 +80,10 @@ const App = () => {
   const [userInfo, setUserInfo] = useState<RawUserInfoType | null>(null);
   const [channels, setChannels] = useState<ChannelType[]>([]);
   const [DMs, setDMs] = useState<DMRoomType[]>([]);
+  const {
+    isOpen, setOpen, dialog, setDialog,
+  } = useDialog();
+  const { handleInvited } = useMatch(setOpen, setDialog);
 
   useEffect(() => {
     if (userInfo) {
@@ -120,6 +127,13 @@ const App = () => {
             history.push('/channel');
             toast.warn(`${name} 채널의 권한이 관리자에서 멤버로 변경되었습니다.`);
           }
+        });
+
+        socket.on('invitedToMatch', ({ mode, opponentId }) => {
+          // eslint-disable-next-line no-console
+          console.log('invited by', opponentId);
+          handleInvited(mode, opponentId);
+          // FIXME: 여러 명으로부터 한번에 초대받을 때 어떻게 할지?
         });
       });
     }
@@ -188,6 +202,13 @@ const App = () => {
 
   const children = userState.id ? (
     <>
+      <Dialog
+        title={dialog.title}
+        content={dialog.content}
+        buttons={dialog.buttons}
+        isOpen={isOpen}
+        onClose={dialog.onClose}
+      />
       <Switch>
         <Route path="/">
           <MainTemplate

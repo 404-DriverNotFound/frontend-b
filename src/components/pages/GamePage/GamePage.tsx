@@ -15,9 +15,8 @@ import Dialog from '../../molecules/Dialog/Dialog';
 import Typo from '../../atoms/Typo/Typo';
 import GamePlayPage from '../GamePlayPage/GamePlayPage';
 import { useGameDispatch, useGameState } from '../../../utils/hooks/useGameContext';
-import { RawUserInfoType } from '../../../types/Response';
-import { MatchPositionType, GameModeType } from '../../../types/Match';
-import { makeAPIPath } from '../../../utils/utils';
+import useMatch from '../../../utils/hooks/useMatch';
+import { GameModeType } from '../../../types/Match';
 
 const MAIN_GAME_PAGE = '/game';
 const PLAY_PATH = '/game/play';
@@ -46,37 +45,11 @@ const GameMainPage = () => {
   const {
     isOpen, setOpen, dialog, setDialog,
   } = useDialog();
+  const { handleReady, handleExit } = useMatch(setOpen, setDialog);
 
   const handleDuplicated = () => {
     toast.warn('자신과 매칭되어 대기를 취소합니다.');
     gameDispatch({ type: 'reset' });
-  };
-
-  const handleReady = (
-    position: MatchPositionType,
-    player0: RawUserInfoType,
-    player1: RawUserInfoType,
-    gameSetting: any,
-  ) => {
-    gameDispatch({
-      type: 'ready',
-      position,
-      player0: { ...player0, avatar: makeAPIPath(`/${player0.avatar}`) },
-      player1: { ...player1, avatar: makeAPIPath(`/${player1.avatar}`) },
-      setting: gameSetting,
-    });
-    socket?.off('ready');
-    socket?.off('duplicated');
-    setOpen(false);
-    history.push(PLAY_PATH);
-  };
-
-  const handleExit = () => {
-    socket?.emit('leaveGame', { type: 'LADDER', mode });
-    gameDispatch({ type: 'reset' });
-    socket?.off('ready');
-    socket?.off('duplicated');
-    setOpen(false);
   };
 
   const changeMode = (gameMode: GameModeType) => {

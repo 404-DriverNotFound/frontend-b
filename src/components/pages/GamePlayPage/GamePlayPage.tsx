@@ -49,7 +49,7 @@ const GamePlayPage = () => {
   const { socket } = useAppState();
   const history = useHistory();
   const {
-    mode, setting, player0, player1, position,
+    mode, setting, player0, player1, position, isPlayer, gameType,
   } = useGameState();
   const gameDispatch = useGameDispatch();
   const [state, setState] = useState<PlayStateType>('init');
@@ -82,8 +82,10 @@ const GamePlayPage = () => {
       toast.error('잘못된 접근입니다.');
       history.goBack();
     }
-    document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('keyup', handleKeyUp);
+    if (isPlayer) {
+      document.addEventListener('keydown', handleKeyDown);
+      document.addEventListener('keyup', handleKeyUp);
+    }
     if (canvas.current) canvasManager.current = new CanvasManager(canvas.current.getContext('2d')!, setting);
 
     socket?.on('playing', () => setState('playing'));
@@ -107,8 +109,10 @@ const GamePlayPage = () => {
         gameDispatch({ type: 'reset' });
         history.goBack();
       };
-      document.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('keyup', handleKeyUp);
+      if (isPlayer) {
+        document.removeEventListener('keydown', handleKeyDown);
+        document.removeEventListener('keyup', handleKeyUp);
+      }
       setState('end');
       setDialog({
         content: message || '게임이 종료되었습니다.',
@@ -119,13 +123,15 @@ const GamePlayPage = () => {
     });
 
     return () => {
-      if (mode) socket?.emit('leaveGame', { type: 'LADDER', mode }); // FIXME LADDER가 아닌 경우
+      if (mode) socket?.emit('leaveGame', { type: gameType, mode });
       setOpen(false);
       gameDispatch({ type: 'reset' });
       socket?.off('update');
       socket?.off('destroy');
-      document.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('keyup', handleKeyUp);
+      if (isPlayer) {
+        document.removeEventListener('keydown', handleKeyDown);
+        document.removeEventListener('keyup', handleKeyUp);
+      }
     };
   }, []);
 
@@ -153,9 +159,8 @@ const GamePlayPage = () => {
           <Grid item container xs={4} direction="column" justifyContent="center" alignItems="center">
             <Typo variant="h6">{mode}</Typo>
             <Grid item container justifyContent="center" alignItems="center">
-              <Button onClick={() => { if (socket?.emit('ready')) setState('ready'); }} disabled={state !== 'init'}>ready</Button>
-              <Button onClick={() => { if (socket?.emit('leaveGame', { type: 'LADDER', mode })) setState('end'); }}>exit</Button>
-              {/* FIXME LADDER가 아닌 경우 */}
+              {isPlayer && <Button onClick={() => { if (socket?.emit('ready')) setState('ready'); }} disabled={state !== 'init'}>ready</Button>}
+              <Button onClick={() => { if (socket?.emit('leaveGame', { type: gameType, mode })) setState('end'); }}>exit</Button>
             </Grid>
           </Grid>
           <Grid item xs={4} container justifyContent="flex-start">

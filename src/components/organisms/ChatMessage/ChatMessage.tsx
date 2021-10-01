@@ -10,6 +10,7 @@ import Typo from '../../atoms/Typo/Typo';
 import { SetDialogType, SetOpenType } from '../../../utils/hooks/useDialog';
 import Button from '../../atoms/Button/Button';
 import { makeMatchHistoryString } from '../../../utils/utils';
+import useMatch from '../../../utils/hooks/useMatch';
 
 type StyleProps = { me: boolean };
 
@@ -58,8 +59,9 @@ const ChatMessage = ({
 }: ChatProps) => {
   const { user } = info;
   const {
-    name, avatar, score, win, lose,
+    id, name, avatar, score, win, lose,
   } = user;
+  const { inviteUser } = useMatch(setOpen, setDialog);
   const classes = useStyles({ me });
   const history = useHistory();
 
@@ -70,9 +72,9 @@ const ChatMessage = ({
         <Grid container direction="column" justifyContent="center" alignItems="center">
           <Typo gutterBottom>초대할 게임 모드를 선택해주세요.</Typo>
           <Grid item container justifyContent="center" alignItems="center">
-            <Button variant="outlined">CLASSIC</Button>
-            <Button variant="outlined">SPEED</Button>
-            <Button variant="outlined">REVERSE</Button>
+            <Button variant="outlined" onClick={() => inviteUser('CLASSIC', id)}>CLASSIC</Button>
+            <Button variant="outlined" onClick={() => inviteUser('SPEED', id)}>SPEED</Button>
+            <Button variant="outlined" onClick={() => inviteUser('REVERSE', id)}>REVERSE</Button>
           </Grid>
         </Grid>),
       buttons: <Button variant="text" onClick={() => { setOpen(false); }}>close</Button>,
