@@ -39,7 +39,7 @@ const ChatPage = () => {
   const [chat, setChat] = useState<string>('');
   const [isChatEnd, setChatEnd] = useState(false);
   const [page, setPage] = useState<number>(0);
-  const [isSending, setSending] = useState<boolean>(false);
+  const isSending = useRef<boolean>(false);
   const [members, setMembers] = useState<MemberType[]>([]);
   const {
     chatting, newMessage, blockList,
@@ -55,11 +55,16 @@ const ChatPage = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (chat.length === 0 || isSending) return;
+    if (chat.length === 0 || isSending.current) return;
 
+    isSending.current = true;
     (chatting?.type === 'channel' ? postChannelChat(chatting!.name, chat) : postDM(chatting!.name, chat))
-      .then(() => { setSending(true); })
-      .catch((error) => { errorMessageHandler(error); });
+      .finally(() => setChat(''))
+      .then(() => {})
+      .catch((error) => {
+        isSending.current = false;
+        errorMessageHandler(error);
+      });
   };
 
   const fetchItems = () => {
@@ -84,7 +89,7 @@ const ChatPage = () => {
 
   useEffect(() => {
     setChats([]);
-    setSending(false);
+    isSending.current = false;
     setChat('');
     setPage(chatting ? 1 : 0);
     setChatEnd(!chatting);
@@ -100,13 +105,13 @@ const ChatPage = () => {
   }, [page]);
 
   useEffect(() => {
-    if (isSending && newMessage) {
+    if (isSending.current && newMessage) {
       if (newMessage.user.id === userState.id) {
-        setSending(false);
+        isSending.current = false;
         setChat('');
       }
     }
-  }, [isSending]);
+  }, [isSending.current]);
 
   useEffect(() => {
     if (newMessage) {
@@ -119,7 +124,7 @@ const ChatPage = () => {
     setChats([]);
     setMembers([]);
     setChatEnd(true);
-    setSending(false);
+    isSending.current = false;
   }, []);
 
   // eslint-disable-next-line no-unused-vars
@@ -179,7 +184,7 @@ const ChatPage = () => {
             )}
           </List>
           <ChatInput value={chat} onChange={handleChange} onSubmit={handleSubmit} />
-          <LinearProgress style={{ visibility: isSending ? 'visible' : 'hidden' }} />
+          <LinearProgress style={{ visibility: isSending.current ? 'visible' : 'hidden' }} />
         </>
       )
         : (
