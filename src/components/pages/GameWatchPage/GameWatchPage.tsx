@@ -8,7 +8,9 @@ import List from '../../atoms/List/List';
 import SubMenu from '../../molecules/SubMenu/SubMenu';
 import useIntersect from '../../../utils/hooks/useIntersect';
 import GameListItem, { GameListItemSkeleton } from '../../organisms/GameListItem/GameListItem';
-import { useAppDispatch, useAppState } from '../../../utils/hooks/useAppContext';
+import { useAppState } from '../../../utils/hooks/useAppContext';
+import useMatch from '../../../utils/hooks/useMatch';
+import { DialogProps } from '../../../utils/hooks/useDialog';
 
 const ALL_MATCH_PATH = '/game/watch/all';
 const LADDER_MATCH_PATH = '/game/watch/ladder';
@@ -20,28 +22,25 @@ type ListProps = {
   type: 'ALL' | 'LADDER' | 'EXHIBITION',
 }
 
+// eslint-disable-next-line no-unused-vars
+const dummySetOpen = (value: boolean) => {};
+// eslint-disable-next-line no-unused-vars
+const dummySetDialog = (value: DialogProps) => {};
+
 const MatchList = ({ type }: ListProps) => {
   const { CancelToken } = axios;
   const source = CancelToken.source();
   const path = makeAPIPath('/matches?status=IN_PROGRESS');
   const typePath = type === 'ALL' ? '' : `&type=${type}`;
-  const appDispatch = useAppDispatch();
   const { socket } = useAppState();
+  const { handleReady } = useMatch(dummySetOpen, dummySetDialog);
   const [matches, setMatches] = useState<MatchType[]>([]);
   const [isListEnd, setListEnd] = useState(true);
   const [page, setPage] = useState<number>(0);
 
   const handleWatch = (matchId: string) => {
     socket?.emit('watchMatch', matchId);
-    appDispatch({ type: 'loading' });
-    // FIXME: 본 함수 아래 부분은 서버->클라이언트 이벤트를 받지 않으면
-    //        로딩이 끝나지 않는 문제를 해결하려고 넣었습니다. 추후 수정 예정입니다.
-    // TODO: socket?.on('이벤트명', () => {
-    //   socket?.off('이벤트명');
-    // });
-    setTimeout(() => {
-      appDispatch({ type: 'endLoading' });
-    }, 3000);
+    socket?.on('ready', handleReady);
   };
 
   const fetchItems = () => {
@@ -81,7 +80,7 @@ const MatchList = ({ type }: ListProps) => {
     setListEnd(false);
 
     return () => {
-      // TODO: socket?.off
+      socket?.off('ready');
       source.cancel();
       setMatches([]);
       setListEnd(true);
