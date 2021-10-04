@@ -80,13 +80,13 @@ const GamePlayPage = () => {
   const handleExit = () => {
     socket?.emit('leaveGame', { type: gameType, mode });
     if (isPlayer) setState('end');
-    else history.goBack();
+    else history.replace('/');
   };
 
   useEffect(() => {
     if (!setting || !position || !mode) {
       toast.error('잘못된 접근입니다.');
-      history.goBack();
+      history.replace('/');
     }
     if (isPlayer) {
       document.addEventListener('keydown', handleKeyDown);
@@ -114,7 +114,7 @@ const GamePlayPage = () => {
     socket?.on('destroy', (message) => {
       const handleClose = () => {
         gameDispatch({ type: 'reset' });
-        history.goBack();
+        history.replace('/');
       };
       if (isPlayer) {
         document.removeEventListener('keydown', handleKeyDown);

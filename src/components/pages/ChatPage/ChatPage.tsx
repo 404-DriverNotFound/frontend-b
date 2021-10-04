@@ -93,6 +93,7 @@ const ChatPage = () => {
     setChat('');
     setPage(chatting ? 1 : 0);
     setChatEnd(!chatting);
+    source.cancel();
     if (chatting && chatting.type === 'channel') {
       asyncGetRequest(makeAPIPath(`/channels/${chatting.name}/members`))
         .then(({ data }) => { setMembers(data); })
