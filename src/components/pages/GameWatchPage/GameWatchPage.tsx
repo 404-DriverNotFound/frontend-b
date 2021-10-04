@@ -39,7 +39,7 @@ const MatchList = ({ type }: ListProps) => {
   const [page, setPage] = useState<number>(0);
 
   const handleWatch = (matchId: string) => {
-    socket?.emit('watchMatch', matchId);
+    socket?.emit('watchMatch', { id: matchId });
     socket?.on('ready', handleReady);
   };
 
