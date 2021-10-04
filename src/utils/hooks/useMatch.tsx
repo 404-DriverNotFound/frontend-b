@@ -54,8 +54,6 @@ const useMatch = (setOpen: SetOpenType, setDialog: SetDialogType) => {
   };
 
   const handleExit = (mode: GameModeType | null) => {
-    // eslint-disable-next-line no-console
-    console.log('exit', mode);
     offListeners(socket);
     socket?.emit('leaveGame', { type: 'LADDER', mode });
     gameDispatch({ type: 'reset' });
