@@ -83,6 +83,11 @@ const ChatMessage = ({
     setOpen(true);
   };
 
+  const handleProfileClick = () => {
+    history.push(`/profile/${name}`);
+    setOpen(false);
+  };
+
   const handleClick = () => {
     setDialog({
       content: (
@@ -92,7 +97,7 @@ const ChatMessage = ({
           <Typo variant="body2" gutterBottom>
             {makeMatchHistoryString(score!, win!, lose!)}
           </Typo>
-          <Button variant="outlined" onClick={() => history.push(`/profile/${name}`)}>프로필 페이지</Button>
+          <Button variant="outlined" onClick={handleProfileClick}>프로필 페이지</Button>
           <Button variant="outlined" onClick={handleMatchChoice}>매치 초대하기</Button>
         </Grid>
       ),
