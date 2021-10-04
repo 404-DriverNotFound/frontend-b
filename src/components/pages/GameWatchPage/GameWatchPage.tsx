@@ -3,7 +3,7 @@ import axios from 'axios';
 import Grid from '@material-ui/core/Grid';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { asyncGetRequest, errorMessageHandler, makeAPIPath } from '../../../utils/utils';
-import { RawMatchType, MatchType } from '../../../types/Match';
+import { RawMatchType, MatchType, GameModeType } from '../../../types/Match';
 import List from '../../atoms/List/List';
 import SubMenu from '../../molecules/SubMenu/SubMenu';
 import useIntersect from '../../../utils/hooks/useIntersect';
@@ -11,6 +11,7 @@ import GameListItem, { GameListItemSkeleton } from '../../organisms/GameListItem
 import { useAppState } from '../../../utils/hooks/useAppContext';
 import useMatch from '../../../utils/hooks/useMatch';
 import { DialogProps } from '../../../utils/hooks/useDialog';
+import { useGameDispatch } from '../../../utils/hooks/useGameContext';
 
 const ALL_MATCH_PATH = '/game/watch/all';
 const LADDER_MATCH_PATH = '/game/watch/ladder';
@@ -33,12 +34,19 @@ const MatchList = ({ type }: ListProps) => {
   const path = makeAPIPath('/matches?status=IN_PROGRESS');
   const typePath = type === 'ALL' ? '' : `&type=${type}`;
   const { socket } = useAppState();
+  const gameDispatch = useGameDispatch();
   const { handleReady } = useMatch(dummySetOpen, dummySetDialog);
   const [matches, setMatches] = useState<MatchType[]>([]);
   const [isListEnd, setListEnd] = useState(true);
   const [page, setPage] = useState<number>(0);
 
-  const handleWatch = (matchId: string) => {
+  const handleWatch = (mode: GameModeType, matchId: string) => {
+    gameDispatch({
+      type: 'setGame',
+      mode,
+      gameType: 'EXHIBITION',
+      isPlayer: false,
+    });
     socket?.emit('watchMatch', { id: matchId });
     socket?.on('ready', handleReady);
   };
@@ -95,7 +103,7 @@ const MatchList = ({ type }: ListProps) => {
           leftUser={match.user1}
           rightUser={match.user2}
           mode={match.mode}
-          onClick={() => handleWatch(match.id)}
+          onClick={() => handleWatch(match.mode, match.id)}
         />
       ))}
       {!isListEnd && (

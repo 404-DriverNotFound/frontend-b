@@ -77,6 +77,12 @@ const GamePlayPage = () => {
     }
   };
 
+  const handleExit = () => {
+    socket?.emit('leaveGame', { type: gameType, mode });
+    if (isPlayer) setState('end');
+    else history.goBack();
+  };
+
   useEffect(() => {
     if (!setting || !position || !mode) {
       toast.error('잘못된 접근입니다.');
@@ -85,7 +91,8 @@ const GamePlayPage = () => {
     if (isPlayer) {
       document.addEventListener('keydown', handleKeyDown);
       document.addEventListener('keyup', handleKeyUp);
-    }
+    } else setState('playing');
+
     if (canvas.current) canvasManager.current = new CanvasManager(canvas.current.getContext('2d')!, setting);
 
     socket?.on('playing', () => setState('playing'));
@@ -160,7 +167,7 @@ const GamePlayPage = () => {
             <Typo variant="h6">{mode}</Typo>
             <Grid item container justifyContent="center" alignItems="center">
               {isPlayer && <Button onClick={() => { if (socket?.emit('ready')) setState('ready'); }} disabled={state !== 'init'}>ready</Button>}
-              <Button onClick={() => { if (socket?.emit('leaveGame', { type: gameType, mode })) setState('end'); }}>exit</Button>
+              <Button onClick={handleExit}>exit</Button>
             </Grid>
           </Grid>
           <Grid item xs={4} container justifyContent="flex-start">

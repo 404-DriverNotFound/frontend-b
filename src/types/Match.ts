@@ -7,7 +7,7 @@ export type MatchGameType = 'LADDER' | 'EXHIBITION';
 
 export type GameModeType = 'CLASSIC' | 'SPEED' | 'REVERSE';
 
-export type MatchPositionType = 'LEFT' | 'RIGHT';
+export type MatchPositionType = 'LEFT' | 'RIGHT' | 'WATCH';
 
 export type RawMatchType = {
   id: string,
