@@ -129,8 +129,8 @@ const App = () => {
           }
         });
 
-        socket.on('invitedToMatch', ({ mode, opponentId }) => {
-          handleInvited(mode, opponentId, socket);
+        socket.on('invitedToMatch', ({ mode, opponent }) => {
+          handleInvited(mode, opponent, socket);
           // FIXME: 여러 명으로부터 한번에 초대받을 때 어떻게 할지?
           // NOTE 큐 하나 만들고 뭐 하나 수락할때까지 Dialog 내용 바꿔가며 띄워주기?
         });

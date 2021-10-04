@@ -61,9 +61,9 @@ const useMatch = (setOpen: SetOpenType, setDialog: SetDialogType) => {
     setOpen(false);
   };
 
-  const handleDeclined = () => {
+  const handleDeclined = ({ message }: { message: string }) => {
     offListeners(socket);
-    toast.warn('매치 요청이 거절되었습니다.');
+    toast.warn(message);
     gameDispatch({ type: 'reset' });
     setOpen(false);
   };
@@ -101,7 +101,6 @@ const useMatch = (setOpen: SetOpenType, setDialog: SetDialogType) => {
   const handleAccept = (gameMode: GameModeType, opponentId: string, currentSocket: Socket) => {
     currentSocket?.on('ready', handleReady);
     currentSocket?.emit('acceptMatch', { mode: gameMode, opponentId });
-    currentSocket?.off('canceled');
   };
 
   const handleDecline = (opponentId: string, currentSocket: Socket) => {
@@ -111,14 +110,17 @@ const useMatch = (setOpen: SetOpenType, setDialog: SetDialogType) => {
     setOpen(false);
   };
 
-  const handleCanceled = () => {
-    toast.warn('매치 요청이 취소되었습니다.');
+  const handleCanceled = ({ message }: { message: string }) => {
+    toast.warn(message);
     gameDispatch({ type: 'reset' });
     offListeners(socket);
     setOpen(false);
   };
 
-  const handleInvited = (gameMode: GameModeType, id: string, currentSocket: Socket) => {
+  const handleInvited = (
+    gameMode: GameModeType, opponent: RawUserInfoType, currentSocket: Socket,
+  ) => {
+    const { id, name } = opponent;
     gameDispatch({
       type: 'setGame',
       gameType: 'EXHIBITION',
@@ -128,7 +130,7 @@ const useMatch = (setOpen: SetOpenType, setDialog: SetDialogType) => {
     currentSocket?.on('canceled', handleCanceled);
     setDialog({
       title: '매치 초대 알림',
-      content: `${id}님으로부터 ${gameMode} 매치 초대가 도착하였습니다.
+      content: `${name}님으로부터 ${gameMode} 매치 초대가 도착하였습니다.
       수락하시겠습니까?`,
       buttons: (
         <>
