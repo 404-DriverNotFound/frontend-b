@@ -8,7 +8,7 @@ import Grid from '@material-ui/core/Grid';
 import Typo from '../../components/atoms/Typo/Typo';
 import Button from '../../components/atoms/Button/Button';
 import { useAppState } from './useAppContext';
-import { useGameDispatch, useGameState } from './useGameContext';
+import { useGameDispatch } from './useGameContext';
 import { RawUserInfoType } from '../../types/Response';
 import { MatchPositionType, GameModeType } from '../../types/Match';
 import { makeAPIPath } from '../utils';
@@ -31,7 +31,6 @@ const offListeners = (socket: Socket | null) => {
 
 const useMatch = (setOpen: SetOpenType, setDialog: SetDialogType) => {
   const { socket } = useAppState();
-  const { mode } = useGameState();
   const gameDispatch = useGameDispatch();
   const classes = useStyles();
   const history = useHistory();
@@ -54,7 +53,9 @@ const useMatch = (setOpen: SetOpenType, setDialog: SetDialogType) => {
     history.push(PLAY_PATH);
   };
 
-  const handleExit = () => {
+  const handleExit = (mode: GameModeType | null) => {
+    // eslint-disable-next-line no-console
+    console.log('exit', mode);
     offListeners(socket);
     socket?.emit('leaveGame', { type: 'LADDER', mode });
     gameDispatch({ type: 'reset' });
@@ -75,11 +76,11 @@ const useMatch = (setOpen: SetOpenType, setDialog: SetDialogType) => {
     setOpen(false);
   };
 
-  const inviteUser = (gameMode: GameModeType, opponentId: string) => {
+  const inviteUser = (mode: GameModeType, opponentId: string) => {
     gameDispatch({
       type: 'setGame',
       gameType: 'EXHIBITION',
-      mode: gameMode,
+      mode,
       isPlayer: true,
     });
     setDialog({
@@ -93,14 +94,14 @@ const useMatch = (setOpen: SetOpenType, setDialog: SetDialogType) => {
       buttons: <Button onClick={() => handleCancel(opponentId)}>초대 취소</Button>,
       onClose: () => handleCancel(opponentId),
     });
-    socket?.emit('inviteMatch', { mode: gameMode, opponentId });
+    socket?.emit('inviteMatch', { mode, opponentId });
     socket?.on('ready', handleReady);
     socket?.on('declined', handleDeclined);
   };
 
-  const handleAccept = (gameMode: GameModeType, opponentId: string, currentSocket: Socket) => {
+  const handleAccept = (mode: GameModeType, opponentId: string, currentSocket: Socket) => {
     currentSocket?.on('ready', handleReady);
-    currentSocket?.emit('acceptMatch', { mode: gameMode, opponentId });
+    currentSocket?.emit('acceptMatch', { mode, opponentId });
   };
 
   const handleDecline = (opponentId: string, currentSocket: Socket) => {
@@ -118,23 +119,23 @@ const useMatch = (setOpen: SetOpenType, setDialog: SetDialogType) => {
   };
 
   const handleInvited = (
-    gameMode: GameModeType, opponent: RawUserInfoType, currentSocket: Socket,
+    mode: GameModeType, opponent: RawUserInfoType, currentSocket: Socket,
   ) => {
     const { id, name } = opponent;
     gameDispatch({
       type: 'setGame',
       gameType: 'EXHIBITION',
-      mode: gameMode,
+      mode,
       isPlayer: true,
     });
     currentSocket?.on('canceled', handleCanceled);
     setDialog({
       title: '매치 초대 알림',
-      content: `${name}님으로부터 ${gameMode} 매치 초대가 도착하였습니다.
+      content: `${name}님으로부터 ${mode} 매치 초대가 도착하였습니다.
       수락하시겠습니까?`,
       buttons: (
         <>
-          <Button onClick={() => handleAccept(gameMode, id, currentSocket)}>confirm</Button>
+          <Button onClick={() => handleAccept(mode, id, currentSocket)}>confirm</Button>
           <Button variant="outlined" onClick={() => handleDecline(id, currentSocket)}>decline</Button>
         </>
       ),

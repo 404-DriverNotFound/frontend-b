@@ -50,6 +50,7 @@ const GameMainPage = () => {
   const handleDuplicated = () => {
     toast.warn('자신과 매칭되어 대기를 취소합니다.');
     gameDispatch({ type: 'reset' });
+    setOpen(false);
   };
 
   const changeMode = (gameMode: GameModeType) => {
@@ -62,8 +63,8 @@ const GameMainPage = () => {
     setDialog({
       ...dialog,
       title: `${gameMode} MODE matching...`,
-      buttons: <Button onClick={handleExit}>매칭 취소</Button>,
-      onClose: handleExit,
+      buttons: <Button onClick={() => handleExit(gameMode)}>매칭 취소</Button>,
+      onClose: () => handleExit(gameMode),
     });
     socket?.on('ready', handleReady);
     socket?.on('duplicated', handleDuplicated);
@@ -72,7 +73,7 @@ const GameMainPage = () => {
   };
 
   useEffect(() => {
-    if (mode) handleExit();
+    if (mode) handleExit(mode);
     setDialog({
       title: 'default',
       content: (
@@ -81,8 +82,8 @@ const GameMainPage = () => {
           <Typo variant="subtitle1" align="center">매칭 가능한 유저를 찾는 중입니다</Typo>
         </Grid>
       ),
-      buttons: <Button onClick={handleExit}>매칭 취소</Button>,
-      onClose: handleExit,
+      buttons: <Button onClick={() => handleExit(mode)}>매칭 취소</Button>,
+      onClose: () => handleExit(mode),
     });
 
     return () => {
