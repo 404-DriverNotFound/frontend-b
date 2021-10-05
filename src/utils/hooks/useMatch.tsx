@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Socket } from 'socket.io-client';
 import { toast } from 'react-toastify';
 import { useHistory } from 'react-router-dom';
@@ -31,6 +31,7 @@ const offListeners = (socket: Socket | null) => {
 
 const useMatch = (setOpen: SetOpenType, setDialog: SetDialogType) => {
   const { socket } = useAppState();
+  const timerId = useRef<ReturnType<typeof setTimeout> | null>(null);
   const gameDispatch = useGameDispatch();
   const classes = useStyles();
   const history = useHistory();
@@ -41,6 +42,8 @@ const useMatch = (setOpen: SetOpenType, setDialog: SetDialogType) => {
     player1: RawUserInfoType,
     gameSetting: any,
   ) => {
+    clearTimeout(timerId.current as unknown as number || undefined);
+    timerId.current = null;
     offListeners(socket);
     gameDispatch({
       type: 'ready',
@@ -61,6 +64,8 @@ const useMatch = (setOpen: SetOpenType, setDialog: SetDialogType) => {
   };
 
   const handleDeclined = ({ message }: { message: string }) => {
+    clearTimeout(timerId.current as unknown as number || undefined);
+    timerId.current = null;
     offListeners(socket);
     toast.warn(message);
     gameDispatch({ type: 'reset' });
@@ -68,6 +73,8 @@ const useMatch = (setOpen: SetOpenType, setDialog: SetDialogType) => {
   };
 
   const handleCancel = (opponentId: string) => {
+    clearTimeout(timerId.current as unknown as number || undefined);
+    timerId.current = null;
     offListeners(socket);
     socket?.emit('cancelMatchInvitation', { opponentId });
     gameDispatch({ type: 'reset' });
@@ -93,6 +100,10 @@ const useMatch = (setOpen: SetOpenType, setDialog: SetDialogType) => {
       onClose: () => handleCancel(opponentId),
     });
     socket?.emit('inviteMatch', { mode, opponentId });
+    timerId.current = setTimeout(() => {
+      handleCancel(opponentId);
+      toast.warn('초대 대기 시간이 1분을 초과하여 자동 취소되었습니다.');
+    }, 60000);
     socket?.on('ready', handleReady);
     socket?.on('declined', handleDeclined);
   };
