@@ -1,5 +1,5 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import Badge from '@material-ui/core/Badge';
 import Grid from '@material-ui/core/Grid';
 import SecurityRoundedIcon from '@material-ui/icons/SecurityRounded';
@@ -11,6 +11,8 @@ import { SetDialogType, SetOpenType } from '../../../utils/hooks/useDialog';
 import Button from '../../atoms/Button/Button';
 import { makeMatchHistoryString } from '../../../utils/utils';
 import useMatch from '../../../utils/hooks/useMatch';
+
+const PLAY_PATH = '/game/play';
 
 type StyleProps = { me: boolean };
 
@@ -64,6 +66,7 @@ const ChatMessage = ({
   const { inviteUser } = useMatch(setOpen, setDialog);
   const classes = useStyles({ me });
   const history = useHistory();
+  const location = useLocation();
 
   const handleMatchChoice = () => {
     setDialog({
@@ -98,7 +101,7 @@ const ChatMessage = ({
             {makeMatchHistoryString(score!, win!, lose!)}
           </Typo>
           <Button variant="outlined" onClick={handleProfileClick}>프로필 페이지</Button>
-          <Button variant="outlined" onClick={handleMatchChoice}>매치 초대하기</Button>
+          {location.pathname !== PLAY_PATH && <Button variant="outlined" onClick={handleMatchChoice}>매치 초대하기</Button>}
         </Grid>
       ),
       buttons: <Button variant="text" onClick={() => { setOpen(false); }}>close</Button>,

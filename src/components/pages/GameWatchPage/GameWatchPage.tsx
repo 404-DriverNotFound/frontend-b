@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Grid from '@material-ui/core/Grid';
-import { Redirect, Route, Switch } from 'react-router-dom';
+import {
+  Redirect, Route, Switch, useLocation,
+} from 'react-router-dom';
 import { asyncGetRequest, errorMessageHandler, makeAPIPath } from '../../../utils/utils';
 import { RawMatchType, MatchType, GameModeType } from '../../../types/Match';
 import List from '../../atoms/List/List';
@@ -141,20 +143,23 @@ const list = [
   { name: 'EXHIBITION', link: EXHIBITION_MATCH_PATH },
 ];
 
-const GameWatchPage = () => (
-  <>
-    <SubMenu current={window.location.pathname} list={list} />
-    <List height="78vh" scroll>
-      <Switch>
-        <Route exact path={ALL_MATCH_PATH} component={AllMatchList} />
-        <Route exact path={LADDER_MATCH_PATH} component={LadderList} />
-        <Route exact path={EXHIBITION_MATCH_PATH} component={ExhibitionList} />
-        <Route path="/">
-          <Redirect to={ALL_MATCH_PATH} />
-        </Route>
-      </Switch>
-    </List>
-  </>
-);
+const GameWatchPage = () => {
+  const location = useLocation();
+  return (
+    <>
+      <SubMenu current={location.pathname} list={list} />
+      <List height="78vh" scroll>
+        <Switch>
+          <Route exact path={ALL_MATCH_PATH} component={AllMatchList} />
+          <Route exact path={LADDER_MATCH_PATH} component={LadderList} />
+          <Route exact path={EXHIBITION_MATCH_PATH} component={ExhibitionList} />
+          <Route path="/">
+            <Redirect to={ALL_MATCH_PATH} />
+          </Route>
+        </Switch>
+      </List>
+    </>
+  );
+};
 
 export default GameWatchPage;

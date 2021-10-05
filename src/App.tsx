@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Switch, Route, Redirect, useHistory,
+  Switch, Route, Redirect, useHistory, useLocation,
 } from 'react-router-dom';
 import axios from 'axios';
 import { io } from 'socket.io-client';
@@ -77,6 +77,7 @@ const App = () => {
   const userDispatch = useUserDispatch();
   const classes = useStyles();
   const history = useHistory();
+  const location = useLocation();
   const [userInfo, setUserInfo] = useState<RawUserInfoType | null>(null);
   const [channels, setChannels] = useState<ChannelType[]>([]);
   const [DMs, setDMs] = useState<DMRoomType[]>([]);
@@ -123,7 +124,7 @@ const App = () => {
             channels: appState.channels.map((channel) => (
               channel.name === name ? { ...channel, role: 'MEMBER' } : { ...channel })),
           });
-          if (window.location.pathname === `/channel/manage/${encodeURI(name)}`) {
+          if (location.pathname === `/channel/manage/${encodeURI(name)}`) {
             history.push('/channel');
             toast.warn(`${name} 채널의 권한이 관리자에서 멤버로 변경되었습니다.`);
           }
