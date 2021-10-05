@@ -39,7 +39,6 @@ const GameMainPage = () => {
   const history = useHistory();
   const classes = useStyles();
   const { mode } = useGameState();
-  // const { mode, setting } = useGameState();
   const gameDispatch = useGameDispatch();
   const { socket } = useAppState();
   const {
@@ -51,6 +50,13 @@ const GameMainPage = () => {
     toast.warn('자신과 매칭되어 대기를 취소합니다.');
     gameDispatch({ type: 'reset' });
     setOpen(false);
+  };
+
+  const handleMatchExit = (gameMode: GameModeType | null) => {
+    if (gameMode) {
+      socket?.emit('leaveGame', { type: 'LADDER', mode: gameMode });
+      setOpen(false);
+    }
   };
 
   const changeMode = (gameMode: GameModeType) => {
@@ -74,6 +80,9 @@ const GameMainPage = () => {
 
   useEffect(() => {
     if (mode) handleExit(mode);
+
+    socket?.on('invitedToMatch', handleMatchExit);
+
     setDialog({
       title: 'default',
       content: (
@@ -88,6 +97,8 @@ const GameMainPage = () => {
 
     return () => {
       // if (!setting) socket?.emit('leaveGame', { type: 'LADDER', mode });
+      // FIXME 뒤로가기 할 때 매치 취소 제대로 되도록
+      socket?.off('invitedToMatch', handleMatchExit);
       socket?.off('ready');
       socket?.off('duplicated');
       setOpen(false);

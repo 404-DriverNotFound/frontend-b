@@ -80,7 +80,7 @@ const useMatch = (setOpen: SetOpenType, setDialog: SetDialogType) => {
       gameType: 'EXHIBITION',
       mode,
       isPlayer: true,
-    });
+    }); // FIXME: 여기서 Dispatch하면 안 됨 -> 수락했을 때 Dispatch
     setDialog({
       title: '매치 초대 수락 대기 중',
       content: (
@@ -98,6 +98,12 @@ const useMatch = (setOpen: SetOpenType, setDialog: SetDialogType) => {
   };
 
   const handleAccept = (mode: GameModeType, opponentId: string, currentSocket: Socket) => {
+    gameDispatch({
+      type: 'setGame',
+      gameType: 'EXHIBITION',
+      mode,
+      isPlayer: true,
+    });
     currentSocket?.on('ready', handleReady);
     currentSocket?.emit('acceptMatch', { mode, opponentId });
   };
@@ -120,12 +126,6 @@ const useMatch = (setOpen: SetOpenType, setDialog: SetDialogType) => {
     mode: GameModeType, opponent: RawUserInfoType, currentSocket: Socket,
   ) => {
     const { id, name } = opponent;
-    gameDispatch({
-      type: 'setGame',
-      gameType: 'EXHIBITION',
-      mode,
-      isPlayer: true,
-    });
     currentSocket?.on('canceled', handleCanceled);
     setDialog({
       title: '매치 초대 알림',
