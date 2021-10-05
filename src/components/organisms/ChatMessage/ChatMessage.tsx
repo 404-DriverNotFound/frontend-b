@@ -11,8 +11,7 @@ import { SetDialogType, SetOpenType } from '../../../utils/hooks/useDialog';
 import Button from '../../atoms/Button/Button';
 import { makeMatchHistoryString } from '../../../utils/utils';
 import useMatch from '../../../utils/hooks/useMatch';
-
-const PLAY_PATH = '/game/play';
+import { PLAY_PATH } from '../../../utils/path';
 
 type StyleProps = { me: boolean };
 

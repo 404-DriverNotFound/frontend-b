@@ -176,7 +176,11 @@ const GamePlayPage = () => {
         </Grid>
       </Grid>
     </>
-  ) : <></>;
+  ) : (
+    <Grid container justifyContent="center" alignItems="center">
+      <Typo>문제가 발생했습니다.</Typo>
+    </Grid>
+  );
 };
 
 export default GamePlayPage;

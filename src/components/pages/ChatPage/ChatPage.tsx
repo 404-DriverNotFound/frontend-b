@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import { useAppDispatch, useAppState } from '../../../utils/hooks/useAppContext';
@@ -18,6 +19,7 @@ import useIntersect from '../../../utils/hooks/useIntersect';
 import { DMToMessage, messageToMessage } from '../../../utils/chats';
 import Button from '../../atoms/Button/Button';
 import { getMembership } from '../../../utils/channels';
+import { PLAY_PATH } from '../../../utils/path';
 
 const COUNTS_PER_PAGE = 20;
 
@@ -48,6 +50,7 @@ const ChatPage = () => {
   const {
     isOpen, setOpen, dialog, setDialog,
   } = useDialog();
+  const location = useLocation();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setChat(e.target.value);
@@ -119,6 +122,10 @@ const ChatPage = () => {
       setChats((prev) => addNewChat(prev, newMessage));
     }
   }, [newMessage]);
+
+  useEffect(() => {
+    if (location.pathname === PLAY_PATH) setOpen(false);
+  }, [location.pathname]);
 
   useEffect(() => () => {
     source.cancel();

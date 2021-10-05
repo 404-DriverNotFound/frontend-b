@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { Socket } from 'socket.io-client';
 import { toast } from 'react-toastify';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
@@ -13,8 +13,7 @@ import { RawUserInfoType } from '../../types/Response';
 import { MatchPositionType, GameModeType } from '../../types/Match';
 import { makeAPIPath } from '../utils';
 import { SetOpenType, SetDialogType } from './useDialog';
-
-const PLAY_PATH = '/game/play';
+import { PLAY_PATH } from '../path';
 
 const useStyles = makeStyles({
   progress: {
@@ -31,10 +30,12 @@ const offListeners = (socket: Socket | null) => {
 
 const useMatch = (setOpen: SetOpenType, setDialog: SetDialogType) => {
   const { socket } = useAppState();
+  const invitedId = useRef<string>('');
   const timerId = useRef<ReturnType<typeof setTimeout> | null>(null);
   const gameDispatch = useGameDispatch();
   const classes = useStyles();
   const history = useHistory();
+  const location = useLocation();
 
   const handleReady = (
     position: MatchPositionType,
@@ -68,7 +69,7 @@ const useMatch = (setOpen: SetOpenType, setDialog: SetDialogType) => {
     timerId.current = null;
     offListeners(socket);
     toast.warn(message);
-    gameDispatch({ type: 'reset' });
+    if (location.pathname !== PLAY_PATH) gameDispatch({ type: 'reset' });
     setOpen(false);
   };
 
@@ -77,17 +78,11 @@ const useMatch = (setOpen: SetOpenType, setDialog: SetDialogType) => {
     timerId.current = null;
     offListeners(socket);
     socket?.emit('cancelMatchInvitation', { opponentId });
-    gameDispatch({ type: 'reset' });
+    if (location.pathname !== PLAY_PATH) gameDispatch({ type: 'reset' });
     setOpen(false);
   };
 
   const inviteUser = (mode: GameModeType, opponentId: string) => {
-    gameDispatch({
-      type: 'setGame',
-      gameType: 'EXHIBITION',
-      mode,
-      isPlayer: true,
-    }); // FIXME: 여기서 Dispatch하면 안 됨 -> 수락했을 때 Dispatch
     setDialog({
       title: '매치 초대 수락 대기 중',
       content: (
@@ -104,7 +99,15 @@ const useMatch = (setOpen: SetOpenType, setDialog: SetDialogType) => {
       handleCancel(opponentId);
       toast.warn('초대 대기 시간이 1분을 초과하여 자동 취소되었습니다.');
     }, 60000);
-    socket?.on('ready', handleReady);
+    socket?.on('ready', (position, player0, player1, gameSetting) => {
+      gameDispatch({
+        type: 'setGame',
+        gameType: 'EXHIBITION',
+        mode,
+        isPlayer: true,
+      });
+      handleReady(position, player0, player1, gameSetting);
+    });
     socket?.on('declined', handleDeclined);
   };
 
@@ -115,11 +118,13 @@ const useMatch = (setOpen: SetOpenType, setDialog: SetDialogType) => {
       mode,
       isPlayer: true,
     });
+    invitedId.current = '';
     currentSocket?.on('ready', handleReady);
     currentSocket?.emit('acceptMatch', { mode, opponentId });
   };
 
   const handleDecline = (opponentId: string, currentSocket: Socket) => {
+    invitedId.current = '';
     gameDispatch({ type: 'reset' });
     currentSocket?.emit('declineMatch', { opponentId });
     currentSocket?.off('canceled');
@@ -127,6 +132,7 @@ const useMatch = (setOpen: SetOpenType, setDialog: SetDialogType) => {
   };
 
   const handleCanceled = ({ message }: { message: string }) => {
+    invitedId.current = '';
     toast.warn(message);
     gameDispatch({ type: 'reset' });
     offListeners(socket);
@@ -137,6 +143,14 @@ const useMatch = (setOpen: SetOpenType, setDialog: SetDialogType) => {
     mode: GameModeType, opponent: RawUserInfoType, currentSocket: Socket,
   ) => {
     const { id, name } = opponent;
+    if (invitedId.current.length) {
+      // NOTE 유저에게 decline을 보내기 때문에 한 유저가 연속으로 보내면 전부 decline되는 문제
+      // FIXME 10/6 스크럼 회의 이후 방향성 결정해서 수정
+      handleDecline(invitedId.current, currentSocket);
+      invitedId.current = id;
+    } else {
+      invitedId.current = id;
+    }
     currentSocket?.on('canceled', handleCanceled);
     setDialog({
       title: '매치 초대 알림',

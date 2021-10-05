@@ -17,10 +17,7 @@ import GamePlayPage from '../GamePlayPage/GamePlayPage';
 import { useGameDispatch, useGameState } from '../../../utils/hooks/useGameContext';
 import useMatch from '../../../utils/hooks/useMatch';
 import { GameModeType } from '../../../types/Match';
-
-const MAIN_GAME_PAGE = '/game';
-const PLAY_PATH = '/game/play';
-const WATCH_PATH = '/game/watch';
+import { MAIN_GAME_PAGE, PLAY_PATH, WATCH_PATH } from '../../../utils/path';
 
 const useStyles = makeStyles({
   root: {
@@ -96,8 +93,10 @@ const GameMainPage = () => {
     });
 
     return () => {
-      // if (!setting) socket?.emit('leaveGame', { type: 'LADDER', mode });
-      // FIXME 뒤로가기 할 때 매치 취소 제대로 되도록
+      // FIXME 뒤로가기 할 때 매치 취소 되지 않는 문제 아직 해결하지 못함
+      if (socket?.listeners('ready').length && mode) {
+        socket?.emit('leaveGame', { type: 'LADDER', mode });
+      }
       socket?.off('invitedToMatch', handleMatchExit);
       socket?.off('ready');
       socket?.off('duplicated');
