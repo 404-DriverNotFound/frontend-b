@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   Route, Switch, useHistory, Redirect,
 } from 'react-router-dom';
@@ -16,8 +16,9 @@ import Typo from '../../atoms/Typo/Typo';
 import GamePlayPage from '../GamePlayPage/GamePlayPage';
 import { useGameDispatch, useGameState } from '../../../utils/hooks/useGameContext';
 import useMatch from '../../../utils/hooks/useMatch';
-import { GameModeType } from '../../../types/Match';
+import { GameModeType, MatchPositionType } from '../../../types/Match';
 import { MAIN_GAME_PAGE, PLAY_PATH, WATCH_PATH } from '../../../utils/path';
+import { RawUserInfoType } from '../../../types/Response';
 
 const useStyles = makeStyles({
   root: {
@@ -36,6 +37,7 @@ const GameMainPage = () => {
   const history = useHistory();
   const classes = useStyles();
   const { mode } = useGameState();
+  const modeRef = useRef<GameModeType | null>(null);
   const gameDispatch = useGameDispatch();
   const { socket } = useAppState();
   const {
@@ -46,6 +48,7 @@ const GameMainPage = () => {
   const handleDuplicated = () => {
     toast.warn('자신과 매칭되어 대기를 취소합니다.');
     gameDispatch({ type: 'reset' });
+    modeRef.current = null;
     setOpen(false);
   };
 
@@ -54,6 +57,22 @@ const GameMainPage = () => {
       socket?.emit('leaveGame', { type: 'LADDER', mode: gameMode });
       setOpen(false);
     }
+    modeRef.current = null;
+  };
+
+  const handleExitWithRef = (gameMode: GameModeType | null) => {
+    modeRef.current = null;
+    handleExit(gameMode);
+  };
+
+  const handleReadyWithRef = (
+    position: MatchPositionType,
+    player0: RawUserInfoType,
+    player1: RawUserInfoType,
+    gameSetting: any,
+  ) => {
+    modeRef.current = null;
+    handleReady(position, player0, player1, gameSetting);
   };
 
   const changeMode = (gameMode: GameModeType) => {
@@ -63,13 +82,14 @@ const GameMainPage = () => {
       mode: gameMode,
       isPlayer: true,
     });
+    modeRef.current = gameMode;
     setDialog({
       ...dialog,
       title: `${gameMode} MODE matching...`,
-      buttons: <Button onClick={() => handleExit(gameMode)}>매칭 취소</Button>,
-      onClose: () => handleExit(gameMode),
+      buttons: <Button onClick={() => handleExitWithRef(gameMode)}>매칭 취소</Button>,
+      onClose: () => handleExitWithRef(gameMode),
     });
-    socket?.on('ready', handleReady);
+    socket?.on('ready', handleReadyWithRef);
     socket?.on('duplicated', handleDuplicated);
     setOpen(true);
     socket?.emit('waiting', { type: 'LADDER', mode: gameMode });
@@ -77,6 +97,7 @@ const GameMainPage = () => {
 
   useEffect(() => {
     if (mode) handleExit(mode);
+    modeRef.current = null;
 
     socket?.on('invitedToMatch', handleMatchExit);
 
@@ -88,15 +109,15 @@ const GameMainPage = () => {
           <Typo variant="subtitle1" align="center">매칭 가능한 유저를 찾는 중입니다</Typo>
         </Grid>
       ),
-      buttons: <Button onClick={() => handleExit(mode)}>매칭 취소</Button>,
-      onClose: () => handleExit(mode),
+      buttons: <Button onClick={() => handleExitWithRef(mode)}>매칭 취소</Button>,
+      onClose: () => handleExitWithRef(mode),
     });
 
     return () => {
-      // FIXME 뒤로가기 할 때 매치 취소 되지 않는 문제 아직 해결하지 못함
-      if (socket?.listeners('ready').length && mode) {
-        socket?.emit('leaveGame', { type: 'LADDER', mode });
+      if (socket?.listeners('ready').length && modeRef.current) {
+        socket?.emit('leaveGame', { type: 'LADDER', mode: modeRef.current });
       }
+      modeRef.current = null;
       socket?.off('invitedToMatch', handleMatchExit);
       socket?.off('ready');
       socket?.off('duplicated');
