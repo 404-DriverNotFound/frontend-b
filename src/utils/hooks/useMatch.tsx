@@ -73,16 +73,16 @@ const useMatch = (setOpen: SetOpenType, setDialog: SetDialogType) => {
     setOpen(false);
   };
 
-  const handleCancel = (opponentId: string) => {
+  const handleCancel = (opponentUserId: string) => {
     clearTimeout(timerId.current as unknown as number || undefined);
     timerId.current = null;
     offListeners(socket);
-    socket?.emit('cancelMatchInvitation', { opponentId });
+    socket?.emit('cancelMatchInvitation', { opponentUserId });
     if (location.pathname !== PLAY_PATH) gameDispatch({ type: 'reset' });
     setOpen(false);
   };
 
-  const inviteUser = (mode: GameModeType, opponentId: string) => {
+  const inviteUser = (mode: GameModeType, opponentUserId: string) => {
     setDialog({
       title: '매치 초대 수락 대기 중',
       content: (
@@ -91,12 +91,12 @@ const useMatch = (setOpen: SetOpenType, setDialog: SetDialogType) => {
           <Typo variant="subtitle1" align="center">매치 초대 후 수락 대기중입니다.</Typo>
         </Grid>
       ),
-      buttons: <Button onClick={() => handleCancel(opponentId)}>초대 취소</Button>,
-      onClose: () => handleCancel(opponentId),
+      buttons: <Button onClick={() => handleCancel(opponentUserId)}>초대 취소</Button>,
+      onClose: () => handleCancel(opponentUserId),
     });
-    socket?.emit('inviteMatch', { mode, opponentId });
+    socket?.emit('inviteMatch', { mode, opponentUserId });
     timerId.current = setTimeout(() => {
-      handleCancel(opponentId);
+      handleCancel(opponentUserId);
       toast.warn('초대 대기 시간이 1분을 초과하여 자동 취소되었습니다.');
     }, 60000);
     socket?.on('ready', (position, player0, player1, gameSetting) => {
@@ -111,7 +111,7 @@ const useMatch = (setOpen: SetOpenType, setDialog: SetDialogType) => {
     socket?.on('declined', handleDeclined);
   };
 
-  const handleAccept = (mode: GameModeType, opponentId: string, currentSocket: Socket) => {
+  const handleAccept = (mode: GameModeType, opponentSocketId: string, currentSocket: Socket) => {
     gameDispatch({
       type: 'setGame',
       gameType: 'EXHIBITION',
@@ -120,13 +120,13 @@ const useMatch = (setOpen: SetOpenType, setDialog: SetDialogType) => {
     });
     invitedId.current = '';
     currentSocket?.on('ready', handleReady);
-    currentSocket?.emit('acceptMatch', { mode, opponentId });
+    currentSocket?.emit('acceptMatch', { mode, opponentSocketId });
   };
 
-  const handleDecline = (opponentId: string, currentSocket: Socket) => {
+  const handleDecline = (opponentSocketId: string, currentSocket: Socket) => {
     invitedId.current = '';
     gameDispatch({ type: 'reset' });
-    currentSocket?.emit('declineMatch', { opponentId });
+    currentSocket?.emit('declineMatch', { opponentSocketId });
     currentSocket?.off('canceled');
     setOpen(false);
   };
@@ -140,17 +140,13 @@ const useMatch = (setOpen: SetOpenType, setDialog: SetDialogType) => {
   };
 
   const handleInvited = (
-    mode: GameModeType, opponent: RawUserInfoType, currentSocket: Socket,
+    mode: GameModeType, opponent: RawUserInfoType, opponentSocketId: string, currentSocket: Socket,
   ) => {
-    const { id, name } = opponent;
-    if (invitedId.current.length) {
-      // NOTE 유저에게 decline을 보내기 때문에 한 유저가 연속으로 보내면 전부 decline되는 문제
-      // FIXME 10/6 스크럼 회의 이후 방향성 결정해서 수정
-      handleDecline(invitedId.current, currentSocket);
-      invitedId.current = id;
-    } else {
-      invitedId.current = id;
-    }
+    const { name } = opponent;
+
+    if (invitedId.current?.length) handleDecline(invitedId.current, currentSocket);
+    invitedId.current = opponentSocketId;
+
     currentSocket?.on('canceled', handleCanceled);
     setDialog({
       title: '매치 초대 알림',
@@ -158,11 +154,15 @@ const useMatch = (setOpen: SetOpenType, setDialog: SetDialogType) => {
       수락하시겠습니까?`,
       buttons: (
         <>
-          <Button onClick={() => handleAccept(mode, id, currentSocket)}>confirm</Button>
-          <Button variant="outlined" onClick={() => handleDecline(id, currentSocket)}>decline</Button>
+          <Button onClick={() => handleAccept(mode, opponentSocketId, currentSocket)}>
+            confirm
+          </Button>
+          <Button variant="outlined" onClick={() => handleDecline(opponentSocketId, currentSocket)}>
+            decline
+          </Button>
         </>
       ),
-      onClose: () => handleDecline(id, currentSocket),
+      onClose: () => handleDecline(opponentSocketId, currentSocket),
     });
     setOpen(true);
   };
