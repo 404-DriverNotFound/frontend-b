@@ -22,7 +22,7 @@ const useStyles = makeStyles({
     '@supports ( -moz-appearance:none )': {
       filter: 'opacity(.5) drop-shadow(0.01rem 0.01rem 0.01rem blue)',
     },
-    '&::-webkit-filter': 'opacity(.1) drop-shadow(0 0 0 blue)',
+    '&::-webkit-filter': 'opacity(.5) drop-shadow(0 0 0 blue)',
   },
   marginBottom: {
     marginBottom: '0.3em',
