@@ -147,7 +147,7 @@ const ChatPage = () => {
   // eslint-disable-next-line no-unused-vars
   const [_, setRef] = useIntersect(async (entry: any, observer: any) => {
     observer.unobserve(entry.target);
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 10));
     setPage((prev) => (isChatEnd ? prev : prev + 1));
     observer.observe(entry.target);
   });
