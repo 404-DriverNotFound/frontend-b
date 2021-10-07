@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 import { Grid, makeStyles } from '@material-ui/core';
@@ -60,7 +60,7 @@ const ChannelInfoForm = ({ setOpen, channel }: ChannelInfoFormProps) => {
   const classes = useStyles();
   const history = useHistory();
 
-  const handleChannelNameChange = (event: React.ChangeEvent<Element>) => {
+  const handleChannelNameChange = useCallback((event: React.ChangeEvent<Element>) => {
     const { value } = (event as React.ChangeEvent<HTMLInputElement>).target;
     if (value.length > 18) return;
     if (/^[^\s]+(\s+[^\s]+)*$/.test(value) && /^[0-9a-zA-z\uAC00-\uD7A3\s]{3,18}$/.test(value)) {
@@ -72,9 +72,9 @@ const ChannelInfoForm = ({ setOpen, channel }: ChannelInfoFormProps) => {
     }
     setChannelName(value);
     setDuplicateChecked(false);
-  };
+  }, []);
 
-  const handlePasswordChange = (event: React.ChangeEvent<Element>) => {
+  const handlePasswordChange = useCallback((event: React.ChangeEvent<Element>) => {
     const { value } = (event as React.ChangeEvent<HTMLInputElement>).target;
     if (value.length > 32) return;
     if (/^[\S]{4,32}$/.test(value)) {
@@ -92,9 +92,9 @@ const ChannelInfoForm = ({ setOpen, channel }: ChannelInfoFormProps) => {
       setHelperTextCheckPassword(PASSWORD_CHECK_NO);
     }
     setPassword(value);
-  };
+  }, [checkPassword]);
 
-  const handleCheckPasswordChange = (event: React.ChangeEvent<Element>) => {
+  const handleCheckPasswordChange = useCallback((event: React.ChangeEvent<Element>) => {
     const { value } = (event as React.ChangeEvent<HTMLInputElement>).target;
     if (value.length > 32) return;
     if (value === password) {
@@ -105,9 +105,9 @@ const ChannelInfoForm = ({ setOpen, channel }: ChannelInfoFormProps) => {
       setHelperTextCheckPassword(PASSWORD_CHECK_NO);
     }
     setCheckPassword(value);
-  };
+  }, [password]);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     appDispatch({ type: 'loading' });
     axios.post('/channels',
@@ -140,9 +140,9 @@ const ChannelInfoForm = ({ setOpen, channel }: ChannelInfoFormProps) => {
           } else toast.error('입력값이 잘못되었습니다. 다시 확인해주세요.');
         } else errorMessageHandler(error);
       });
-  };
+  }, [channelName, isToggleChecked, checkPassword]);
 
-  const handleEdit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleEdit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     appDispatch({ type: 'loading' });
     axios.patch(`/channels/${channel}/password`,
@@ -155,9 +155,9 @@ const ChannelInfoForm = ({ setOpen, channel }: ChannelInfoFormProps) => {
         toast('채널 패스워드가 변경되었습니다.');
       })
       .catch((error) => { errorMessageHandler(error); });
-  };
+  }, [channel, isToggleChecked, checkPassword]);
 
-  const handleChannelNameCheck = () => {
+  const handleChannelNameCheck = useCallback(() => {
     appDispatch({ type: 'loading' });
     axios.head(`/channels/${channelName}`)
       .finally(() => {
@@ -174,9 +174,9 @@ const ChannelInfoForm = ({ setOpen, channel }: ChannelInfoFormProps) => {
           setDuplicateChecked(true);
         } else errorMessageHandler(error);
       });
-  };
+  }, [channelName]);
 
-  const isValidForm = () => {
+  const isValidForm = useCallback(() => {
     if (!isToggleChecked) {
       if (isValidChannelName && isDuplicateChecked) return true;
       return false;
@@ -184,7 +184,8 @@ const ChannelInfoForm = ({ setOpen, channel }: ChannelInfoFormProps) => {
     if (isValidChannelName && isValidPassword
       && isValidCheckPassword && isDuplicateChecked) return true;
     return false;
-  };
+  }, [isToggleChecked, isValidChannelName, isValidPassword,
+    isValidCheckPassword, isDuplicateChecked]);
 
   useEffect(() => {
     if (channel) {
@@ -295,4 +296,4 @@ ChannelInfoForm.defaultProps = {
   channel: '',
 };
 
-export default ChannelInfoForm;
+export default React.memo(ChannelInfoForm);

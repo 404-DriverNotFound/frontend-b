@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { Grid, makeStyles } from '@material-ui/core';
@@ -81,7 +81,7 @@ const UserInfoForm = ({
 
   useEffect(() => () => source.cancel(), []);
 
-  const handleNameChange = (event: React.ChangeEvent<Element>) => {
+  const handleNameChange = useCallback((event: React.ChangeEvent<Element>) => {
     const { value } = (event as React.ChangeEvent<HTMLInputElement>).target;
     if (value.length > 12) return;
 
@@ -95,9 +95,9 @@ const UserInfoForm = ({
     } else {
       setNameChecked(false);
     }
-  };
+  }, [currentName]);
 
-  const handleNameCheck = () => {
+  const handleNameCheck = useCallback(() => {
     appDispatch({ type: 'loading' });
     axios.head(`/users/${username}`)
       .finally(() => {
@@ -114,16 +114,16 @@ const UserInfoForm = ({
           setNameChecked(true);
         } else errorMessageHandler(error);
       });
-  };
+  }, [username]);
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const split = event.target.value.split('\\');
     setFilename(split[split.length - 1]);
     if (event.target.files) setImageFile(event.target.files[0]);
     else setImageFile(new Blob());
-  };
+  }, []);
 
-  const handleRegister = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleRegister = useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const formData = new FormData();
@@ -163,9 +163,9 @@ const UserInfoForm = ({
           } else toast.error('입력값이 잘못되었습니다. 다시 확인해주세요.');
         } else errorMessageHandler(error);
       });
-  };
+  }, [imageFile, username, is2FAEnabled, ftId]);
 
-  const handleEdit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleEdit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData();
     if (isAvatarChanged) formData.append('avatar', imageFile);
@@ -214,9 +214,9 @@ const UserInfoForm = ({
           } else toast.error('입력값이 잘못되었습니다. 다시 확인해주세요.');
         } else errorMessageHandler(error);
       });
-  };
+  }, [imageFile, username, is2FAEnabled]);
 
-  const isValidForm = () => {
+  const isValidForm = useCallback(() => {
     if (is2FAChanged) {
       if (username === currentName) return is2FAChanged;
       return isNameChecked && is2FAChanged;
@@ -226,7 +226,7 @@ const UserInfoForm = ({
     }
     if (username !== currentName) return isNameChecked;
     return false;
-  };
+  }, [is2FAChanged, username, currentName, isNameChecked, isAvatarChanged]);
 
   return (
     <>
@@ -287,4 +287,4 @@ UserInfoForm.defaultProps = {
   ftId: '',
 };
 
-export default UserInfoForm;
+export default React.memo(UserInfoForm);

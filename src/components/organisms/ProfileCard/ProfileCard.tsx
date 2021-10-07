@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -63,7 +63,7 @@ const useStyles = makeStyles({
   },
 });
 
-export const ProfileCardSkeleton = () => {
+export const ProfileCardSkeleton = React.memo(() => {
   const classes = useStyles();
   return (
     <Grid className={classes.skeletonCard} item container justifyContent="space-around" alignItems="center">
@@ -84,7 +84,7 @@ export const ProfileCardSkeleton = () => {
       </Grid>
     </Grid>
   );
-};
+});
 
 type ProfileCardProps = {
   userInfo: RelatedInfoType,
@@ -135,7 +135,7 @@ const ProfileCard = ({
     },
   };
 
-  const handlePostRequest = (
+  const handlePostRequest = useCallback((
     comment: string,
     status?: FriendshipType,
   ) => {
@@ -155,9 +155,9 @@ const ProfileCard = ({
       })
       .catch((error) => { errorMessageHandler(error); });
     setOpen(false);
-  };
+  }, [userInfo]);
 
-  const handlePatchRequest = (
+  const handlePatchRequest = useCallback((
     comment: string,
     status: FriendshipType,
   ) => {
@@ -178,9 +178,9 @@ const ProfileCard = ({
       })
       .catch((error) => { errorMessageHandler(error); });
     setOpen(false);
-  };
+  }, [userInfo]);
 
-  const handleDeleteRequest = (
+  const handleDeleteRequest = useCallback((
     comment: string,
     path: string,
   ) => {
@@ -198,7 +198,9 @@ const ProfileCard = ({
       })
       .catch((error) => { errorMessageHandler(error); });
     setOpen(false);
-  };
+  }, [userInfo]);
+
+  useEffect(() => () => source.cancel(), []);
 
   const friendButton: ButtonObjType | null = (() => {
     switch (relationship) {
@@ -314,8 +316,6 @@ const ProfileCard = ({
     }
   })();
 
-  useEffect(() => () => source.cancel(), []);
-
   const blockButton: ButtonObjType = (() => {
     switch (relationship) {
       case 'BLOCKING':
@@ -409,7 +409,7 @@ const ProfileCard = ({
     });
   })();
 
-  const buttonArray = () => {
+  const makeButtonArray = () => {
     const array: ButtonObjType[] = [];
 
     if (me.id === id) {
@@ -421,24 +421,22 @@ const ProfileCard = ({
     return (!profile && relationship === 'NONE') ? otherButtons : array.concat(otherButtons);
   };
 
-  const Buttons = buttonArray().map((button) => (
-    <Grid item key={button.text}>
-      <Button
-        className={['친구 요청 취소', '친구 요청 수락'].includes(button.text) ? '' : classes.button}
-        variant={['친구 요청 취소', '친구 요청 수락'].includes(button.text) ? 'contained' : 'outlined'}
-        onClick={button.onClick}
-        key={button.text}
-      >
-        {button.text}
-      </Button>
-    </Grid>
-  ));
-
   return (
     <Grid className={classes.root} item container justifyContent="space-around" alignItems="center">
       <UserProfile userInfo={userInfo} profile={profile} />
       <Grid item container justifyContent="flex-end" alignItems="center" xs={7}>
-        {Buttons}
+        {makeButtonArray().map((button) => (
+          <Grid item key={button.text}>
+            <Button
+              className={['친구 요청 취소', '친구 요청 수락'].includes(button.text) ? '' : classes.button}
+              variant={['친구 요청 취소', '친구 요청 수락'].includes(button.text) ? 'contained' : 'outlined'}
+              onClick={button.onClick}
+              key={button.text}
+            >
+              {button.text}
+            </Button>
+          </Grid>
+        ))}
       </Grid>
     </Grid>
   );
