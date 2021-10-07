@@ -14,7 +14,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import { useUserDispatch, useUserState } from './utils/hooks/useUserContext';
 import { useAppDispatch, useAppState } from './utils/hooks/useAppContext';
 import LoginPage from './components/pages/LoginPage/LoginPage';
-import { asyncGetRequest, makeAPIPath } from './utils/utils';
+import { asyncGetRequest } from './utils/utils';
 import RegisterPage from './components/pages/RegisterPage/RegisterPage';
 import MainTemplate from './components/templates/MainTemplate/MainTemplate';
 import MFARegisterPage from './components/pages/MFARegisterPage/MFARegisterPage';
@@ -35,6 +35,7 @@ import GamePage from './components/pages/GamePage/GamePage';
 import Dialog from './components/molecules/Dialog/Dialog';
 import useDialog from './utils/hooks/useDialog';
 import useMatch from './utils/hooks/useMatch';
+import useError from './utils/hooks/useError';
 
 const useStyles = makeStyles({
   progress: {
@@ -79,6 +80,7 @@ const App = () => {
   const classes = useStyles();
   const history = useHistory();
   const location = useLocation();
+  const errorMessageHandler = useError();
   const [userInfo, setUserInfo] = useState<RawUserInfoType | null>(null);
   const [channels, setChannels] = useState<ChannelType[]>([]);
   const [DMs, setDMs] = useState<DMRoomType[]>([]);
@@ -96,7 +98,7 @@ const App = () => {
         appDispatch({ type: 'connect', socket });
         userDispatch({
           type: 'login',
-          info: { ...userInfo, avatar: makeAPIPath(`/${userInfo.avatar}`) },
+          info: { ...userInfo },
         });
         channels.forEach((channel) => socket.emit('joinRoom', { id: channel.id }));
         appDispatch({ type: 'join', channels, DMs });
@@ -140,8 +142,10 @@ const App = () => {
 
   useEffect(() => {
     axios.defaults.withCredentials = true;
+    axios.defaults.baseURL = process.env.REACT_APP_API_URL;
+    axios.defaults.cancelToken = source.token;
     appDispatch({ type: 'loading' });
-    asyncGetRequest(makeAPIPath('/users/me'), source)
+    asyncGetRequest('/users/me')
       .finally(() => {
         appDispatch({ type: 'endLoading' });
       })
@@ -158,22 +162,22 @@ const App = () => {
           throw new Error('2FA');
         }
         appDispatch({ type: 'loading' });
-        return (asyncGetRequest(makeAPIPath('/blocks'), source));
+        return (asyncGetRequest('/blocks'));
       })
       .then(({ data }: { data: RawUserInfoType[] }) => {
         const list = data.map((user) => user.name);
         appDispatch({ type: 'renewBlockList', list });
-        return (asyncGetRequest(makeAPIPath('/channels/me'), source));
+        return (asyncGetRequest('/channels/me'));
       })
       .then(({ data }) => {
         setChannels(data.map((channel: RawChannelType) => makeChannelInfo(channel)));
-        return (asyncGetRequest(makeAPIPath('/dmers'), source));
+        return (asyncGetRequest('/dmers'));
       })
       .then(({ data }) => {
         setDMs(data.map((dm: RawUserInfoType): DMRoomType => ({
           id: dm.id,
           name: dm.name,
-          avatar: makeAPIPath(`/${dm.avatar}`),
+          avatar: dm.avatar,
           status: dm.status,
           latestMessage: DM_INIT,
           unreads: 0,
@@ -186,7 +190,7 @@ const App = () => {
         } else if (error.response) {
           userDispatch({ type: 'reset' });
         } else {
-          toast.error(error.message);
+          errorMessageHandler(error);
         }
       });
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import axios from 'axios';
 import strictUriEncode from 'strict-uri-encode';
 import { useHistory } from 'react-router-dom';
@@ -13,9 +13,10 @@ import ListItem from '../../atoms/ListItem/ListItem';
 import { ChannelType } from '../../../types/Chat';
 import Button from '../../atoms/Button/Button';
 import { useAppDispatch, useAppState } from '../../../utils/hooks/useAppContext';
-import { errorMessageHandler, makeAPIPath, makeDateString } from '../../../utils/utils';
+import { makeDateString } from '../../../utils/utils';
 import { useUserState } from '../../../utils/hooks/useUserContext';
 import Input from '../../atoms/Input/Input';
+import useError from '../../../utils/hooks/useError';
 
 const useStyles = makeStyles({
   root: {
@@ -62,7 +63,7 @@ const useStyles = makeStyles({
   },
 });
 
-export const ChannelListItemSkeleton = () => {
+export const ChannelListItemSkeleton = React.memo(() => {
   const classes = useStyles();
   return (
     <ListItem>
@@ -82,7 +83,7 @@ export const ChannelListItemSkeleton = () => {
       </Grid>
     </ListItem>
   );
-};
+});
 
 type ChannelListItemProps = {
   info: ChannelType,
@@ -99,13 +100,14 @@ const ChannelJoinForm = ({ info, setOpen }: ChannelJoinFormProps) => {
   const { name, isLocked } = info;
   const [password, setPassword] = useState<string>('');
   const userState = useUserState();
+  const errorMessageHandler = useError();
   const appDispatch = useAppDispatch();
   const appState = useAppState();
   const history = useHistory();
 
   const handleJoinChannel = () => {
     appDispatch({ type: 'loading' });
-    axios.post(makeAPIPath(`/channels/${strictUriEncode(name)}/members`), isLocked ? {
+    axios.post(`/channels/${strictUriEncode(name)}/members`, isLocked ? {
       memberName: userState.name, password,
     } : { memberName: userState.name })
       .finally(() => {
@@ -162,16 +164,16 @@ const ChannelListItem = ({
   const {
     name, role, unreads, isLocked, updatedAt,
   } = info;
-  const dateStr = makeDateString(updatedAt);
+  const errorMessageHandler = useError();
   const appDispatch = useAppDispatch();
   const appState = useAppState();
   const userState = useUserState();
   const history = useHistory();
   const classes = useStyles();
 
-  const handleExitChannel = () => {
+  const handleExitChannel = useCallback(() => {
     appDispatch({ type: 'loading' });
-    axios.delete(makeAPIPath(`/channels/${strictUriEncode(name)}/members/${userState.name}`))
+    axios.delete(`/channels/${strictUriEncode(name)}/members/${userState.name}`)
       .finally(() => {
         appDispatch({ type: 'endLoading' });
       })
@@ -184,18 +186,18 @@ const ChannelListItem = ({
       .catch((error) => {
         errorMessageHandler(error);
       });
-  };
+  }, [info]);
 
-  const openJoinDialog = () => {
+  const openJoinDialog = useCallback(() => {
     setDialog({
       title: 'Join Channel',
       content: <ChannelJoinForm info={info} setOpen={setOpen} />,
       onClose: () => { setOpen(false); },
     });
     setOpen(true);
-  };
+  }, [info]);
 
-  const openLeaveDialog = () => {
+  const openLeaveDialog = useCallback(() => {
     setDialog({
       title: 'Leave Channel',
       content: role === 'OWNER'
@@ -209,14 +211,22 @@ const ChannelListItem = ({
       onClose: () => { setOpen(false); },
     });
     setOpen(true);
-  };
+  }, [info]);
 
-  const JoinButton = () => (<Button variant="outlined" onClick={openJoinDialog}>채널 가입</Button>);
-  const ManageButton = () => (<Button variant="outlined" onClick={() => history.push(`/channel/manage/${strictUriEncode(name)}`)}>채널 관리</Button>);
-  const GoChatButton = () => (<Button variant="outlined" onClick={() => appDispatch({ type: 'enterChat', chatting: { type: 'channel', name } })}>채팅 참가</Button>);
-  const LeaveButton = () => (<Button variant="outlined" onClick={openLeaveDialog}>채널 탈퇴</Button>);
+  const handleManage = useCallback(() => {
+    history.push(`/channel/manage/${strictUriEncode(name)}`);
+  }, []);
 
-  const Buttons = () => {
+  const handleEnterChat = useCallback(() => {
+    appDispatch({ type: 'enterChat', chatting: { type: 'channel', name } });
+  }, []);
+
+  const JoinButton = React.memo(() => <Button variant="outlined" onClick={openJoinDialog}>채널 가입</Button>);
+  const ManageButton = React.memo(() => <Button variant="outlined" onClick={handleManage}>채널 관리</Button>);
+  const GoChatButton = React.memo(() => <Button variant="outlined" onClick={handleEnterChat}>채팅 참가</Button>);
+  const LeaveButton = React.memo(() => <Button variant="outlined" onClick={openLeaveDialog}>채널 탈퇴</Button>);
+
+  const Buttons = useCallback(() => {
     switch (role) {
       case 'MEMBER':
         return (
@@ -238,13 +248,13 @@ const ChannelListItem = ({
       default:
         return (<JoinButton />);
     }
-  };
+  }, [role]);
 
   return (
     <ListItem>
       <Grid className={classes.root} item container justifyContent="space-around" alignItems="center">
         <Grid item container justifyContent="center" alignItems="center" xs={2}>
-          <Typo variant="body1">{dateStr}</Typo>
+          <Typo variant="body1">{makeDateString(updatedAt)}</Typo>
         </Grid>
         <Grid item container justifyContent="center" alignItems="center" xs={5}>
           <Typo variant="h6">{name}</Typo>
@@ -263,4 +273,4 @@ const ChannelListItem = ({
   );
 };
 
-export default ChannelListItem;
+export default React.memo(ChannelListItem);

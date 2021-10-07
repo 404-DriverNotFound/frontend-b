@@ -5,7 +5,7 @@ import strictUriEncode from 'strict-uri-encode';
 import Grid from '@material-ui/core/Grid';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import { useAppDispatch, useAppState } from '../../../utils/hooks/useAppContext';
-import { asyncGetRequest, errorMessageHandler, makeAPIPath } from '../../../utils/utils';
+import { asyncGetRequest } from '../../../utils/utils';
 import ChatInput from '../../atoms/ChatInput/ChatInput';
 import List from '../../atoms/List/List';
 import Typo from '../../atoms/Typo/Typo';
@@ -21,11 +21,12 @@ import { DMToMessage, messageToMessage } from '../../../utils/chats';
 import Button from '../../atoms/Button/Button';
 import { getMembership } from '../../../utils/channels';
 import { PLAY_PATH } from '../../../utils/path';
+import useError from '../../../utils/hooks/useError';
 
 const COUNTS_PER_PAGE = 20;
 
-const postChannelChat = (name: string, content: string) => (axios.post(makeAPIPath(`/channels/${strictUriEncode(name)}/chats`), { content }));
-const postDM = (name: string, content: string) => (axios.post(makeAPIPath('/dms'), { name, content }));
+const postChannelChat = (name: string, content: string) => (axios.post(`/channels/${strictUriEncode(name)}/chats`, { content }));
+const postDM = (name: string, content: string) => (axios.post('/dms', { name, content }));
 
 const addNewChat = (prev: MessageType[], message: MessageType) => {
   const temp = prev.slice();
@@ -46,6 +47,7 @@ const ChatPage = () => {
   const [members, setMembers] = useState<MemberType[]>([]);
   const appDispatch = useAppDispatch();
   const location = useLocation();
+  const errorMessageHandler = useError();
   const { chatting, newMessage, blockList } = useAppState();
   const {
     isOpen, setOpen, dialog, setDialog,
@@ -71,9 +73,9 @@ const ChatPage = () => {
 
   const fetchItems = () => {
     if (!chatting || isChatEnd) return;
-    const path = chatting.type === 'channel' ? makeAPIPath(`/channels/${strictUriEncode(chatting.name)}/chats`) : makeAPIPath(`/dms/opposite/${chatting.name}`);
+    const path = chatting.type === 'channel' ? `/channels/${strictUriEncode(chatting.name)}/chats` : `/dms/opposite/${chatting.name}`;
 
-    asyncGetRequest(`${path}?perPage=${COUNTS_PER_PAGE}&page=${page}`, source)
+    asyncGetRequest(`${path}?perPage=${COUNTS_PER_PAGE}&page=${page}`)
       .finally(() => appDispatch({ type: 'endLoading' }))
       .then(({ data }) => {
         const typed: MessageType[] = data
@@ -98,7 +100,7 @@ const ChatPage = () => {
     setPage(-1);
     setChatEnd(true);
     if (chatting && chatting.type === 'channel') {
-      asyncGetRequest(makeAPIPath(`/channels/${strictUriEncode(chatting.name)}/members`))
+      asyncGetRequest(`/channels/${strictUriEncode(chatting.name)}/members`)
         .then(({ data }) => { setMembers(data); })
         .catch((error) => { errorMessageHandler(error); });
     } else setMembers([]);
