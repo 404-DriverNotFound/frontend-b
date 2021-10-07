@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Grid from '@material-ui/core/Grid';
-import { asyncGetRequest, makeAPIPath } from '../../../utils/utils';
+import { asyncGetRequest } from '../../../utils/utils';
 import List from '../../atoms/List/List';
 import useIntersect from '../../../utils/hooks/useIntersect';
 import { DMRoomType } from '../../../types/Chat';
@@ -42,7 +42,6 @@ const DMPage = () => {
               const DM = appState.DMs.find((one) => one.name === opposite.name);
               return {
                 ...opposite,
-                avatar: makeAPIPath(`/${opposite.avatar}`),
                 latestMessage,
                 unreads: DM ? DM.unreads : 0,
               };

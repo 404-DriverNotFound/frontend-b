@@ -13,7 +13,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import { useUserDispatch, useUserState } from './utils/hooks/useUserContext';
 import { useAppDispatch, useAppState } from './utils/hooks/useAppContext';
 import LoginPage from './components/pages/LoginPage/LoginPage';
-import { asyncGetRequest, makeAPIPath } from './utils/utils';
+import { asyncGetRequest } from './utils/utils';
 import RegisterPage from './components/pages/RegisterPage/RegisterPage';
 import MainTemplate from './components/templates/MainTemplate/MainTemplate';
 import MFARegisterPage from './components/pages/MFARegisterPage/MFARegisterPage';
@@ -97,7 +97,7 @@ const App = () => {
         appDispatch({ type: 'connect', socket });
         userDispatch({
           type: 'login',
-          info: { ...userInfo, avatar: makeAPIPath(`/${userInfo.avatar}`) },
+          info: { ...userInfo },
         });
         channels.forEach((channel) => socket.emit('joinRoom', { id: channel.id }));
         appDispatch({ type: 'join', channels, DMs });
@@ -176,7 +176,7 @@ const App = () => {
         setDMs(data.map((dm: RawUserInfoType): DMRoomType => ({
           id: dm.id,
           name: dm.name,
-          avatar: makeAPIPath(`/${dm.avatar}`),
+          avatar: dm.avatar,
           status: dm.status,
           latestMessage: DM_INIT,
           unreads: 0,

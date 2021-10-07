@@ -6,7 +6,7 @@ import { useHistory } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useUserDispatch } from '../../../utils/hooks/useUserContext';
 import { useAppDispatch } from '../../../utils/hooks/useAppContext';
-import { asyncGetRequest, makeAPIPath } from '../../../utils/utils';
+import { asyncGetRequest } from '../../../utils/utils';
 import { RawUserInfoType } from '../../../types/Response';
 import Button from '../../atoms/Button/Button';
 import DigitInput from '../../atoms/DigitInput/DigitInput';
@@ -116,7 +116,7 @@ const MFAPage = () => {
           info: {
             id,
             name,
-            avatar: makeAPIPath(`/${avatar}`),
+            avatar,
             enable2FA,
             authenticatorSecret,
             isSecondFactorAuthenticated,

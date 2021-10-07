@@ -189,7 +189,7 @@ const UserInfoForm = ({
           info: {
             id,
             name,
-            avatar: makeAPIPath(`/${avatar}`),
+            avatar,
             enable2FA,
             authenticatorSecret,
             isSecondFactorAuthenticated,

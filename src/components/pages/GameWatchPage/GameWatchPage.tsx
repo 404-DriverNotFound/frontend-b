@@ -4,7 +4,7 @@ import Grid from '@material-ui/core/Grid';
 import {
   Redirect, Route, Switch, useLocation,
 } from 'react-router-dom';
-import { asyncGetRequest, makeAPIPath } from '../../../utils/utils';
+import { asyncGetRequest } from '../../../utils/utils';
 import { RawMatchType, MatchType, GameModeType } from '../../../types/Match';
 import List from '../../atoms/List/List';
 import SubMenu from '../../molecules/SubMenu/SubMenu';
@@ -63,8 +63,6 @@ const MatchList = ({ type }: ListProps) => {
         const typed: MatchType[] = data.map((match) => ({
           ...match,
           createdAt: new Date(match.createdAt),
-          user1: { ...match.user1, avatar: makeAPIPath(`/${match.user1.avatar}`) },
-          user2: { ...match.user2, avatar: makeAPIPath(`/${match.user2.avatar}`) },
         }));
         setMatches((prev) => prev.concat(typed));
         if (data.length === 0 || data.length < COUNTS_PER_PAGE) setListEnd(true);

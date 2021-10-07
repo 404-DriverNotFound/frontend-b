@@ -3,7 +3,7 @@ import { RouteComponentProps, useHistory } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import Grid from '@material-ui/core/Grid';
-import { asyncGetRequest, makeAPIPath } from '../../../utils/utils';
+import { asyncGetRequest } from '../../../utils/utils';
 import List from '../../atoms/List/List';
 import Button from '../../atoms/Button/Button';
 import Dialog from '../../molecules/Dialog/Dialog';
@@ -54,7 +54,7 @@ const ChannelManagePage = ({ match }: RouteComponentProps<MatchParams>) => {
 
     asyncGetRequest(`${path}?perPage=${COUNTS_PER_PAGE}&page=${page}`)
       .then(({ data }) => {
-        setUsers((prev) => prev.concat(data.map((user: MemberType) => ({ ...user, avatar: makeAPIPath(`/${user.avatar}`) }))));
+        setUsers((prev) => prev.concat(data));
         if (data.length === 0 || data.length < COUNTS_PER_PAGE) setListEnd(true);
       })
       .catch((error) => {

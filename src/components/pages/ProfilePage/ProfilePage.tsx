@@ -12,7 +12,7 @@ import AchieveListItem, { AchieveListItemSkeleton } from '../../organisms/Achiev
 import { RelatedInfoType } from '../../../types/User';
 import { useUserState } from '../../../utils/hooks/useUserContext';
 import { useAppDispatch } from '../../../utils/hooks/useAppContext';
-import { asyncGetRequest, makeAPIPath } from '../../../utils/utils';
+import { asyncGetRequest } from '../../../utils/utils';
 import { makeRelatedInfo } from '../../../utils/friendships';
 import { initialRawFriendInfo, initialRawUserInfo, RawRelatedInfoType } from '../../../types/Response';
 import { RawAchievementType, AchievementType } from '../../../types/Game';
@@ -55,8 +55,6 @@ const MatchHistory = ({ username }: UserNameType) => {
         const match: MatchType[] = data.map((info) => ({
           ...info,
           createdAt: new Date(info.createdAt),
-          user1: { ...info.user1, avatar: makeAPIPath(`/${info.user1.avatar}`) },
-          user2: { ...info.user2, avatar: makeAPIPath(`/${info.user2.avatar}`) },
         }));
         setMatchHistories((prev) => prev.concat(match));
         if (data.length === 0 || data.length < COUNTS_PER_PAGE) setListEnd(true);
