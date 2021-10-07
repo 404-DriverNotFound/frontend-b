@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import strictUriEncode from 'strict-uri-encode';
 import Grid from '@material-ui/core/Grid';
 import Badge from '@material-ui/core/Badge';
 import SecurityRoundedIcon from '@material-ui/icons/SecurityRounded';
@@ -202,7 +201,7 @@ const ChannelUserListItem = ({
   ) => {
     const path = ['ADMIN', 'MEMBER', 'BANNED'].includes(type) ? 'role' : type;
     appDispatch({ type: 'loading' });
-    axios.patch(`/channels/${strictUriEncode(channelName)}/members/${name}/${path}`,
+    axios.patch(`/channels/${channelName}/members/${name}/${path}`,
       path !== type ? { role: type } : null)
       .finally(() => {
         appDispatch({ type: 'endLoading' });
@@ -222,7 +221,7 @@ const ChannelUserListItem = ({
 
   const handleUnBanUser = useCallback(() => {
     appDispatch({ type: 'loading' });
-    axios.delete(`/channels/${strictUriEncode(channelName)}/members/${name}`)
+    axios.delete(`/channels/${channelName}/members/${name}`)
       .finally(() => {
         appDispatch({ type: 'endLoading' });
       })
