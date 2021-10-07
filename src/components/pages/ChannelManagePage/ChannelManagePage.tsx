@@ -50,7 +50,7 @@ const ChannelManagePage = ({ match }: RouteComponentProps<MatchParams>) => {
   const fetchItems = () => {
     if (isListEnd) return;
 
-    asyncGetRequest(`${path}?perPage=${COUNTS_PER_PAGE}&page=${page}`, source)
+    asyncGetRequest(`${path}?perPage=${COUNTS_PER_PAGE}&page=${page}`)
       .then(({ data }) => {
         setUsers((prev) => prev.concat(data.map((user: MemberType) => ({ ...user, avatar: makeAPIPath(`/${user.avatar}`) }))));
         if (data.length === 0 || data.length < COUNTS_PER_PAGE) setListEnd(true);
@@ -90,6 +90,7 @@ const ChannelManagePage = ({ match }: RouteComponentProps<MatchParams>) => {
         }
       })
       .catch((error) => {
+        source.cancel();
         errorMessageHandler(error);
         history.goBack();
       });

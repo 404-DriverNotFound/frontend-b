@@ -33,7 +33,7 @@ const MFARegisterPage = () => {
 
   useEffect(() => {
     appDispatch({ type: 'loading' });
-    asyncGetRequest('/users/me', source)
+    asyncGetRequest('/users/me')
       .then(({ data }: { data: RawUserInfoType }) => {
         const { enable2FA, authenticatorSecret } = data;
         if (!enable2FA || (enable2FA && authenticatorSecret)) {

@@ -27,7 +27,7 @@ const DMPage = () => {
   const fetchItems = () => {
     if (isListEnd) return;
 
-    asyncGetRequest(`${path}?perPage=${COUNTS_PER_PAGE}&page=${page}`, source)
+    asyncGetRequest(`${path}?perPage=${COUNTS_PER_PAGE}&page=${page}`)
       .then(({ data }: { data: RawUserInfoType[] }) => {
         const promises = data.map((one) => axios.get(`/dms/opposite/${one.name}?perPage=1&page=1`, {
           cancelToken: source.token,

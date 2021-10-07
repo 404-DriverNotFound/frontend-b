@@ -49,7 +49,7 @@ const MatchHistory = ({ username }: UserNameType) => {
   const fetchItems = () => {
     if (isListEnd) return;
 
-    asyncGetRequest(`${path}?perPage=${COUNTS_PER_PAGE}&page=${page}&status=DONE`, source)
+    asyncGetRequest(`${path}?perPage=${COUNTS_PER_PAGE}&page=${page}&status=DONE`)
       .then(({ data }: { data: RawMatchType[] }) => {
         const match: MatchType[] = data.map((info) => ({
           ...info,
@@ -193,11 +193,11 @@ const ProfilePage = ({ match }: RouteComponentProps<MatchParams>) => {
       friendship: initialRawFriendInfo,
     };
     appDispatch({ type: 'loading' });
-    asyncGetRequest(`/users/${username}`, source)
+    asyncGetRequest(`/users/${username}`)
       .then(({ data }) => {
         Object.assign(userInfo, data);
         return (
-          asyncGetRequest(`/friendships/${username}`, source)
+          asyncGetRequest(`/friendships/${username}`)
             .then((response) => {
               Object.assign(userInfo.friendship, response.data);
               setUser(makeRelatedInfo(me, userInfo));

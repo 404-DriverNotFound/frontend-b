@@ -1,14 +1,15 @@
-import axios, { CancelTokenSource } from 'axios';
+import axios from 'axios';
 import { toast } from 'react-toastify';
 
 const makeAPIPath = (path: string): string => (`${process.env.REACT_APP_API_URL}${path}`);
 
-const asyncGetRequest = async (url: string, source?: CancelTokenSource) => {
-  let response;
+const asyncGetRequest = async (url: string) => {
+  const { CancelToken } = axios;
+  const source = CancelToken.source();
   axios.defaults.withCredentials = true;
   axios.defaults.baseURL = process.env.REACT_APP_API_URL;
-  if (source) response = await axios.get(url, { cancelToken: source.token });
-  else response = await axios.get(url);
+  axios.defaults.cancelToken = source.token;
+  const response = await axios.get(url, { cancelToken: source.token });
   return response;
 };
 

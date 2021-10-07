@@ -72,7 +72,7 @@ const ChatPage = () => {
     if (!chatting || isChatEnd) return;
     const path = chatting.type === 'channel' ? `/channels/${chatting.name}/chats` : `/dms/opposite/${chatting.name}`;
 
-    asyncGetRequest(`${path}?perPage=${COUNTS_PER_PAGE}&page=${page}`, source)
+    asyncGetRequest(`${path}?perPage=${COUNTS_PER_PAGE}&page=${page}`)
       .finally(() => appDispatch({ type: 'endLoading' }))
       .then(({ data }) => {
         const typed: MessageType[] = data

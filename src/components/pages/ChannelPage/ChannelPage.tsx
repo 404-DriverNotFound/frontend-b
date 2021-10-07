@@ -53,7 +53,7 @@ const ChannelList = ({ type }: ListProps) => {
   const fetchItems = () => {
     if (isListEnd) return;
 
-    asyncGetRequest(`${path}?perPage=${COUNTS_PER_PAGE}&page=${page}`, source)
+    asyncGetRequest(`${path}?perPage=${COUNTS_PER_PAGE}&page=${page}`)
       .then(({ data }) => {
         const typed: ChannelType[] = data.map((channel: RawChannelType) => (
           makeChannelInfo(channel)));

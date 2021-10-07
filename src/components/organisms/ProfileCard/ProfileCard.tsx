@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -103,9 +103,9 @@ type ButtonObjType = {
 const ProfileCard = ({
   userInfo, setUser, setOpen, setDialog, profile,
 }: ProfileCardProps) => {
-  const {
-    id, name, relationship,
-  } = userInfo;
+  const { CancelToken } = axios;
+  const source = CancelToken.source();
+  const { id, name, relationship } = userInfo;
   const { inviteUser } = useMatch(setOpen, setDialog);
   const me = useUserState();
   const appDispatch = useAppDispatch();
@@ -312,6 +312,8 @@ const ProfileCard = ({
         return null;
     }
   })();
+
+  useEffect(() => () => source.cancel(), []);
 
   const blockButton: ButtonObjType = (() => {
     switch (relationship) {

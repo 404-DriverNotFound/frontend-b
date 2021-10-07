@@ -45,7 +45,7 @@ const MFAPage = () => {
 
   useEffect(() => {
     appDispatch({ type: 'loading' });
-    asyncGetRequest('/users/me', source)
+    asyncGetRequest('/users/me')
       .finally(() => {
         appDispatch({ type: 'endLoading' });
       })

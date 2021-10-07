@@ -37,6 +37,8 @@ type ChannelInfoFormProps = {
 };
 
 const ChannelInfoForm = ({ setOpen, channel }: ChannelInfoFormProps) => {
+  const { CancelToken } = axios;
+  const source = CancelToken.source();
   const [channelName, setChannelName] = useState<string>('');
   const [isValidChannelName, setValidChannelName] = useState<boolean>(false);
   // eslint-disable-next-line max-len
@@ -192,10 +194,13 @@ const ChannelInfoForm = ({ setOpen, channel }: ChannelInfoFormProps) => {
           setToggleCheck(data.password !== null);
         })
         .catch((error) => {
+          source.cancel();
           errorMessageHandler(error);
           setOpen(false);
         });
     }
+
+    return () => source.cancel();
   }, []);
 
   return (

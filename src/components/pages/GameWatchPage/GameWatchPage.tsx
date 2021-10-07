@@ -56,7 +56,7 @@ const MatchList = ({ type }: ListProps) => {
   const fetchItems = () => {
     if (isListEnd) return;
 
-    asyncGetRequest(`${path}&perPage=${COUNTS_PER_PAGE}&page=${page}${typePath}`, source)
+    asyncGetRequest(`${path}&perPage=${COUNTS_PER_PAGE}&page=${page}${typePath}`)
       .then(({ data }: { data: RawMatchType[] }) => {
         const typed: MatchType[] = data.map((match) => ({
           ...match,

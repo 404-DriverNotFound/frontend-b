@@ -40,6 +40,8 @@ type UserInfoFormProps = {
 const UserInfoForm = ({
   currentName, currentAvatarSrc, current2FA, setDialog, setOpen, ftId,
 }: UserInfoFormProps) => {
+  const { CancelToken } = axios;
+  const source = CancelToken.source();
   const [username, setUsername] = useState<string>(currentName);
   const [helperText, setHelperText] = useState<string>('영문+숫자 3-12자');
   const [isValidName, setNameValid] = useState<boolean>(false);
@@ -74,6 +76,8 @@ const UserInfoForm = ({
     };
     fileReader.readAsDataURL(imageFile as Blob);
   }, [imageFile]);
+
+  useEffect(() => () => source.cancel(), []);
 
   const handleNameChange = (event: React.ChangeEvent<Element>) => {
     const { value } = (event as React.ChangeEvent<HTMLInputElement>).target;

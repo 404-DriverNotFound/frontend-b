@@ -50,7 +50,7 @@ const UserList = ({ type }: ListProps) => {
   const fetchItems = () => {
     if (isListEnd) return;
 
-    asyncGetRequest(`${path}?perPage=${COUNTS_PER_PAGE}&page=${page}`, source)
+    asyncGetRequest(`${path}?perPage=${COUNTS_PER_PAGE}&page=${page}`)
       .then(({ data }: { data: RawUserInfoType[] }) => {
         const typed: UserInfoType[] = data;
         setUsers((prev) => prev.concat(typed.map((user) => ({ ...user, avatar: makeAPIPath(`/${user.avatar}`), relationship }))));
@@ -77,13 +77,13 @@ const UserList = ({ type }: ListProps) => {
 
   useEffect(() => {
     if (type === 'friends') {
-      asyncGetRequest('/friends?status=REQUESTED&me=REQUESTER', source)
+      asyncGetRequest('/friends?status=REQUESTED&me=REQUESTER')
         .then(({ data }: { data: RawUserInfoType[] }) => {
           const typed: UserInfoType[] = data;
           setUsers(typed.map((oneUser) => ({ ...oneUser, avatar: makeAPIPath(`/${oneUser.avatar}`), relationship: 'REQUESTING' })));
         })
         .catch((error) => { errorMessageHandler(error); });
-      asyncGetRequest('/friends?status=REQUESTED&me=ADDRESSEE', source)
+      asyncGetRequest('/friends?status=REQUESTED&me=ADDRESSEE')
         .then(({ data }: { data: RawUserInfoType[] }) => {
           const typed: UserInfoType[] = data;
           setUsers((prev) => prev.concat(typed.map((oneUser) => ({ ...oneUser, avatar: makeAPIPath(`/${oneUser.avatar}`), relationship: 'REQUESTED' }))));
