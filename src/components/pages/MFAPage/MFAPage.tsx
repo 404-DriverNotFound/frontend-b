@@ -45,7 +45,7 @@ const MFAPage = () => {
 
   useEffect(() => {
     appDispatch({ type: 'loading' });
-    asyncGetRequest(makeAPIPath('/users/me'), source)
+    asyncGetRequest('/users/me', source)
       .finally(() => {
         appDispatch({ type: 'endLoading' });
       })
@@ -101,7 +101,7 @@ const MFAPage = () => {
 
   const handleClick = () => {
     appDispatch({ type: 'loading' });
-    axios.post(makeAPIPath('/auth/otp'), { token: inputs.join('') })
+    axios.post('/auth/otp', { token: inputs.join('') })
       .finally(() => {
         appDispatch({ type: 'endLoading' });
       })

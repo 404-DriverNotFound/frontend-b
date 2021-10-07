@@ -93,7 +93,7 @@ const UserInfoForm = ({
 
   const handleNameCheck = () => {
     appDispatch({ type: 'loading' });
-    axios.head(makeAPIPath(`/users/${username}`))
+    axios.head(`/users/${username}`)
       .finally(() => {
         appDispatch({ type: 'endLoading' });
       })
@@ -127,7 +127,7 @@ const UserInfoForm = ({
     formData.append('ftId', ftId!);
     appDispatch({ type: 'loading' });
     axios({
-      url: makeAPIPath('/users'),
+      url: '/users',
       method: 'post',
       data: formData,
     })
@@ -167,7 +167,7 @@ const UserInfoForm = ({
     if (is2FAChanged) formData.append('enable2FA', String(is2FAEnabled));
     appDispatch({ type: 'loading' });
     axios({
-      url: makeAPIPath('/users/me'),
+      url: '/users/me',
       method: 'patch',
       data: formData,
     })

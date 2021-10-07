@@ -4,7 +4,7 @@ import { useHistory } from 'react-router-dom';
 import { Grid, makeStyles } from '@material-ui/core';
 import { toast } from 'react-toastify';
 import { useAppDispatch, useAppState } from '../../../utils/hooks/useAppContext';
-import { asyncGetRequest, errorMessageHandler, makeAPIPath } from '../../../utils/utils';
+import { asyncGetRequest, errorMessageHandler } from '../../../utils/utils';
 import { SetOpenType } from '../../../utils/hooks/useDialog';
 import Input from '../../atoms/Input/Input';
 import Switch from '../../atoms/Switch/Switch';
@@ -106,7 +106,7 @@ const ChannelInfoForm = ({ setOpen, channel }: ChannelInfoFormProps) => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     appDispatch({ type: 'loading' });
-    axios.post(makeAPIPath('/channels'),
+    axios.post('/channels',
       isToggleChecked ? { name: channelName, password: checkPassword }
         : { name: channelName })
       .finally(() => {
@@ -141,7 +141,7 @@ const ChannelInfoForm = ({ setOpen, channel }: ChannelInfoFormProps) => {
   const handleEdit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     appDispatch({ type: 'loading' });
-    axios.patch(makeAPIPath(`/channels/${channel}/password`),
+    axios.patch(`/channels/${channel}/password`,
       isToggleChecked ? { password: checkPassword } : {})
       .finally(() => {
         appDispatch({ type: 'endLoading' });
@@ -155,7 +155,7 @@ const ChannelInfoForm = ({ setOpen, channel }: ChannelInfoFormProps) => {
 
   const handleChannelNameCheck = () => {
     appDispatch({ type: 'loading' });
-    axios.head(makeAPIPath(`/channels/${channelName}`))
+    axios.head(`/channels/${channelName}`)
       .finally(() => {
         appDispatch({ type: 'endLoading' });
       })
@@ -187,7 +187,7 @@ const ChannelInfoForm = ({ setOpen, channel }: ChannelInfoFormProps) => {
       setValidChannelName(true);
       setDuplicateChecked(true);
       setChannelName(channel);
-      asyncGetRequest(makeAPIPath(`/channels/${channel}`))
+      asyncGetRequest(`/channels/${channel}`)
         .then(({ data }) => {
           setToggleCheck(data.password !== null);
         })

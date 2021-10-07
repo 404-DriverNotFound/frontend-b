@@ -22,14 +22,14 @@ const DMPage = () => {
   const [page, setPage] = useState<number>(0);
   const userState = useUserState();
   const appState = useAppState();
-  const path = makeAPIPath('/dmers');
+  const path = '/dmers';
 
   const fetchItems = () => {
     if (isListEnd) return;
 
     asyncGetRequest(`${path}?perPage=${COUNTS_PER_PAGE}&page=${page}`, source)
       .then(({ data }: { data: RawUserInfoType[] }) => {
-        const promises = data.map((one) => axios.get(makeAPIPath(`/dms/opposite/${one.name}?perPage=1&page=1`), {
+        const promises = data.map((one) => axios.get(`/dms/opposite/${one.name}?perPage=1&page=1`, {
           cancelToken: source.token,
         }));
         Promise.all(promises)

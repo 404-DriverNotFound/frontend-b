@@ -11,7 +11,7 @@ import Button from '../../atoms/Button/Button';
 import UserProfile from '../../molecules/UserProfile/UserProfile';
 import { SetDialogType, SetOpenType } from '../../../utils/hooks/useDialog';
 import UserInfoForm from '../UserInfoForm/UserInfoForm';
-import { errorMessageHandler, makeAPIPath } from '../../../utils/utils';
+import { errorMessageHandler } from '../../../utils/utils';
 import { makeRelationship } from '../../../utils/friendships';
 import Typo from '../../atoms/Typo/Typo';
 import useMatch from '../../../utils/hooks/useMatch';
@@ -139,7 +139,7 @@ const ProfileCard = ({
     status?: FriendshipType,
   ) => {
     appDispatch({ type: 'loading' });
-    axios.post(makeAPIPath(status ? '/blocks' : '/friendships'), {
+    axios.post(status ? '/blocks' : '/friendships', {
       addresseeName: name,
     })
       .finally(() => {
@@ -161,7 +161,7 @@ const ProfileCard = ({
     status: FriendshipType,
   ) => {
     appDispatch({ type: 'loading' });
-    axios.patch(makeAPIPath(`/friendships/${name}/status`), {
+    axios.patch(`/friendships/${name}/status`, {
       status,
     })
       .finally(() => {
@@ -184,7 +184,7 @@ const ProfileCard = ({
     path: string,
   ) => {
     appDispatch({ type: 'loading' });
-    axios.delete(makeAPIPath(`${path}/${name}`))
+    axios.delete(`${path}/${name}`)
       .finally(() => {
         appDispatch({ type: 'endLoading' });
       })

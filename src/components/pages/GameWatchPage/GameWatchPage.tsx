@@ -33,7 +33,7 @@ const dummySetDialog = (value: DialogProps) => {};
 const MatchList = ({ type }: ListProps) => {
   const { CancelToken } = axios;
   const source = CancelToken.source();
-  const path = makeAPIPath('/matches?status=IN_PROGRESS');
+  const path = '/matches?status=IN_PROGRESS';
   const typePath = type === 'ALL' ? '' : `&type=${type}`;
   const { socket } = useAppState();
   const gameDispatch = useGameDispatch();

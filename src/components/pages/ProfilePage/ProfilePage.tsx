@@ -41,7 +41,7 @@ type MatchParams = {
 const MatchHistory = ({ username }: UserNameType) => {
   const { CancelToken } = axios;
   const source = CancelToken.source();
-  const path = makeAPIPath(`/users/${username}/matches`);
+  const path = `/users/${username}/matches`;
   const [matchHistories, setMatchHistories] = useState<MatchType[]>([]);
   const [isListEnd, setListEnd] = useState(true);
   const [page, setPage] = useState<number>(0);
@@ -130,7 +130,7 @@ const AchievementList = ({ username }: UserNameType) => {
   const source = CancelToken.source();
   const [achieves, setAchieves] = useState<AchievementType[]>([]);
   const [isLoaded, setLoaded] = useState<boolean>(false);
-  const path = makeAPIPath(`/users/${username}/achievements`);
+  const path = `/users/${username}/achievements`;
 
   useEffect(() => {
     axios.get(path, { cancelToken: source.token })
@@ -193,11 +193,11 @@ const ProfilePage = ({ match }: RouteComponentProps<MatchParams>) => {
       friendship: initialRawFriendInfo,
     };
     appDispatch({ type: 'loading' });
-    asyncGetRequest(makeAPIPath(`/users/${username}`), source)
+    asyncGetRequest(`/users/${username}`, source)
       .then(({ data }) => {
         Object.assign(userInfo, data);
         return (
-          asyncGetRequest(makeAPIPath(`/friendships/${username}`), source)
+          asyncGetRequest(`/friendships/${username}`, source)
             .then((response) => {
               Object.assign(userInfo.friendship, response.data);
               setUser(makeRelatedInfo(me, userInfo));

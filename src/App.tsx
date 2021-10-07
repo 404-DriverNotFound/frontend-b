@@ -139,8 +139,9 @@ const App = () => {
 
   useEffect(() => {
     axios.defaults.withCredentials = true;
+    axios.defaults.baseURL = process.env.REACT_APP_API_URL;
     appDispatch({ type: 'loading' });
-    asyncGetRequest(makeAPIPath('/users/me'), source)
+    asyncGetRequest('/users/me', source)
       .finally(() => {
         appDispatch({ type: 'endLoading' });
       })
@@ -157,16 +158,16 @@ const App = () => {
           throw new Error('2FA');
         }
         appDispatch({ type: 'loading' });
-        return (asyncGetRequest(makeAPIPath('/blocks'), source));
+        return (asyncGetRequest('/blocks', source));
       })
       .then(({ data }: { data: RawUserInfoType[] }) => {
         const list = data.map((user) => user.name);
         appDispatch({ type: 'renewBlockList', list });
-        return (asyncGetRequest(makeAPIPath('/channels/me'), source));
+        return (asyncGetRequest('/channels/me', source));
       })
       .then(({ data }) => {
         setChannels(data.map((channel: RawChannelType) => makeChannelInfo(channel)));
-        return (asyncGetRequest(makeAPIPath('/dmers'), source));
+        return (asyncGetRequest('/dmers', source));
       })
       .then(({ data }) => {
         setDMs(data.map((dm: RawUserInfoType): DMRoomType => ({

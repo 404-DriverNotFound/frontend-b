@@ -12,7 +12,7 @@ import ListItem from '../../atoms/ListItem/ListItem';
 import { ChannelType } from '../../../types/Chat';
 import Button from '../../atoms/Button/Button';
 import { useAppDispatch, useAppState } from '../../../utils/hooks/useAppContext';
-import { errorMessageHandler, makeAPIPath, makeDateString } from '../../../utils/utils';
+import { errorMessageHandler, makeDateString } from '../../../utils/utils';
 import { useUserState } from '../../../utils/hooks/useUserContext';
 import Input from '../../atoms/Input/Input';
 
@@ -104,7 +104,7 @@ const ChannelJoinForm = ({ info, setOpen }: ChannelJoinFormProps) => {
 
   const handleJoinChannel = () => {
     appDispatch({ type: 'loading' });
-    axios.post(makeAPIPath(`/channels/${name}/members`), isLocked ? {
+    axios.post(`/channels/${name}/members`, isLocked ? {
       memberName: userState.name, password,
     } : { memberName: userState.name })
       .finally(() => {
@@ -170,7 +170,7 @@ const ChannelListItem = ({
 
   const handleExitChannel = () => {
     appDispatch({ type: 'loading' });
-    axios.delete(makeAPIPath(`/channels/${name}/members/${userState.name}`))
+    axios.delete(`/channels/${name}/members/${userState.name}`)
       .finally(() => {
         appDispatch({ type: 'endLoading' });
       })

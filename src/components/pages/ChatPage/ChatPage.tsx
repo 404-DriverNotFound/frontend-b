@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import { useAppDispatch, useAppState } from '../../../utils/hooks/useAppContext';
-import { asyncGetRequest, errorMessageHandler, makeAPIPath } from '../../../utils/utils';
+import { asyncGetRequest, errorMessageHandler } from '../../../utils/utils';
 import ChatInput from '../../atoms/ChatInput/ChatInput';
 import List from '../../atoms/List/List';
 import Typo from '../../atoms/Typo/Typo';
@@ -23,8 +23,8 @@ import { PLAY_PATH } from '../../../utils/path';
 
 const COUNTS_PER_PAGE = 20;
 
-const postChannelChat = (name: string, content: string) => (axios.post(makeAPIPath(`/channels/${name}/chats`), { content }));
-const postDM = (name: string, content: string) => (axios.post(makeAPIPath('/dms'), { name, content }));
+const postChannelChat = (name: string, content: string) => (axios.post(`/channels/${name}/chats`, { content }));
+const postDM = (name: string, content: string) => (axios.post('/dms', { name, content }));
 
 const addNewChat = (prev: MessageType[], message: MessageType) => {
   const temp = prev.slice();
@@ -70,7 +70,7 @@ const ChatPage = () => {
 
   const fetchItems = () => {
     if (!chatting || isChatEnd) return;
-    const path = chatting.type === 'channel' ? makeAPIPath(`/channels/${chatting.name}/chats`) : makeAPIPath(`/dms/opposite/${chatting.name}`);
+    const path = chatting.type === 'channel' ? `/channels/${chatting.name}/chats` : `/dms/opposite/${chatting.name}`;
 
     asyncGetRequest(`${path}?perPage=${COUNTS_PER_PAGE}&page=${page}`, source)
       .finally(() => appDispatch({ type: 'endLoading' }))
@@ -97,7 +97,7 @@ const ChatPage = () => {
     setPage(-1);
     setChatEnd(true);
     if (chatting && chatting.type === 'channel') {
-      asyncGetRequest(makeAPIPath(`/channels/${chatting.name}/members`))
+      asyncGetRequest(`/channels/${chatting.name}/members`)
         .then(({ data }) => { setMembers(data); })
         .catch((error) => { errorMessageHandler(error); });
     } else setMembers([]);

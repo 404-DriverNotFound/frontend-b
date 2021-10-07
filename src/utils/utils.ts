@@ -6,6 +6,7 @@ const makeAPIPath = (path: string): string => (`${process.env.REACT_APP_API_URL}
 const asyncGetRequest = async (url: string, source?: CancelTokenSource) => {
   let response;
   axios.defaults.withCredentials = true;
+  axios.defaults.baseURL = process.env.REACT_APP_API_URL;
   if (source) response = await axios.get(url, { cancelToken: source.token });
   else response = await axios.get(url);
   return response;

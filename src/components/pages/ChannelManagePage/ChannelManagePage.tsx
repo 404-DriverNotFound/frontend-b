@@ -30,7 +30,7 @@ const ChannelManagePage = ({ match }: RouteComponentProps<MatchParams>) => {
   const [isListEnd, setListEnd] = useState(true);
   const [page, setPage] = useState<number>(0);
   const { channelName } = match.params;
-  const path = makeAPIPath(`/channels/${channelName}/members`);
+  const path = `/channels/${channelName}/members`;
   const {
     isOpen, setOpen, dialog, setDialog,
   } = useDialog();
@@ -76,7 +76,7 @@ const ChannelManagePage = ({ match }: RouteComponentProps<MatchParams>) => {
 
   useEffect(() => {
     appDispatch({ type: 'loading' });
-    asyncGetRequest(makeAPIPath(`/channels/${channelName}/members`))
+    asyncGetRequest(`/channels/${channelName}/members`)
       .finally(() => { appDispatch({ type: 'endLoading' }); })
       .then(({ data }) => {
         const found = data.find((member: MemberType) => (

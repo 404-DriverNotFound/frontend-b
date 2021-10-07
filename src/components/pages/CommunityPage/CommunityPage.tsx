@@ -38,7 +38,7 @@ const relationships: RelationListType = {
 const UserList = ({ type }: ListProps) => {
   const { CancelToken } = axios;
   const source = CancelToken.source();
-  const path = type === 'all' ? makeAPIPath('/users') : makeAPIPath(`/${type}`);
+  const path = type === 'all' ? '/users' : `/${type}`;
   const relationship = relationships[type];
   const [users, setUsers] = useState<RelatedInfoType[]>([]);
   const [isListEnd, setListEnd] = useState(true);
@@ -77,13 +77,13 @@ const UserList = ({ type }: ListProps) => {
 
   useEffect(() => {
     if (type === 'friends') {
-      asyncGetRequest(makeAPIPath('/friends?status=REQUESTED&me=REQUESTER'), source)
+      asyncGetRequest('/friends?status=REQUESTED&me=REQUESTER', source)
         .then(({ data }: { data: RawUserInfoType[] }) => {
           const typed: UserInfoType[] = data;
           setUsers(typed.map((oneUser) => ({ ...oneUser, avatar: makeAPIPath(`/${oneUser.avatar}`), relationship: 'REQUESTING' })));
         })
         .catch((error) => { errorMessageHandler(error); });
-      asyncGetRequest(makeAPIPath('/friends?status=REQUESTED&me=ADDRESSEE'), source)
+      asyncGetRequest('/friends?status=REQUESTED&me=ADDRESSEE', source)
         .then(({ data }: { data: RawUserInfoType[] }) => {
           const typed: UserInfoType[] = data;
           setUsers((prev) => prev.concat(typed.map((oneUser) => ({ ...oneUser, avatar: makeAPIPath(`/${oneUser.avatar}`), relationship: 'REQUESTED' }))));

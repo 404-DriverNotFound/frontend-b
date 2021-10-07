@@ -13,7 +13,7 @@ import { MembershipRole, MemberType } from '../../../types/Chat';
 import { UserStatusType } from '../../../types/User';
 import Button from '../../atoms/Button/Button';
 import { SetDialogType, SetOpenType } from '../../../utils/hooks/useDialog';
-import { errorMessageHandler, makeAPIPath } from '../../../utils/utils';
+import { errorMessageHandler } from '../../../utils/utils';
 import { useAppDispatch } from '../../../utils/hooks/useAppContext';
 
 type StyleProps = {
@@ -175,7 +175,7 @@ const ChannelUserListItem = ({
   ) => {
     const path = ['ADMIN', 'MEMBER', 'BANNED'].includes(type) ? 'role' : type;
     appDispatch({ type: 'loading' });
-    axios.patch(makeAPIPath(`/channels/${channelName}/members/${name}/${path}`),
+    axios.patch(`/channels/${channelName}/members/${name}/${path}`,
       path !== type ? { role: type } : null)
       .finally(() => {
         appDispatch({ type: 'endLoading' });
@@ -195,7 +195,7 @@ const ChannelUserListItem = ({
 
   const handleUnBanUser = () => {
     appDispatch({ type: 'loading' });
-    axios.delete(makeAPIPath(`/channels/${channelName}/members/${name}`))
+    axios.delete(`/channels/${channelName}/members/${name}`)
       .finally(() => {
         appDispatch({ type: 'endLoading' });
       })

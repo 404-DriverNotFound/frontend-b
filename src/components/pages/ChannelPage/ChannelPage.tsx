@@ -5,7 +5,7 @@ import {
 } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
-import { asyncGetRequest, errorMessageHandler, makeAPIPath } from '../../../utils/utils';
+import { asyncGetRequest, errorMessageHandler } from '../../../utils/utils';
 import List from '../../atoms/List/List';
 import SubMenu from '../../molecules/SubMenu/SubMenu';
 import Button from '../../atoms/Button/Button';
@@ -41,7 +41,7 @@ const list = [
 const ChannelList = ({ type }: ListProps) => {
   const { CancelToken } = axios;
   const source = CancelToken.source();
-  const path = type === 'joined' ? makeAPIPath('/channels/me') : makeAPIPath('/channels');
+  const path = type === 'joined' ? '/channels/me' : '/channels';
   const appState = useAppState();
   const [channels, setChannels] = useState<ChannelType[]>([]);
   const [isListEnd, setListEnd] = useState(false);

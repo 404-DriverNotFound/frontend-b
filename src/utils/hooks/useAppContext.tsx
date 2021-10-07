@@ -4,7 +4,7 @@ import React, {
 import { Socket } from 'socket.io-client';
 import { ChannelType, DMRoomType, MessageType } from '../../types/Chat';
 import { UserInfoType } from '../../types/User';
-import { asyncGetRequest, errorMessageHandler, makeAPIPath } from '../utils';
+import { asyncGetRequest, errorMessageHandler } from '../utils';
 
 type ChattingType = {
   type: 'channel' | 'DM',
@@ -71,7 +71,7 @@ const newMessageReducer = (state: AppStateType, message: MessageType): AppStateT
     let userInfo : UserInfoType | null = null;
     if (message.user.name === message.name) userInfo = message.user;
     else {
-      asyncGetRequest(makeAPIPath('/users/me'))
+      asyncGetRequest('/users/me')
         .then(({ data }) => { userInfo = data; })
         .catch((error) => { errorMessageHandler(error); });
     }
