@@ -64,7 +64,7 @@ const ChannelInfoForm = ({ setOpen, channel }: ChannelInfoFormProps) => {
   const handleChannelNameChange = useCallback((event: React.ChangeEvent<Element>) => {
     const { value } = (event as React.ChangeEvent<HTMLInputElement>).target;
     if (value.length > 18) return;
-    if (/^[^\s]+(\s+[^\s]+)*$/.test(value) && (/^[^\\%]{1,18}$/).test(value)) {
+    if (/^[^\s]+(\s+[^\s]+)*$/.test(value) && (/^[^\\%]{3,18}$/).test(value)) {
       setValidChannelName(true);
       setHelperTextChannelName(CHANNEL_NAME_AVAILABLE);
     } else {
@@ -192,8 +192,8 @@ const ChannelInfoForm = ({ setOpen, channel }: ChannelInfoFormProps) => {
     if (channel) {
       setValidChannelName(true);
       setDuplicateChecked(true);
-      setChannelName(channel);
-      asyncGetRequest(`/channels/${decodeURIComponent(channel)}`)
+      setChannelName(decodeURIComponent(channel));
+      asyncGetRequest(`/channels/${channel}`)
         .then(({ data }) => {
           setToggleCheck(data.password !== null);
         })
