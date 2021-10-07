@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Grid from '@material-ui/core/Grid';
-import { asyncGetRequest, errorMessageHandler, makeAPIPath } from '../../../utils/utils';
+import { asyncGetRequest, makeAPIPath } from '../../../utils/utils';
 import List from '../../atoms/List/List';
 import useIntersect from '../../../utils/hooks/useIntersect';
 import { DMRoomType } from '../../../types/Chat';
@@ -11,6 +11,7 @@ import { RawUserInfoType } from '../../../types/Response';
 import DMListItem, { DMListItemSkeleton } from '../../organisms/DMListItem/DMListItem';
 import { UserInfoType } from '../../../types/User';
 import { useAppState } from '../../../utils/hooks/useAppContext';
+import useError from '../../../utils/hooks/useError';
 
 const COUNTS_PER_PAGE = 10;
 
@@ -20,6 +21,7 @@ const DMPage = () => {
   const [DMs, setDMs] = useState<DMRoomType[]>([]);
   const [isListEnd, setListEnd] = useState(true);
   const [page, setPage] = useState<number>(0);
+  const errorMessageHandler = useError();
   const userState = useUserState();
   const appState = useAppState();
   const path = '/dmers';

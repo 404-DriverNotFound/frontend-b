@@ -12,6 +12,7 @@ import Button from '../../atoms/Button/Button';
 import DigitInput from '../../atoms/DigitInput/DigitInput';
 import Typo from '../../atoms/Typo/Typo';
 import LoginTemplate from '../../templates/LoginTemplate/LoginTemplate';
+import useError from '../../../utils/hooks/useError';
 
 const useStyles = makeStyles({
   inputs: {
@@ -39,6 +40,7 @@ const MFAPage = () => {
   const refs = inputs.map(() => useRef<HTMLInputElement | HTMLTextAreaElement>(null));
   const appDispatch = useAppDispatch();
   const userDispatch = useUserDispatch();
+  const errorMessageHandler = useError();
   const history = useHistory();
   const prevInputs = usePrevious(inputs);
   const classes = useStyles();
@@ -126,7 +128,7 @@ const MFAPage = () => {
       })
       .catch((error) => {
         if (error.response) toast.error('인증 번호가 잘못되었습니다.');
-        else toast.error(error.message);
+        else errorMessageHandler(error);
       });
   };
 

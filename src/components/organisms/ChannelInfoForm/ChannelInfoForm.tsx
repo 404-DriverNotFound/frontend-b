@@ -4,12 +4,13 @@ import { useHistory } from 'react-router-dom';
 import { Grid, makeStyles } from '@material-ui/core';
 import { toast } from 'react-toastify';
 import { useAppDispatch, useAppState } from '../../../utils/hooks/useAppContext';
-import { asyncGetRequest, errorMessageHandler } from '../../../utils/utils';
+import { asyncGetRequest } from '../../../utils/utils';
 import { SetOpenType } from '../../../utils/hooks/useDialog';
 import Input from '../../atoms/Input/Input';
 import Switch from '../../atoms/Switch/Switch';
 import Typo from '../../atoms/Typo/Typo';
 import Button from '../../atoms/Button/Button';
+import useError from '../../../utils/hooks/useError';
 
 const useStyles = makeStyles({
   edit: {
@@ -53,6 +54,7 @@ const ChannelInfoForm = ({ setOpen, channel }: ChannelInfoFormProps) => {
   // eslint-disable-next-line max-len
   const [helperTextCheckPassword, setHelperTextCheckPassword] = useState<string>(CHANNEL_PASSWORD_HELPER_TEXT);
   const [isDuplicateChecked, setDuplicateChecked] = useState<boolean>(false);
+  const errorMessageHandler = useError();
   const appDispatch = useAppDispatch();
   const appState = useAppState();
   const classes = useStyles();
@@ -136,7 +138,7 @@ const ChannelInfoForm = ({ setOpen, channel }: ChannelInfoFormProps) => {
           if (error.response.status === 500) {
             toast.error('서버에 문제가 있습니다. 잠시 후 다시 시도해주세요.');
           } else toast.error('입력값이 잘못되었습니다. 다시 확인해주세요.');
-        } else toast.error(error.message);
+        } else errorMessageHandler(error);
       });
   };
 
@@ -170,7 +172,7 @@ const ChannelInfoForm = ({ setOpen, channel }: ChannelInfoFormProps) => {
           setHelperTextChannelName('사용할 수 있는 채널명입니다.');
           setValidChannelName(true);
           setDuplicateChecked(true);
-        } else toast.error(error.message);
+        } else errorMessageHandler(error);
       });
   };
 

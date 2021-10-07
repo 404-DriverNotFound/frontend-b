@@ -3,7 +3,7 @@ import { RouteComponentProps, useHistory } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import Grid from '@material-ui/core/Grid';
-import { asyncGetRequest, errorMessageHandler, makeAPIPath } from '../../../utils/utils';
+import { asyncGetRequest, makeAPIPath } from '../../../utils/utils';
 import List from '../../atoms/List/List';
 import Button from '../../atoms/Button/Button';
 import Dialog from '../../molecules/Dialog/Dialog';
@@ -15,6 +15,7 @@ import { useAppDispatch } from '../../../utils/hooks/useAppContext';
 import { useUserState } from '../../../utils/hooks/useUserContext';
 import ChannelInfoForm from '../../organisms/ChannelInfoForm/ChannelInfoForm';
 import ChannelUserListItem, { ChannelUserListItemSkeleton } from '../../organisms/ChannelUserListItem/ChannelUserListItem';
+import useError from '../../../utils/hooks/useError';
 
 const COUNTS_PER_PAGE = 10;
 
@@ -34,6 +35,7 @@ const ChannelManagePage = ({ match }: RouteComponentProps<MatchParams>) => {
   const {
     isOpen, setOpen, dialog, setDialog,
   } = useDialog();
+  const errorMessageHandler = useError();
   const history = useHistory();
   const userState = useUserState();
   const appDispatch = useAppDispatch();

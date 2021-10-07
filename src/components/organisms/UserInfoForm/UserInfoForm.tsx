@@ -14,6 +14,7 @@ import Button from '../../atoms/Button/Button';
 import Switch from '../../atoms/Switch/Switch';
 import { SetDialogType, SetOpenType } from '../../../utils/hooks/useDialog';
 import useLogout from '../../../utils/hooks/useLogout';
+import useError from '../../../utils/hooks/useError';
 
 const useStyles = makeStyles({
   root: {
@@ -52,6 +53,7 @@ const UserInfoForm = ({
   const [filename, setFilename] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<string | Blob>('');
   const [previewSrc, setPreviewSrc] = useState<string>(currentAvatarSrc || makeAPIPath('/files/avatar/default.png'));
+  const errorMessageHandler = useError();
   const appDispatch = useAppDispatch();
   const userDispatch = useUserDispatch();
   const handleLogout = useLogout();
@@ -110,7 +112,7 @@ const UserInfoForm = ({
         if (error.response && error.response.status === 404) {
           setHelperText('사용할 수 있는 닉네임입니다.');
           setNameChecked(true);
-        } else toast.error(error.message);
+        } else errorMessageHandler(error);
       });
   };
 
@@ -159,7 +161,7 @@ const UserInfoForm = ({
           if (error.response.status === 500) {
             toast.error('서버에 문제가 있습니다. 잠시 후 다시 시도해주세요.');
           } else toast.error('입력값이 잘못되었습니다. 다시 확인해주세요.');
-        } else toast.error(error.message);
+        } else errorMessageHandler(error);
       });
   };
 
@@ -210,7 +212,7 @@ const UserInfoForm = ({
           if (error.response.status === 500) {
             toast.error('서버에 문제가 있습니다. 잠시 후 다시 시도해주세요.');
           } else toast.error('입력값이 잘못되었습니다. 다시 확인해주세요.');
-        } else toast.error(error.message);
+        } else errorMessageHandler(error);
       });
   };
 

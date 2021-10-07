@@ -11,10 +11,10 @@ import Button from '../../atoms/Button/Button';
 import UserProfile from '../../molecules/UserProfile/UserProfile';
 import { SetDialogType, SetOpenType } from '../../../utils/hooks/useDialog';
 import UserInfoForm from '../UserInfoForm/UserInfoForm';
-import { errorMessageHandler } from '../../../utils/utils';
 import { makeRelationship } from '../../../utils/friendships';
 import Typo from '../../atoms/Typo/Typo';
 import useMatch from '../../../utils/hooks/useMatch';
+import useError from '../../../utils/hooks/useError';
 
 const useStyles = makeStyles({
   root: {
@@ -109,6 +109,7 @@ const ProfileCard = ({
   const { inviteUser } = useMatch(setOpen, setDialog);
   const me = useUserState();
   const appDispatch = useAppDispatch();
+  const errorMessageHandler = useError();
   const appState = useAppState();
   const history = useHistory();
   const classes = useStyles();

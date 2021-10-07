@@ -12,9 +12,10 @@ import ListItem from '../../atoms/ListItem/ListItem';
 import { ChannelType } from '../../../types/Chat';
 import Button from '../../atoms/Button/Button';
 import { useAppDispatch, useAppState } from '../../../utils/hooks/useAppContext';
-import { errorMessageHandler, makeDateString } from '../../../utils/utils';
+import { makeDateString } from '../../../utils/utils';
 import { useUserState } from '../../../utils/hooks/useUserContext';
 import Input from '../../atoms/Input/Input';
+import useError from '../../../utils/hooks/useError';
 
 const useStyles = makeStyles({
   root: {
@@ -98,6 +99,7 @@ const ChannelJoinForm = ({ info, setOpen }: ChannelJoinFormProps) => {
   const { name, isLocked } = info;
   const [password, setPassword] = useState<string>('');
   const userState = useUserState();
+  const errorMessageHandler = useError();
   const appDispatch = useAppDispatch();
   const appState = useAppState();
   const history = useHistory();
@@ -162,6 +164,7 @@ const ChannelListItem = ({
     name, role, unreads, isLocked, updatedAt,
   } = info;
   const dateStr = makeDateString(updatedAt);
+  const errorMessageHandler = useError();
   const appDispatch = useAppDispatch();
   const appState = useAppState();
   const userState = useUserState();

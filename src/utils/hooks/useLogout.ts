@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
-import { errorMessageHandler } from '../utils';
 import { useAppDispatch } from './useAppContext';
 import { useUserDispatch } from './useUserContext';
 
@@ -20,7 +19,7 @@ const useLogout = () => {
         userDispatch({ type: 'logout' });
         history.push('/');
       })
-      .catch((error) => { errorMessageHandler(error); });
+      .catch(() => {});
   };
   return handleLogout;
 };

@@ -4,7 +4,7 @@ import {
 } from 'react-router-dom';
 import axios from 'axios';
 import Grid from '@material-ui/core/Grid';
-import { asyncGetRequest, errorMessageHandler, makeAPIPath } from '../../../utils/utils';
+import { asyncGetRequest, makeAPIPath } from '../../../utils/utils';
 import List from '../../atoms/List/List';
 import ListItem from '../../atoms/ListItem/ListItem';
 import SubMenu from '../../molecules/SubMenu/SubMenu';
@@ -14,6 +14,7 @@ import { RawUserInfoType } from '../../../types/Response';
 import useDialog from '../../../utils/hooks/useDialog';
 import Dialog from '../../molecules/Dialog/Dialog';
 import useIntersect from '../../../utils/hooks/useIntersect';
+import useError from '../../../utils/hooks/useError';
 
 const ALL_PATH = '/community/all';
 const FRIEND_PATH = '/community/friend';
@@ -43,6 +44,7 @@ const UserList = ({ type }: ListProps) => {
   const [users, setUsers] = useState<RelatedInfoType[]>([]);
   const [isListEnd, setListEnd] = useState(true);
   const [page, setPage] = useState<number>(0);
+  const errorMessageHandler = useError();
   const {
     isOpen, setOpen, dialog, setDialog,
   } = useDialog();

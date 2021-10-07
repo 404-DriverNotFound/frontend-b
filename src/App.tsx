@@ -34,6 +34,7 @@ import GamePage from './components/pages/GamePage/GamePage';
 import Dialog from './components/molecules/Dialog/Dialog';
 import useDialog from './utils/hooks/useDialog';
 import useMatch from './utils/hooks/useMatch';
+import useError from './utils/hooks/useError';
 
 const useStyles = makeStyles({
   progress: {
@@ -78,6 +79,7 @@ const App = () => {
   const classes = useStyles();
   const history = useHistory();
   const location = useLocation();
+  const errorMessageHandler = useError();
   const [userInfo, setUserInfo] = useState<RawUserInfoType | null>(null);
   const [channels, setChannels] = useState<ChannelType[]>([]);
   const [DMs, setDMs] = useState<DMRoomType[]>([]);
@@ -187,7 +189,7 @@ const App = () => {
         } else if (error.response) {
           userDispatch({ type: 'reset' });
         } else {
-          toast.error(error.message);
+          errorMessageHandler(error);
         }
       });
 

@@ -13,8 +13,8 @@ import { MembershipRole, MemberType } from '../../../types/Chat';
 import { UserStatusType } from '../../../types/User';
 import Button from '../../atoms/Button/Button';
 import { SetDialogType, SetOpenType } from '../../../utils/hooks/useDialog';
-import { errorMessageHandler } from '../../../utils/utils';
 import { useAppDispatch } from '../../../utils/hooks/useAppContext';
+import useError from '../../../utils/hooks/useError';
 
 type StyleProps = {
   status: UserStatusType,
@@ -164,6 +164,7 @@ const ChannelUserListItem = ({
   } = info;
   const { role, unmutedAt } = memberships[0];
   const appDispatch = useAppDispatch();
+  const errorMessageHandler = useError();
   const me = useUserState();
   const classes = useStyles({ status, role });
 

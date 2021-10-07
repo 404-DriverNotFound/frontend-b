@@ -4,7 +4,7 @@ import Grid from '@material-ui/core/Grid';
 import {
   Redirect, Route, Switch, useLocation,
 } from 'react-router-dom';
-import { asyncGetRequest, errorMessageHandler, makeAPIPath } from '../../../utils/utils';
+import { asyncGetRequest, makeAPIPath } from '../../../utils/utils';
 import { RawMatchType, MatchType, GameModeType } from '../../../types/Match';
 import List from '../../atoms/List/List';
 import SubMenu from '../../molecules/SubMenu/SubMenu';
@@ -14,6 +14,7 @@ import { useAppState } from '../../../utils/hooks/useAppContext';
 import useMatch from '../../../utils/hooks/useMatch';
 import { DialogProps } from '../../../utils/hooks/useDialog';
 import { useGameDispatch } from '../../../utils/hooks/useGameContext';
+import useError from '../../../utils/hooks/useError';
 
 const ALL_MATCH_PATH = '/game/watch/all';
 const LADDER_MATCH_PATH = '/game/watch/ladder';
@@ -37,6 +38,7 @@ const MatchList = ({ type }: ListProps) => {
   const typePath = type === 'ALL' ? '' : `&type=${type}`;
   const { socket } = useAppState();
   const gameDispatch = useGameDispatch();
+  const errorMessageHandler = useError();
   const { handleReady } = useMatch(dummySetOpen, dummySetDialog);
   const [matches, setMatches] = useState<MatchType[]>([]);
   const [isListEnd, setListEnd] = useState(true);
