@@ -9,7 +9,7 @@ const useError = () => {
   const timerId = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const errorMessageHandler = (error: any) => {
-    if (error.response?.status === 403) {
+    if (error.response?.status === 403 && error.response?.data?.message === 'Forbidden resource') {
       toast.error('세션이 만료되어 5초 후 로그아웃합니다. 다시 로그인해주세요.');
       appDispatch({ type: 'loading' });
       timerId.current = setTimeout(() => {
