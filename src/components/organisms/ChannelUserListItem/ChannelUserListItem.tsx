@@ -1,6 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import strictUriEncode from 'strict-uri-encode';
 import Grid from '@material-ui/core/Grid';
 import Badge from '@material-ui/core/Badge';
 import SecurityRoundedIcon from '@material-ui/icons/SecurityRounded';
@@ -175,7 +176,7 @@ const ChannelUserListItem = ({
   ) => {
     const path = ['ADMIN', 'MEMBER', 'BANNED'].includes(type) ? 'role' : type;
     appDispatch({ type: 'loading' });
-    axios.patch(makeAPIPath(`/channels/${channelName}/members/${name}/${path}`),
+    axios.patch(makeAPIPath(`/channels/${strictUriEncode(channelName)}/members/${name}/${path}`),
       path !== type ? { role: type } : null)
       .finally(() => {
         appDispatch({ type: 'endLoading' });
@@ -195,7 +196,7 @@ const ChannelUserListItem = ({
 
   const handleUnBanUser = () => {
     appDispatch({ type: 'loading' });
-    axios.delete(makeAPIPath(`/channels/${channelName}/members/${name}`))
+    axios.delete(makeAPIPath(`/channels/${strictUriEncode(channelName)}/members/${name}`))
       .finally(() => {
         appDispatch({ type: 'endLoading' });
       })

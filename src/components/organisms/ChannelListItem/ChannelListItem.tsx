@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import strictUriEncode from 'strict-uri-encode';
 import { useHistory } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import Grid from '@material-ui/core/Grid';
@@ -104,7 +105,7 @@ const ChannelJoinForm = ({ info, setOpen }: ChannelJoinFormProps) => {
 
   const handleJoinChannel = () => {
     appDispatch({ type: 'loading' });
-    axios.post(makeAPIPath(`/channels/${name}/members`), isLocked ? {
+    axios.post(makeAPIPath(`/channels/${strictUriEncode(name)}/members`), isLocked ? {
       memberName: userState.name, password,
     } : { memberName: userState.name })
       .finally(() => {
@@ -170,7 +171,7 @@ const ChannelListItem = ({
 
   const handleExitChannel = () => {
     appDispatch({ type: 'loading' });
-    axios.delete(makeAPIPath(`/channels/${name}/members/${userState.name}`))
+    axios.delete(makeAPIPath(`/channels/${strictUriEncode(name)}/members/${userState.name}`))
       .finally(() => {
         appDispatch({ type: 'endLoading' });
       })
@@ -211,7 +212,7 @@ const ChannelListItem = ({
   };
 
   const JoinButton = () => (<Button variant="outlined" onClick={openJoinDialog}>채널 가입</Button>);
-  const ManageButton = () => (<Button variant="outlined" onClick={() => history.push(`/channel/manage/${name}`)}>채널 관리</Button>);
+  const ManageButton = () => (<Button variant="outlined" onClick={() => history.push(`/channel/manage/${strictUriEncode(name)}`)}>채널 관리</Button>);
   const GoChatButton = () => (<Button variant="outlined" onClick={() => appDispatch({ type: 'enterChat', chatting: { type: 'channel', name } })}>채팅 참가</Button>);
   const LeaveButton = () => (<Button variant="outlined" onClick={openLeaveDialog}>채널 탈퇴</Button>);
 

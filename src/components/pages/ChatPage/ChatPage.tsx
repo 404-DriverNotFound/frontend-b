@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import strictUriEncode from 'strict-uri-encode';
 import Grid from '@material-ui/core/Grid';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import { useAppDispatch, useAppState } from '../../../utils/hooks/useAppContext';
@@ -23,7 +24,7 @@ import { PLAY_PATH } from '../../../utils/path';
 
 const COUNTS_PER_PAGE = 20;
 
-const postChannelChat = (name: string, content: string) => (axios.post(makeAPIPath(`/channels/${name}/chats`), { content }));
+const postChannelChat = (name: string, content: string) => (axios.post(makeAPIPath(`/channels/${strictUriEncode(name)}/chats`), { content }));
 const postDM = (name: string, content: string) => (axios.post(makeAPIPath('/dms'), { name, content }));
 
 const addNewChat = (prev: MessageType[], message: MessageType) => {
@@ -70,7 +71,7 @@ const ChatPage = () => {
 
   const fetchItems = () => {
     if (!chatting || isChatEnd) return;
-    const path = chatting.type === 'channel' ? makeAPIPath(`/channels/${chatting.name}/chats`) : makeAPIPath(`/dms/opposite/${chatting.name}`);
+    const path = chatting.type === 'channel' ? makeAPIPath(`/channels/${strictUriEncode(chatting.name)}/chats`) : makeAPIPath(`/dms/opposite/${chatting.name}`);
 
     asyncGetRequest(`${path}?perPage=${COUNTS_PER_PAGE}&page=${page}`, source)
       .finally(() => appDispatch({ type: 'endLoading' }))
@@ -97,7 +98,7 @@ const ChatPage = () => {
     setPage(-1);
     setChatEnd(true);
     if (chatting && chatting.type === 'channel') {
-      asyncGetRequest(makeAPIPath(`/channels/${chatting.name}/members`))
+      asyncGetRequest(makeAPIPath(`/channels/${strictUriEncode(chatting.name)}/members`))
         .then(({ data }) => { setMembers(data); })
         .catch((error) => { errorMessageHandler(error); });
     } else setMembers([]);
