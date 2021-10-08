@@ -111,7 +111,7 @@ const GamePlayPage = () => {
       ]);
     });
 
-    socket?.on('destroy', (message) => {
+    socket?.on('destroy', ({ message }) => {
       const handleClose = () => {
         gameDispatch({ type: 'reset' });
         history.replace('/');

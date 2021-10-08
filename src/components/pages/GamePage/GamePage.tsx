@@ -16,9 +16,8 @@ import Typo from '../../atoms/Typo/Typo';
 import GamePlayPage from '../GamePlayPage/GamePlayPage';
 import { useGameDispatch, useGameState } from '../../../utils/hooks/useGameContext';
 import useMatch from '../../../utils/hooks/useMatch';
-import { GameModeType, MatchPositionType } from '../../../types/Match';
+import { GameModeType, ReadyEventType } from '../../../types/Match';
 import { MAIN_GAME_PAGE, PLAY_PATH, WATCH_PATH } from '../../../utils/path';
-import { RawUserInfoType } from '../../../types/Response';
 
 const useStyles = makeStyles({
   root: {
@@ -65,14 +64,9 @@ const GameMainPage = () => {
     handleExit(gameMode);
   };
 
-  const handleReadyWithRef = (
-    position: MatchPositionType,
-    player0: RawUserInfoType,
-    player1: RawUserInfoType,
-    gameSetting: any,
-  ) => {
+  const handleReadyWithRef = (data: ReadyEventType) => {
     modeRef.current = null;
-    handleReady(position, player0, player1, gameSetting);
+    handleReady(data);
   };
 
   const changeMode = (gameMode: GameModeType) => {
