@@ -58,7 +58,7 @@ const useMatch = (setOpen: SetOpenType, setDialog: SetDialogType) => {
 
   const handleExit = (mode: GameModeType | null) => {
     offListeners(socket);
-    socket?.emit('leaveGame', { type: 'LADDER', mode });
+    socket?.emit('leaveGame', { mode });
     gameDispatch({ type: 'reset' });
     setOpen(false);
   };

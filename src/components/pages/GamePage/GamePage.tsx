@@ -54,7 +54,7 @@ const GameMainPage = () => {
 
   const handleMatchExit = (gameMode: GameModeType | null) => {
     if (gameMode) {
-      socket?.emit('leaveGame', { type: 'LADDER', mode: gameMode });
+      socket?.emit('leaveGame', { mode: gameMode });
       setOpen(false);
     }
     modeRef.current = null;
@@ -92,7 +92,7 @@ const GameMainPage = () => {
     socket?.on('ready', handleReadyWithRef);
     socket?.on('duplicated', handleDuplicated);
     setOpen(true);
-    socket?.emit('waiting', { type: 'LADDER', mode: gameMode });
+    socket?.emit('waiting', { mode: gameMode });
   };
 
   useEffect(() => {
@@ -115,7 +115,7 @@ const GameMainPage = () => {
 
     return () => {
       if (socket?.listeners('ready').length && modeRef.current) {
-        socket?.emit('leaveGame', { type: 'LADDER', mode: modeRef.current });
+        socket?.emit('leaveGame', { mode: modeRef.current });
       }
       modeRef.current = null;
       socket?.off('invitedToMatch', handleMatchExit);
